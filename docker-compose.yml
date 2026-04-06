@@ -1,20 +1,18 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: help-your-pet-mysql
+  postgres:
+    image: postgres:15-alpine
+    container_name: help-your-pet-postgres
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: help_your_pet
-      MYSQL_USER: helppet
-      MYSQL_PASSWORD: helppet123
+      POSTGRES_DB: help_your_pet
+      POSTGRES_USER: helppet
+      POSTGRES_PASSWORD: helppet123
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init-complete.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - helppet-network
 
@@ -30,9 +28,27 @@ services:
       - helppet-network
     command: redis-server --appendonly yes
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: help-your-pet-pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@helppet.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - helppet-network
+
 volumes:
-  mysql_data:
+  postgres_data:
   redis_data:
+  pgadmin_data:
 
 networks:
   helppet-network:
