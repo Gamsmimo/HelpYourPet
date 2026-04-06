@@ -1,0 +1,29 @@
+/* You can add global styles to this file, and also import other style files */
+@import './assets/css/Estilos-Home.css';
+
+/* Variables globales para el tema */
+:root {
+  --rosa-pastel: #f8d7da;
+  --azul-nav: #99c6ed;
+  --azul-pastel: #c6eee6;
+  --beige: #f8f9fa;
+  --azul-oscuro: #0451c4;
+  --verde-oscuro: #2926a7;
+  --rosa-fuerte: #ba9dff;
+  --gris-claro: #f8f9fa;
+  --gris-medio: #e9ecef;
+  --color-fondo: #ffffff;
+  --color-texto: #000000;
+  --color-navbar: #f4f4f4;
+  --color-card: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fredoka', 'Baloo 2', sans-serif;
+}

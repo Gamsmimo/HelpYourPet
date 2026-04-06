@@ -1,0 +1,408 @@
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo y nombre -->
+    <div class="brand-section">
+      <div class="logo">
+        <img src="assets/img/logo.png" alt="logo" class="logo">
+      </div>
+      <span class="brand-name">HelpYourPet</span>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar en la página...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <!-- Toggle Modo Oscuro/Claro -->
+      <div class="theme-toggle-container">
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox">
+        <label for="themeToggle" class="theme-toggle-label">
+          <div class="toggle-circle">
+            <i class="bi bi-moon-stars-fill toggle-icon moon-icon"></i>
+            <i class="bi bi-sun-fill toggle-icon sun-icon"></i>
+          </div>
+        </label>
+      </div>
+
+      <!-- Menú Hamburguesa -->
+      <div class="hamburger-menu">
+        <button class="hamburger-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="menu-content">
+          <div class="menu-item">
+            <a routerLink="/usuario/perfil" style="text-decoration: none;">
+              <i class="fas fa-user-plus"></i>
+              <span>Perfil</span>
+            </a>
+          </div>
+          <div class="menu-item">
+            <a routerLink="/tienda" style="text-decoration: none;">
+              <i class="fas fa-shop"></i>
+              <span>PetShop</span>
+            </a>
+          </div>
+          <div class="menu-item">
+            <a routerLink="/adopcion" style="text-decoration: none;">
+              <i class="fas fa-dog"></i>
+              <span>Adopciones</span>
+            </a>
+          </div>
+          <div class="menu-item">
+            <a routerLink="/sobre-nosotros" style="text-decoration: none;">
+              <i class="fas fa-users"></i>
+              <span>Acerca de Nosotros</span>
+            </a>
+          </div>
+          <div class="menu-item">
+            <a href="#" (click)="logout()" style="text-decoration: none;">
+              <i class="fas fa-arrow-right"></i>
+              <span>Cerrar Sesión</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="inicio">
+  <div class="container">
+    <h1><strong>¡BIENVENIDO A HelpYourPet!</strong></h1>
+    <p>Cuidamos de quienes hacen tu vida más feliz.</p>
+  </div>
+</section>
+
+<!-- Introducción -->
+<section class="section intro" data-searchable>
+  <div class="container">
+    <div class="intro-content">
+      <div class="intro-text">
+        <h2>La Importancia de Tener Mascotas</h2>
+        <p>Tener una mascota es una experiencia profundamente enriquecedora que va mucho más allá de la simple
+          compañía. Las mascotas, ya sean perros, gatos, aves, conejos u otros animales, tienen un impacto positivo
+          en la vida de las personas a nivel emocional, físico y social.</p>
+        <p>Su presencia genera una sensación de bienestar y tranquilidad, y puede reducir significativamente los
+          niveles de estrés, ansiedad e incluso depresión. Diversos estudios han demostrado que acariciar o jugar
+          con una mascota estimula la liberación de oxitocina, la hormona del afecto, y disminuye la producción de
+          cortisol, la hormona del estrés. Esto mejora el estado de ánimo y contribuye a una mayor estabilidad
+          emocional.</p>
+        <p>Cuidar una mascota contribuye al crecimiento personal al enseñar a valorar y atender las necesidades de
+          otro ser vivo. Esto fortalece la responsabilidad, la empatía y la paciencia, especialmente en los niños,
+          quienes aprenden a comprometerse y a desarrollar una mayor sensibilidad y respeto por los demás.</p>
+        <p>Nuestro equipo de profesionales está dedicado a proporcionar la mejor atención médica, consejos de
+          cuidado y servicios que garanticen una vida larga y feliz para tu mascota.</p>
+      </div>
+      <div class="intro-img">
+        <img src="assets/img/imagenH.png" alt="Niña abrazando a su perro">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Consejos para mascotas -->
+<section class="section consejos" data-searchable>
+  <div class="container">
+    <div class="section-title">
+      <h2>Consejos para el Cuidado de tu Mascota</h2>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Alimetacion.png" class="card-img-top" alt="Alimentación saludable">
+          <div class="card-body">
+            <h5 class="card-title">Alimentación Saludable</h5>
+            <p class="card-text">Proporciónale una dieta equilibrada y acorde a su especie, edad y tamaño. Evita
+              darle comida humana que puede ser tóxica como chocolate, uvas o cebolla ya que pueden ser dañinas para su
+              salud. Consulta con un veterinario sobre el alimento más adecuado.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/agua.png" class="card-img-top" alt="Agua Fresca">
+          <div class="card-body">
+            <h5 class="card-title">Agua fresca siempre disponible</h5>
+            <p class="card-text">Asegúrate de que tu mascota tenga acceso constante a agua limpia y fresca,
+              especialmente en climas cálidos.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/ejercicioM.png" class="card-img-top" alt="Ejercicio diario">
+          <div class="card-body">
+            <h5 class="card-title">Ejercicio Diario</h5>
+            <p class="card-text">Proporciónale momentos de juego y ejercicio diario para evitar el sobrepeso y el
+              aburrimiento. Jugar también fortalece el vínculo con tu mascota.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Chequeo.png" class="card-img-top" alt="Visitas al veterinario">
+          <div class="card-body">
+            <h5 class="card-title">Chequeos Regulares</h5>
+            <p class="card-text">Lleva a tu mascota a chequeos regulares, cumple con el calendario de vacunación y
+              desparasitación. Un control periódico previene enfermedades y detecta a tiempo cualquier problema de
+              salud.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Higiene.png" class="card-img-top" alt="Higiene y Aseo">
+          <div class="card-body">
+            <h5 class="card-title">Higiene y Aseo</h5>
+            <p class="card-text">Baña a tu mascota con la frecuencia adecuada, mantén limpios sus espacios como
+              cama, plato y juguetes; y cepilla su pelaje regularmente. También es importante revisar sus uñas, oídos y
+              dientes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Esterilizacion.png" class="card-img-top" alt="Esterilización o Castración">
+          <div class="card-body">
+            <h5 class="card-title">Esterilización o Castración</h5>
+            <p class="card-text">Consulta con el veterinario si este procedimiento es adecuado. Ayuda a prevenir
+              enfermedades y a controlar la sobrepoblación.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Humanizar.png" class="card-img-top" alt="No Humanices en Exceso">
+          <div class="card-body">
+            <h5 class="card-title">No Humanices En Exceso</h5>
+            <p class="card-text">Trata a tu mascota con cariño, pero respeta su naturaleza animal. No todos los
+              comportamientos humanos son adecuados para ellos.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card card-consejo">
+          <img src="assets/img/Respeto.png" class="card-img-top" alt="Respeto y paciencia">
+          <div class="card-body">
+            <h5 class="card-title">Respeto y Paciencia</h5>
+            <p class="card-text">Recuerda que cada animal tiene su personalidad. Respeta sus tiempos, sus espacios y
+              trata con paciencia sus miedos o comportamientos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Curiosidades -->
+<section class="section curiosidades" data-searchable>
+  <div class="container">
+    <div class="section-title">
+      <h2>Curiosidades sobre Mascotas</h2>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-dog"></i>
+          </div>
+          <h4>Olfato Canino</h4>
+          <p>El olfato de un perro es entre 10,000 y 100,000 veces más sensible que el de los humanos. Algunas razas
+            pueden detectar enfermedades como el cáncer, la diabetes hasta crisis epilépticas con su olfato.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-cat"></i>
+          </div>
+          <h4>Ronroneo Felino</h4>
+          <p>Los gatos no solo ronronean cuando están contentos. También lo hacen cuando sienten dolor o estrés, como
+            un mecanismo de auto-curación que libera endorfinas.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-fish"></i>
+          </div>
+          <h4>Linea Lateral En Peces</h4>
+          <p>Los peces tienen una línea lateral en sus costados que les permite detectar vibraciones y movimientos en
+            el agua. Funciona como un radar natural que les ayuda a evitar obstáculos, nadar en grupo, detectar presas
+            o depredadores y orientarse, incluso en la oscuridad o aguas turbias.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-cow"></i>
+          </div>
+          <h4>Vacas Con Buena Memoria</h4>
+          <p>Las vacas no solo pueden recordar rostros humanos y de otras vacas durante años, sino que también
+            reconocen patrones y rutinas. También recuerdan rutas para ir a pastar, horarios de ordeño y hasta cómo
+            abrir ciertos tipos de puertas o cercas si lo han aprendido antes.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-crow"></i>
+          </div>
+          <h4>Loros longevos</h4>
+          <p>Los loros pueden vivir más de 50 años, algunas especies como el guacamayo azul pueden superar los 70
+            años.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="curiosidad-card">
+          <div class="curiosidad-img">
+            <i class="fas fa-horse"></i>
+          </div>
+          <h4>Caballos Detectan Emociones Humanas</h4>
+          <p>Los caballos pueden reconocer expresiones faciales humanas y tonos de voz reaccionando según cómo los
+            trates. Pueden recordar si alguien fue amable o agresivo y ajustar su comportamiento en futuras
+            interacciones.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Eventos y Campañas -->
+<section id="eventos-section" class="section eventos" data-searchable>
+  <div class="container">
+    <div class="section-title">
+      <h2>Eventos Y Campañas</h2>
+    </div>
+    <div class="row">
+      <div class="col-12 text-center" *ngIf="eventos.length === 0">
+        <p class="text-muted">No hay eventos disponibles en este momento.</p>
+      </div>
+      <div class="col-md-4 mb-4" *ngFor="let evento of eventos">
+        <div class="eventos">
+          <img [src]="evento.imagen || 'assets/img/Desparasitacion1.png'" class="card-img-top" alt="Evento">
+          <h4 class="card-title">{{ evento.titulo }}</h4>
+          <p class="card-text">
+            {{ evento.fechainicio | date:'dd/MM/yyyy' }} - {{ evento.fechafin | date:'dd/MM/yyyy' }}<br>
+            {{ evento.descripcion }}
+          </p>
+          <button class="btn btn-primary" (click)="openModal(evento.veterinaria)">
+            Más Información
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<a href="#inicio" class="btn btn-inicio">
+  <i class="fa-solid fa-up-long"></i>
+</a>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/img/logofotter.png" alt="logo" style="height: 90px;">
+        <div class="footer-brand" style="font-family: 'fira sans'; font-size: 1.8rem; margin-top: 10px;">
+          HelpYourPet</div>
+      </div>
+
+      <div class="footer-about" style="max-width: 400px;">
+        <p style="font-style: italic; opacity: 0.8;">"Simplifica tu trabajo, mejora su salud"</p>
+        <p>Nuestra plataforma digital está diseñada para optimizar la gestión clínica.</p>
+      </div>
+
+      <div class="footer-contact">
+        <h5 style="font-size: 1.3rem; margin-bottom: 15px;">Contacto</h5>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <a href="#" style="color: #ccc; text-decoration: none;"><i class="fas fa-map-marker-alt"></i>
+            Duitama, Boyacá</a>
+          <a href="tel:018000457890" style="color: #ccc; text-decoration: none;"><i class="fas fa-phone"></i> 018000 45
+            78 90</a>
+          <a href="mailto:info@clinicpet.com" style="color: #ccc; text-decoration: none;"><i
+              class="fas fa-envelope"></i> info@clinicpet.com</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>&copy; 2025 HelpYourPet. Todos los derechos reservados. Desarrollado en Duitama, Boyacá</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Modal de Información -->
+<div class="modal-overlay" [class.active]="modalActive" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="modal-body" *ngIf="selectedVeterinaria">
+      <div class="icon-header">
+        <i class="fas fa-store"></i>
+      </div>
+
+      <h2 class="vet-name">{{ selectedVeterinaria.nombre }}</h2>
+
+      <div class="info-container">
+        <div class="info-left">
+          <div class="info-row">
+            <div class="icon-circle icon-location">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="info-text">
+              <div class="info-text-content">{{ selectedVeterinaria.direccion }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="icon-circle icon-phone">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-text">
+              <div class="info-text-content">{{ selectedVeterinaria.telefono }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="icon-circle icon-email">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-text">
+              <div class="info-text-content">{{ selectedVeterinaria.correo }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="icon-circle icon-clock">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-text">
+              <div class="schedule-details">
+                <div class="schedule-line">{{ selectedVeterinaria.horario }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="description-section">
+          <div class="description-title">
+            <i class="fas fa-info-circle"></i>
+            Acerca de Nosotros
+          </div>
+          <div class="description-text">
+            {{ selectedVeterinaria.descripcion }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

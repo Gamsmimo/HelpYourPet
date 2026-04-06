@@ -1,0 +1,464 @@
+<!-- Overlay para cerrar sidebar en móviles -->
+<div class="sidebar-overlay" id="sidebarOverlay" (click)="toggleSidebar()"></div>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" [class.active]="sidebarOpen">
+      <div class="sidebar-header">
+        <h3 class="text-center">HelpYourPet</h3>
+        <div class="user-profile text-center">
+          <img [src]="usuarioLogueado?.imagen || 'assets/img/humano.jpg'" 
+               alt="Foto de perfil" 
+               class="rounded-circle mb-2" 
+               id="sidebar-profile-picture">
+          <h5 id="username">{{ usuarioLogueado?.nombres }} {{ usuarioLogueado?.apellidos }}</h5>
+          <p class="text-muted">Dueño de mascotas</p>
+        </div>
+      </div>
+
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" 
+             [class.active]="activeSection === 'dashboard'" 
+             href="#dashboard" 
+             (click)="showSection('dashboard'); $event.preventDefault()">
+            <i class="fas fa-home me-2"></i>Inicio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" 
+             [class.active]="activeSection === 'mascotas'" 
+             href="#mascotas" 
+             (click)="showSection('mascotas'); $event.preventDefault()">
+            <i class="fas fa-paw me-2"></i>Mis Mascotas
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" 
+             [class.active]="activeSection === 'compras'" 
+             href="#compras" 
+             (click)="showSection('compras'); $event.preventDefault()">
+            <i class="fas fa-shopping-cart me-2"></i>Mis Compras
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" 
+             [class.active]="activeSection === 'adopciones-usuario'" 
+             href="#adopciones-usuario" 
+             (click)="showSection('adopciones-usuario'); $event.preventDefault()">
+            <i class="fas fa-heart me-2"></i>Mis Adopciones
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" 
+             [class.active]="activeSection === 'configuracion'" 
+             href="#configuracion" 
+             (click)="showSection('configuracion'); $event.preventDefault()">
+            <i class="fas fa-cog me-2"></i>Configuración
+          </a>
+        </li>
+
+        <!-- Separador y Cerrar Sesión -->
+        <li class="nav-item mt-4 pt-3 border-top">
+          <a class="nav-link text-danger logout-sidebar" href="#" (click)="logout(); $event.preventDefault()">
+            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+      <input type="hidden" id="current-user-id" [value]="usuarioLogueado?.id">
+
+      <!-- Sección Dashboard -->
+      <section id="dashboard" class="content-section" [style.display]="activeSection === 'dashboard' ? 'block' : 'none'">
+        <div class="section-header">
+          <h1 class="h2">Hola, <span id="username-header">{{ usuarioLogueado?.nombres }}</span></h1>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="menu-toggle" id="menuToggle1" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="theme-toggle-container">
+              <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox">
+              <label for="themeToggle" class="theme-toggle-label">
+                <i class="fas fa-moon toggle-icon moon-icon"></i>
+                <i class="fas fa-sun toggle-icon sun-icon"></i>
+              </label>
+            </div>
+            <a routerLink="/usuario" class="btn-volver-inicio">
+              <i class="fas fa-home"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Mis Mascotas (Preview) -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5><i class="fas fa-paw me-2"></i>Mis Mascotas</h5>
+          </div>
+          <div class="card-body">
+            <div class="row" id="pets-preview">
+              <div *ngIf="!tieneMascotas" class="col-12">
+                <div class="alert alert-info text-center">
+                  <i class="fas fa-paw me-2"></i>No tienes mascotas registradas aún.
+                </div>
+              </div>
+              <div *ngIf="tieneMascotas" class="col-12">
+                <div class="pets-grid">
+                  <div *ngFor="let mascota of mascotas" class="pet-card">
+                    <div class="pet-image-container">
+                      <img *ngIf="mascota.foto" 
+                           [src]="mascota.foto" 
+                           [alt]="'Foto de ' + mascota.nombre"
+                           class="pet-image"
+                           (error)="onImageError($event)"
+                           loading="lazy" />
+                      <div *ngIf="!mascota.foto" class="pet-image-placeholder d-none">
+                        <i class="fas fa-paw"></i>
+                      </div>
+                    </div>
+                    <div class="pet-info">
+                      <h5 class="pet-name">{{ mascota.nombre }}</h5>
+                      <div class="pet-details">
+                        <div class="pet-detail">
+                          <i class="fas fa-paw"></i>
+                          <span>{{ mascota.especie }}</span>
+                        </div>
+                        <div class="pet-detail">
+                          <i class="fas fa-calendar"></i>
+                          <span *ngIf="mascota.unidadEdad === 'años'">
+                            {{ mascota.edad }} {{ mascota.edad === 1 ? 'año' : 'años' }}
+                          </span>
+                          <span *ngIf="mascota.unidadEdad === 'meses'">
+                            {{ mascota.edad }} {{ mascota.edad === 1 ? 'mes' : 'meses' }}
+                          </span>
+                        </div>
+                        <div class="pet-detail" *ngIf="mascota.raza">
+                          <i class="fas fa-dna"></i>
+                          <span>{{ mascota.raza }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Mis Mascotas -->
+      <section id="mascotas" class="content-section" [style.display]="activeSection === 'mascotas' ? 'block' : 'none'">
+        <div class="section-header">
+          <h1 class="h2"><i class="fas fa-paw me-2"></i>Mis Mascotas</h1>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="menu-toggle" id="menuToggle2" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="theme-toggle-container">
+              <input type="checkbox" id="themeToggle2" class="theme-toggle-checkbox">
+              <label for="themeToggle2" class="theme-toggle-label">
+                <i class="fas fa-moon toggle-icon moon-icon"></i>
+                <i class="fas fa-sun toggle-icon sun-icon"></i>
+              </label>
+            </div>
+            <a routerLink="/usuario" class="btn-volver-inicio">
+              <i class="fas fa-home"></i>
+            </a>
+            <button class="btn btn-primary" id="add-pet-btn" data-bs-toggle="modal" data-bs-target="#addPetModal">
+              <i class="fas fa-plus me-2"></i>Agregar Mascota
+            </button>
+          </div>
+        </div>
+
+        <div class="row" id="pets-list">
+          <div *ngIf="!tieneMascotas" class="col-12">
+            <div class="alert alert-info text-center py-5">
+              <i class="fas fa-paw fa-3x mb-3"></i>
+              <h4>No tienes mascotas registradas.</h4>
+              <p>¡Agrega tu primera mascota haciendo clic en el botón arriba!</p>
+            </div>
+          </div>
+          <div *ngIf="tieneMascotas" class="col-12">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Foto</th>
+                    <th>Nombre</th>
+                    <th>Especie</th>
+                    <th>Edad</th>
+                    <th>Género</th>
+                    <th>Raza</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let mascota of mascotas">
+                    <td>
+                      <img *ngIf="mascota.foto" 
+                           [src]="mascota.foto" 
+                           [alt]="'Foto de ' + mascota.nombre"
+                           class="rounded" 
+                           width="50" 
+                           height="50"
+                           (error)="onImageErrorTable($event)"
+                           loading="lazy" />
+                      <span *ngIf="!mascota.foto" class="text-muted d-none">Sin foto</span>
+                    </td>
+                    <td><strong>{{ mascota.nombre }}</strong></td>
+                    <td>{{ mascota.especie }}</td>
+                    <td>{{ mascota.edad }} {{ mascota.unidadEdad }}</td>
+                    <td>{{ mascota.genero }}</td>
+                    <td>{{ mascota.raza }}</td>
+                    <td>
+                      <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary edit-pet-btn"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editPetModal">
+                          <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                (click)="eliminarMascota(mascota.id)">
+                          <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Mis Compras -->
+      <section id="compras" class="content-section" [style.display]="activeSection === 'compras' ? 'block' : 'none'">
+        <div class="section-header">
+          <h1 class="h2"><i class="fas fa-shopping-cart me-2"></i>Mis Compras</h1>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="menu-toggle" id="menuToggle4" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="theme-toggle-container">
+              <input type="checkbox" id="themeToggle4" class="theme-toggle-checkbox">
+              <label for="themeToggle4" class="theme-toggle-label">
+                <i class="fas fa-moon toggle-icon moon-icon"></i>
+                <i class="fas fa-sun toggle-icon sun-icon"></i>
+              </label>
+            </div>
+            <a routerLink="/usuario" class="btn-volver-inicio">
+              <i class="fas fa-home"></i>
+            </a>
+            <button class="btn btn-primary" id="go-to-shop-btn">
+              <i class="fas fa-store me-2"></i>Ir a la Tienda
+            </button>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5><i class="fas fa-history me-2"></i>Historial de Compras</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="purchase-history">
+                  <tr *ngIf="compras.length === 0">
+                    <td colspan="4" class="text-center">No tienes compras registradas</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Mis Adopciones -->
+      <section id="adopciones-usuario" class="content-section" [style.display]="activeSection === 'adopciones-usuario' ? 'block' : 'none'">
+        <div class="section-header">
+          <h1 class="h2"><i class="fas fa-heart me-2"></i>Mis Mascotas en Adopción</h1>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="menu-toggle" id="menuToggle7" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="theme-toggle-container">
+              <input type="checkbox" id="themeToggle7" class="theme-toggle-checkbox">
+              <label for="themeToggle7" class="theme-toggle-label">
+                <i class="fas fa-moon toggle-icon moon-icon"></i>
+                <i class="fas fa-sun toggle-icon sun-icon"></i>
+              </label>
+            </div>
+            <a routerLink="/usuario" class="btn-volver-inicio">
+              <i class="fas fa-home"></i>
+            </a>
+            <a routerLink="/adopcion" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Publicar Mascota en Adopción
+            </a>
+          </div>
+        </div>
+
+        <div *ngIf="adopciones.length === 0" 
+             class="text-center py-5"
+             style="background: var(--card-bg); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+          <i class="fas fa-heart fa-4x mb-4" style="color: var(--rosa-fuerte); opacity: 0.5;"></i>
+          <h3 style="color: var(--text-color); font-weight: 700; margin-bottom: 15px;">
+            No has publicado mascotas en adopción
+          </h3>
+          <p style="color: var(--text-color); opacity: 0.7; font-size: 1.1rem; margin-bottom: 30px;">
+            ¡Ayuda a encontrar un hogar a una mascota que necesite amor!
+          </p>
+          <a routerLink="/adopcion" 
+             class="btn btn-primary"
+             style="padding: 15px 40px; font-size: 1.1rem; border-radius: 50px;">
+            <i class="fas fa-plus me-2"></i>Publicar Primera Mascota
+          </a>
+        </div>
+      </section>
+
+      <!-- Sección Configuración -->
+      <section id="configuracion" class="content-section" [style.display]="activeSection === 'configuracion' ? 'block' : 'none'">
+        <div class="section-header">
+          <h1 class="h2"><i class="fas fa-cog me-2"></i>Configuración de Perfil</h1>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="menu-toggle" id="menuToggle6" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="theme-toggle-container">
+              <input type="checkbox" id="themeToggle6" class="theme-toggle-checkbox">
+              <label for="themeToggle6" class="theme-toggle-label">
+                <i class="fas fa-moon toggle-icon moon-icon"></i>
+                <i class="fas fa-sun toggle-icon sun-icon"></i>
+              </label>
+            </div>
+            <a routerLink="/usuario" class="btn-volver-inicio">
+              <i class="fas fa-home"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="row g-2 config-main-layout">
+          <!-- Información Personal -->
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-user-edit me-2"></i>Información Personal</h6>
+              </div>
+              <div class="card-body">
+                <form id="profile-form" (ngSubmit)="guardarPerfil()">
+                  <div class="row g-2">
+                    <!-- Información del formulario -->
+                    <div class="col-md-12">
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <label for="profile-name" class="form-label fw-bold">Nombres</label>
+                          <input type="text" class="form-control" id="profile-name" 
+                                 [(ngModel)]="usuarioLogueado.nombres" 
+                                 name="nombres"
+                                 required
+                                 placeholder="Ingresa tus nombres">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="profile-apellidos" class="form-label fw-bold">Apellidos</label>
+                          <input type="text" class="form-control" id="profile-apellidos" 
+                                 [(ngModel)]="usuarioLogueado.apellidos"
+                                 name="apellidos"
+                                 required
+                                 placeholder="Ingresa tus apellidos">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="profile-email" class="form-label fw-bold">Correo Electrónico</label>
+                          <input type="email" class="form-control" id="profile-email" 
+                                 [(ngModel)]="usuarioLogueado.correo"
+                                 name="correo"
+                                 required
+                                 placeholder="correo@ejemplo.com">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="profile-phone" class="form-label fw-bold">Teléfono</label>
+                          <input type="tel" class="form-control" id="profile-phone" 
+                                 [(ngModel)]="usuarioLogueado.telefono"
+                                 name="telefono"
+                                 placeholder="+57 123 456 7890">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="profile-edad" class="form-label fw-bold">Edad</label>
+                          <input type="number" class="form-control" id="profile-edad" 
+                                 [(ngModel)]="usuarioLogueado.edad"
+                                 name="edad"
+                                 placeholder="Tu edad">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="profile-address" class="form-label fw-bold">Dirección</label>
+                          <input type="text" class="form-control" id="profile-address" 
+                                 [(ngModel)]="usuarioLogueado.direccion"
+                                 name="direccion"
+                                 placeholder="Ingresa tu dirección completa">
+                        </div>
+                        <div class="col-12 text-center mt-2">
+                          <button type="submit" class="btn btn-primary btn-sm px-4">
+                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de Seguridad y Eliminar Cuenta -->
+          <div class="col-12">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="card border-warning">
+                  <div class="card-header bg-warning text-dark" style="padding: 0.4rem 0.6rem;">
+                    <h6 class="mb-0" style="font-size: 0.9rem;">
+                      <i class="fas fa-key me-2"></i>Seguridad
+                    </h6>
+                  </div>
+                  <div class="card-body text-center" style="padding: 0.6rem;">
+                    <p class="text-muted mb-2" style="font-size: 0.8rem;">
+                      Cambia tu contraseña regularmente
+                    </p>
+                    <a routerLink="/recovery" class="btn btn-warning btn-sm">
+                      <i class="fas fa-lock me-1"></i>Cambiar Contraseña
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-danger">
+                  <div class="card-header bg-danger text-white" style="padding: 0.4rem 0.6rem;">
+                    <h6 class="mb-0" style="font-size: 0.9rem;">
+                      <i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro
+                    </h6>
+                  </div>
+                  <div class="card-body text-center" style="padding: 0.6rem;">
+                    <p class="text-muted mb-2" style="font-size: 0.8rem;">
+                      Eliminación permanente de cuenta
+                    </p>
+                    <button class="btn btn-outline-danger btn-sm" id="delete-account-btn">
+                      <i class="fas fa-trash me-1"></i>Eliminar Cuenta
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+/* Importar el CSS original de Registro */
+@import url('../../../assets/css/Estilos-registro.css');
+
+/* Estilos adicionales para los iconos de contraseña */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-container input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 16px;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.password-toggle:hover {
+  color: #495057;
+}
+
+.password-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Spinner de carga */
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.15em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 0.125em;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

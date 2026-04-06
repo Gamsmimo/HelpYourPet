@@ -1,0 +1,60 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { MascotasService } from './mascotas.service';
+import { CreateMascotaDto } from './dto/create-mascota.dto';
+import { UpdateMascotaDto } from './dto/update-mascota.dto';
+import { Mascota } from './entities/mascota.entity';
+
+@ApiTags('mascotas')
+@Controller('mascotas')
+export class MascotasController {
+  constructor(private readonly mascotasService: MascotasService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Crear nueva mascota' })
+  @ApiResponse({ status: 201, description: 'Mascota creada exitosamente', type: Mascota })
+  @ApiBearerAuth('JWT-auth')
+  create(@Body() createMascotaDto: CreateMascotaDto) {
+    return this.mascotasService.create(createMascotaDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Listar todas las mascotas' })
+  @ApiResponse({ status: 200, description: 'Lista de mascotas', type: [Mascota] })
+  findAll() {
+    return this.mascotasService.findAll();
+  }
+
+  @Get('usuario/:idUsuario')
+  @ApiOperation({ summary: 'Listar mascotas de un usuario' })
+  @ApiResponse({ status: 200, description: 'Lista de mascotas del usuario', type: [Mascota] })
+  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.mascotasService.findByUsuario(idUsuario);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener mascota por ID' })
+  @ApiResponse({ status: 200, description: 'Mascota encontrada', type: Mascota })
+  @ApiResponse({ status: 404, description: 'Mascota no encontrada' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.mascotasService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar mascota' })
+  @ApiResponse({ status: 200, description: 'Mascota actualizada', type: Mascota })
+  @ApiResponse({ status: 404, description: 'Mascota no encontrada' })
+  @ApiBearerAuth('JWT-auth')
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMascotaDto: UpdateMascotaDto) {
+    return this.mascotasService.update(id, updateMascotaDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar mascota' })
+  @ApiResponse({ status: 200, description: 'Mascota eliminada' })
+  @ApiResponse({ status: 404, description: 'Mascota no encontrada' })
+  @ApiBearerAuth('JWT-auth')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.mascotasService.remove(id);
+  }
+}
