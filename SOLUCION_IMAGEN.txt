@@ -1,0 +1,38 @@
+SOLUCIÓN PARA VER LA IMAGEN DE MASCOTAS
+==========================================
+
+La imagen está correctamente guardada y el código está bien configurado.
+El problema es que el navegador tiene caché.
+
+SOLUCIÓN - HAZ UN HARD REFRESH:
+
+1. Abre el navegador en: http://localhost:4200
+
+2. Presiona las siguientes teclas según tu navegador:
+
+   Chrome/Edge:
+   - Windows: Ctrl + Shift + R
+   - O también: Ctrl + F5
+
+   Firefox:
+   - Windows: Ctrl + Shift + R
+   - O también: Ctrl + F5
+
+3. Si aún no funciona, abre las herramientas de desarrollador:
+   - Presiona F12
+   - Haz clic derecho en el botón de recargar
+   - Selecciona "Vaciar caché y recargar de forma forzada"
+
+4. Otra opción:
+   - Cierra completamente el navegador
+   - Ábrelo de nuevo
+   - Ve a http://localhost:4200
+
+VERIFICACIÓN:
+La imagen debería aparecer en el lado izquierdo del login con:
+- Gato y perro con fondo transparente
+- Texto "HelpYourPet" en negro encima
+- Texto "Cuidamos a quienes más amas" en negro
+- Footer negro con letras blancas
+
+Si después de hacer el hard refresh no aparece, avísame.
