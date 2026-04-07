@@ -17,7 +17,7 @@ export class Pago {
   metodoPago: string;
 
   @ApiProperty({ description: 'Monto del pago', example: 150000 })
-  @Column({ type: 'double', nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   monto: number;
 
   @ApiProperty({ description: 'ID de la venta' })

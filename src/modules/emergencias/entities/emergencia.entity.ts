@@ -19,7 +19,7 @@ export class Emergencia {
   estado: string;
 
   @ApiProperty({ description: 'Fecha y hora de la emergencia' })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   fechaHora: Date;
 
   @ApiProperty({ description: 'Tipo de emergencia', example: 'Accidente' })

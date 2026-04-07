@@ -23,12 +23,12 @@ export class AuthService {
         throw new ConflictException('El correo ya está registrado');
       }
 
-    // Crear usuario con rol por defecto (Usuario = 2)
+    // Crear usuario con rol por defecto (Usuario = 3)
     console.log('Creando usuario con datos:', {
       nombres: registerDto.nombre,
       apellidos: registerDto.apellidos,
       correo: registerDto.correo,
-      rol_id: registerDto.idRol || 2,
+      rol_id: registerDto.idRol || 3,
     });
     
     const usuario = await this.usuariosService.create({
@@ -36,13 +36,10 @@ export class AuthService {
       apellidos: registerDto.apellidos,
       correo: registerDto.correo,
       password: registerDto.contrasena,
-      num_documento: registerDto.documento || '0000000000',
-      telefono: registerDto.telefono || '0000000',
+      telefono: registerDto.telefono || '',
       direccion: registerDto.direccion || '',
-      tipo_documento: 'CC' as any,
-      edad: 18,
       rol_id: registerDto.idRol || 3,
-      activo: true,
+      estado: true,
     });
     
     console.log('Usuario creado:', usuario);
@@ -84,7 +81,7 @@ export class AuthService {
       }
 
     // Verificar si el usuario está activo
-    if (!usuario.activo) {
+    if (!usuario.estado) {
       throw new UnauthorizedException('Usuario inactivo');
     }
 

@@ -14,11 +14,11 @@ export class DetalleVenta {
   cantidad: number;
 
   @ApiProperty({ description: 'Precio unitario', example: 50000 })
-  @Column({ type: 'double', nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   precio: number;
 
   @ApiProperty({ description: 'Subtotal', example: 100000 })
-  @Column({ type: 'double', nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   subtotal: number;
 
   @ApiProperty({ description: 'ID del producto' })

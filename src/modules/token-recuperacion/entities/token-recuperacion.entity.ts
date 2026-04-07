@@ -9,7 +9,7 @@ export class TokenRecuperacion {
   id: number;
 
   @ApiProperty({ description: 'Fecha de expiración del token' })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   fechaExpiracion: Date;
 
   @ApiProperty({ description: 'Token de recuperación' })

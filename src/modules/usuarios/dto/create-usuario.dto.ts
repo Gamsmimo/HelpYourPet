@@ -31,32 +31,35 @@ export class CreateUsuarioDto {
   @MinLength(8)
   password: string;
 
-  @ApiProperty({ description: 'Tipo de documento', enum: TipoDocumento, example: 'CC' })
+  @ApiProperty({ description: 'Tipo de documento', enum: TipoDocumento, example: 'CC', required: false })
+  @IsOptional()
   @IsEnum(TipoDocumento)
-  tipo_documento: TipoDocumento;
+  tipo_documento?: TipoDocumento;
 
-  @ApiProperty({ description: 'Número de documento', example: '1234567890' })
+  @ApiProperty({ description: 'Número de documento', example: '1234567890', required: false })
+  @IsOptional()
   @IsString()
   @MinLength(5)
   @MaxLength(50)
-  num_documento: string;
+  num_documento?: string;
 
-  @ApiProperty({ description: 'Edad', example: 25 })
+  @ApiProperty({ description: 'Edad', example: 25, required: false })
+  @IsOptional()
   @IsInt()
   @Min(18)
   @Max(120)
-  edad: number;
+  edad?: number;
 
-  @ApiProperty({ description: 'Teléfono', example: '3001234567' })
+  @ApiProperty({ description: 'Teléfono', example: '3001234567', required: false })
+  @IsOptional()
   @IsString()
   @MinLength(7)
   @MaxLength(20)
-  telefono: string;
+  telefono?: string;
 
   @ApiProperty({ description: 'Dirección', required: false })
   @IsOptional()
   @IsString()
-  @MaxLength(255)
   direccion?: string;
 
   @ApiProperty({ description: 'URL de imagen', required: false })
@@ -65,6 +68,11 @@ export class CreateUsuarioDto {
   imagen?: string;
 
   @ApiProperty({ description: 'Estado activo', example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  estado?: boolean;
+
+  @ApiProperty({ description: 'Estado activo (alias)', example: true, required: false })
   @IsOptional()
   @IsBoolean()
   activo?: boolean;

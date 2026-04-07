@@ -24,6 +24,6 @@ export class Producto {
   nombre: string;
 
   @ApiProperty({ description: 'Precio del producto', example: 50000 })
-  @Column({ type: 'double', nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   precio: number;
 }

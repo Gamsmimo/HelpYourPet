@@ -19,7 +19,7 @@ export class Cita {
   estado: string;
 
   @ApiProperty({ description: 'Fecha y hora de la cita' })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   fechaHora: Date;
 
   @ApiProperty({ description: 'Motivo de la cita', example: 'Consulta general' })

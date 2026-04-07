@@ -21,17 +21,11 @@ export class UsuariosService {
       throw new ConflictException('El correo ya está registrado');
     }
 
-    const existingDoc = await this.usuariosRepository.findOne({
-      where: { num_documento: createUsuarioDto.num_documento },
-    });
-    if (existingDoc) {
-      throw new ConflictException('El número de documento ya está registrado');
-    }
-
     const hashedPassword = await bcrypt.hash(createUsuarioDto.password, 10);
     const usuario = this.usuariosRepository.create({
       ...createUsuarioDto,
       password: hashedPassword,
+      estado: createUsuarioDto.estado ?? createUsuarioDto.activo ?? true,
     });
 
     return this.usuariosRepository.save(usuario);
@@ -53,11 +47,13 @@ export class UsuariosService {
   }
 
   async findOneWithPassword(id: number): Promise<Usuario> {
-    const usuario = await this.usuariosRepository.findOne({
-      where: { id },
-      relations: ['rol'],
-      select: ['id', 'nombres', 'apellidos', 'correo', 'password', 'activo', 'rol_id'],
-    });
+    const usuario = await this.usuariosRepository
+      .createQueryBuilder('usuario')
+      .leftJoinAndSelect('usuario.rol', 'rol')
+      .where('usuario.id = :id', { id })
+      .addSelect('usuario.password')
+      .getOne();
+    
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
@@ -89,7 +85,7 @@ export class UsuariosService {
 
   async remove(id: number): Promise<void> {
     const usuario = await this.findOne(id);
-    usuario.activo = false;
+    usuario.estado = false;
     await this.usuariosRepository.save(usuario);
   }
 }

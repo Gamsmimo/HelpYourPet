@@ -27,7 +27,7 @@ export class Adopcion {
   estado: string;
 
   @ApiProperty({ description: 'Fecha de publicación' })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   fechaPublicacion: Date;
 
   @ApiProperty({ description: 'Género de la mascota', example: 'Macho' })

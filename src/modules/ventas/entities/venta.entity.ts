@@ -13,7 +13,7 @@ export class Venta {
   fecha: Date;
 
   @ApiProperty({ description: 'Total de la venta', example: 150000 })
-  @Column({ type: 'double', nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   total: number;
 
   @ApiProperty({ description: 'ID del usuario' })
