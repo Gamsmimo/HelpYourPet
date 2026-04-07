@@ -79,12 +79,6 @@
     gap: 18px;
 }
 
-.form-box form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
 .titulo {
     font-size: 35px;
     font-weight: bold;
@@ -163,36 +157,7 @@ input:hover {
     font-size: 0.9rem;
 }
 
-/* Estilos adicionales para el spinner de carga */
-.spinner-border {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  vertical-align: text-bottom;
-  border: 0.15em solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spinner-border 0.75s linear infinite;
-}
-
-.spinner-border-sm {
-  width: 0.875rem;
-  height: 0.875rem;
-  border-width: 0.125em;
-}
-
-@keyframes spinner-border {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* responsive imagen mascotas */
+//responsive imagen mascotas
 @media (max-width: 768px) {
     .left {
         display: none;

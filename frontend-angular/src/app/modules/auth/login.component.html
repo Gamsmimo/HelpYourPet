@@ -1,53 +1,66 @@
-<div class="background-container">
-  <img src="assets/img/img1.jpeg" alt="Fondo decorativo" class="background-image" />
-</div>
-
 <div class="login-container">
-  <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
-    <h2>Iniciar Sesión</h2>
-    
-    <div class="input-group">
-      <label for="correo">Correo</label>
-      <input 
-        type="email" 
-        id="correo" 
-        name="correo" 
-        [(ngModel)]="credentials.correo"
-        placeholder="Ingresa tu correo" 
-        required 
-        email />
-    </div>
-    
-    <div class="input-group">
-      <label for="password">Contraseña</label>
-      <div class="password-container">
-        <input 
-          [type]="showPassword ? 'text' : 'password'" 
-          id="password" 
-          name="password"
-          [(ngModel)]="credentials.contrasena"
-          placeholder="Ingresa tu contraseña" 
-          required />
-        <i 
-          class="toggle-password fas" 
-          [class.fa-eye]="!showPassword"
-          [class.fa-eye-slash]="showPassword"
-          (click)="togglePassword()"></i>
-      </div>
+
+    <!-- LADO IZQUIERDO -->
+    <div class="left">
+
+        <!-- IMAGEN -->
+        <img src="assets/images/fondoinicio.png" class="Mascotas">
+
+        <!-- TEXTO ENCIMA -->
+        <div class="overlay">
+            <h1>Helpyourpet</h1>
+            <p>Cuidamos a quienes más amas</p>
+        </div>
+
     </div>
 
-    <button type="submit" [disabled]="!loginForm.valid || loading">
-      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-      {{ loading ? 'Ingresando...' : 'Ingresar' }}
-    </button>
+    <!-- LINEA DIVISORA -->
+    <div class="vertical-divider"></div>
 
-    <div class="forgot-password">
-      <a routerLink="/recovery">¿Olvidaste tu contraseña?</a>
+    <!-- LADO DERECHO -->
+    <div class="right">
+
+        <div class="form-box">
+
+            <div class="titulo">Iniciar sesión</div>
+
+            <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+                <input 
+                    type="email" 
+                    name="correo"
+                    [(ngModel)]="credentials.correo"
+                    placeholder="Correo electrónico o celular"
+                    required
+                    email>
+                
+                <input 
+                    [type]="showPassword ? 'text' : 'password'"
+                    name="password"
+                    [(ngModel)]="credentials.contrasena"
+                    placeholder="Contraseña"
+                    required>
+
+                <button type="submit" class="login-btn" [disabled]="!loginForm.valid || loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
+                </button>
+            </form>
+
+            <p class="forgot" routerLink="/recovery">¿Olvidaste tu contraseña?</p>
+
+            <div class="divider"></div>
+
+            <button class="register-btn" routerLink="/register">
+                Crear cuenta nueva
+            </button>
+
+        </div>
+
     </div>
-  </form>
 
-  <div class="registro">
-    ¿No tienes cuenta?
-    <a routerLink="/register">Crea tu cuenta</a>
-  </div>
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>&copy; 2024 Helpyourpet - Todos los derechos reservados</p>
+    </div>
+
 </div>
