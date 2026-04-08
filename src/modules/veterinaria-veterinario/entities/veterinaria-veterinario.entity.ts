@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 import { Veterinaria } from '../../veterinarias/entities/veterinaria.entity';
 
-@Entity('veterinariaveterinario')
+@Entity('veterinaria_veterinario')
 export class VeterinariaVeterinario {
   @ApiProperty({ description: 'ID único', example: 1 })
   @PrimaryGeneratedColumn()

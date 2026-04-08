@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Carrito } from '../../carrito/entities/carrito.entity';
 import { Producto } from '../../productos/entities/producto.entity';
 
-@Entity('carritoproducto')
+@Entity('carrito_producto')
 export class CarritoProducto {
   @ApiProperty({ description: 'ID único', example: 1 })
   @PrimaryGeneratedColumn()

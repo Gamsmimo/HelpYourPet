@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Mascota } from '../../mascotas/entities/mascota.entity';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 
-@Entity('historiaclinica')
+@Entity('historia_clinica')
 export class HistoriaClinica {
   @ApiProperty({ description: 'ID único de la historia clínica', example: 1 })
   @PrimaryGeneratedColumn()

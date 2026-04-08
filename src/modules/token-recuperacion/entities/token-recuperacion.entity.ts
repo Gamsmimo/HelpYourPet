@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 
-@Entity('tokenrecuperacion')
+@Entity('token_recuperacion')
 export class TokenRecuperacion {
   @ApiProperty({ description: 'ID único del token', example: 1 })
   @PrimaryGeneratedColumn()

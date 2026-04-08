@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 
-@Entity('perfilveterinario')
+@Entity('perfil_veterinario')
 export class PerfilVeterinario {
   @ApiProperty({ description: 'ID único del perfil', example: 1 })
   @PrimaryGeneratedColumn()
