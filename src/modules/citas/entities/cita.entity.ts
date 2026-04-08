@@ -7,46 +7,56 @@ import { Veterinaria } from '../../veterinarias/entities/veterinaria.entity';
 @Entity('cita')
 export class Cita {
   @ApiProperty({ description: 'ID único de la cita', example: 1 })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_cita' })
   id: number;
 
-  @ApiProperty({ description: 'Descripción de la cita' })
-  @Column({ length: 255, nullable: true })
-  descripcion: string;
+  @ApiProperty({ description: 'ID del usuario' })
+  @Column({ name: 'id_usuario' })
+  idUsuario: number;
+
+  @ApiProperty({ description: 'ID de la mascota' })
+  @Column({ name: 'id_mascota' })
+  idMascota: number;
+
+  @ApiProperty({ description: 'ID de la veterinaria' })
+  @Column({ name: 'id_veterinaria' })
+  idVeterinaria: number;
+
+  @ApiProperty({ description: 'ID del servicio' })
+  @Column({ name: 'id_servicio', nullable: true })
+  idServicio: number;
 
   @ApiProperty({ description: 'Estado de la cita', example: 'Pendiente' })
   @Column({ length: 255, nullable: true })
   estado: string;
 
   @ApiProperty({ description: 'Fecha y hora de la cita' })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'fecha_hora', type: 'timestamp', nullable: true })
   fechaHora: Date;
 
   @ApiProperty({ description: 'Motivo de la cita', example: 'Consulta general' })
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'text', nullable: true })
   motivo: string;
 
-  @ApiProperty({ description: 'ID de la mascota' })
-  @Column()
-  idMascota: number;
+  @ApiProperty({ description: 'Observaciones' })
+  @Column({ type: 'text', nullable: true })
+  observaciones: string;
 
-  @ApiProperty({ description: 'ID del usuario' })
-  @Column()
-  idUsuario: number;
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @ApiProperty({ description: 'ID de la veterinaria' })
-  @Column()
-  idVeterinaria: number;
+  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @ManyToOne(() => Mascota)
-  @JoinColumn({ name: 'idMascota' })
+  @JoinColumn({ name: 'id_mascota' })
   mascota: Mascota;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'idUsuario' })
+  @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 
   @ManyToOne(() => Veterinaria)
-  @JoinColumn({ name: 'idVeterinaria' })
+  @JoinColumn({ name: 'id_veterinaria' })
   veterinaria: Veterinaria;
 }

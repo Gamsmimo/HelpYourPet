@@ -5,7 +5,7 @@ import { Usuario } from '../../usuarios/entities/usuario.entity';
 @Entity('mascota')
 export class Mascota {
   @ApiProperty({ description: 'ID único de la mascota', example: 1 })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_mascota' })
   id: number;
 
   @ApiProperty({ description: 'Nombre de la mascota', example: 'Firulais' })
@@ -24,34 +24,37 @@ export class Mascota {
   @Column({ type: 'int', nullable: true })
   edad: number;
 
-  @ApiProperty({ description: 'Género', example: 'Macho' })
-  @Column({ length: 255, nullable: true })
-  genero: string;
+  @ApiProperty({ description: 'Sexo', example: 'Macho' })
+  @Column({ name: 'sexo', length: 10, nullable: true })
+  sexo: string;
 
-  @ApiProperty({ description: 'Descripción', required: false })
-  @Column({ type: 'text', nullable: true })
-  descripcion: string;
+  @ApiProperty({ description: 'Peso', example: 15.5 })
+  @Column({ name: 'peso', type: 'decimal', precision: 5, scale: 2, nullable: true })
+  peso: number;
+
+  @ApiProperty({ description: 'Color', example: 'Café' })
+  @Column({ name: 'color', length: 50, nullable: true })
+  color: string;
 
   @ApiProperty({ description: 'URL de la foto', required: false })
   @Column({ length: 255, nullable: true })
   foto: string;
 
-  @ApiProperty({ description: 'Tamaño', example: 'Mediano' })
-  @Column({ length: 255, nullable: true })
-  tamaño: string;
-
-  @ApiProperty({ description: 'Unidad de edad', example: 'años' })
-  @Column({ length: 255, nullable: true })
-  unidadEdad: string;
+  @ApiProperty({ description: 'Estado', example: true })
+  @Column({ name: 'estado', type: 'boolean', default: true })
+  estado: boolean;
 
   @ApiProperty({ description: 'ID del usuario dueño' })
-  @Column()
+  @Column({ name: 'id_usuario' })
   idUsuario: number;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @CreateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'idUsuario' })
+  @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 }

@@ -5,7 +5,7 @@ import { Usuario } from '../../usuarios/entities/usuario.entity';
 @Entity('reporte_maltrato')
 export class ReporteMaltrato {
   @ApiProperty({ description: 'ID único del reporte', example: 1 })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_reporte' })
   id: number;
 
   @ApiProperty({ description: 'Descripción del reporte' })
@@ -17,18 +17,28 @@ export class ReporteMaltrato {
   estado: string;
 
   @ApiProperty({ description: 'Fecha del reporte' })
-  @Column({ type: 'date', nullable: true })
-  fecha: Date;
+  @Column({ name: 'fecha_reporte', type: 'timestamp', nullable: true })
+  fechaReporte: Date;
+
+  @ApiProperty({ description: 'Evidencia', example: 'foto.jpg' })
+  @Column({ name: 'evidencia', length: 255, nullable: true })
+  evidencia: string;
 
   @ApiProperty({ description: 'Ubicación del incidente' })
   @Column({ length: 255, nullable: true })
   ubicacion: string;
 
   @ApiProperty({ description: 'ID del usuario que reporta' })
-  @Column()
+  @Column({ name: 'id_usuario' })
   idUsuario: number;
 
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'idUsuario' })
+  @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 }

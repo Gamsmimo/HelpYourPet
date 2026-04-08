@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsBoolean, IsNumber } from 'class-validator';
 
 export class CreateVeterinariaDto {
   @ApiProperty({ description: 'Nombre de la veterinaria', example: 'Veterinaria Central' })
@@ -11,30 +11,35 @@ export class CreateVeterinariaDto {
   @IsEmail()
   correo?: string;
 
-  @ApiProperty({ description: 'Descripción', required: false })
+  @ApiProperty({ description: 'Servicios ofrecidos', required: false })
   @IsOptional()
   @IsString()
-  descripcion?: string;
+  serviciosOfrecidos?: string;
 
   @ApiProperty({ description: 'Dirección', example: 'Calle 100 #50-25', required: false })
   @IsOptional()
   @IsString()
   direccion?: string;
 
-  @ApiProperty({ description: 'Estado', example: 'Activo', required: false })
+  @ApiProperty({ description: 'Estado', example: true, required: false })
   @IsOptional()
-  @IsString()
-  estado?: string;
+  @IsBoolean()
+  estado?: boolean;
 
-  @ApiProperty({ description: 'Horario', example: 'Lun-Vie 8am-6pm', required: false })
+  @ApiProperty({ description: 'Horario de atención', example: 'Lun-Vie 8am-6pm', required: false })
   @IsOptional()
   @IsString()
-  horario?: string;
+  horarioAtencion?: string;
 
-  @ApiProperty({ description: 'RUT', example: '900123456-7', required: false })
+  @ApiProperty({ description: 'Calificación promedio', example: 4.5, required: false })
+  @IsOptional()
+  @IsNumber()
+  calificacionPromedio?: number;
+
+  @ApiProperty({ description: 'Foto', required: false })
   @IsOptional()
   @IsString()
-  rut?: string;
+  foto?: string;
 
   @ApiProperty({ description: 'Teléfono', example: '3001234567', required: false })
   @IsOptional()
