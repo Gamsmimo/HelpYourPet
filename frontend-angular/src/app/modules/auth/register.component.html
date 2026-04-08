@@ -1,97 +1,108 @@
-<div class="background-container">
-  <img src="assets/img/fondo-registrar.jpg" alt="Fondo decorativo" class="background-image" />
-</div>
+<div class="register-container">
 
-<div class="blur-container">
-  <h2 class="form-title">Crear Cuenta</h2>
-  <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="nombres">Nombres</label>
-        <input type="text" id="nombres" name="nombres" [(ngModel)]="formData.nombre" required />
-      </div>
+  <!-- LADO IZQUIERDO -->
+  <div class="left">
+    <!-- IMAGEN -->
+    <img src="assets/images/mascotas-login.png" class="mascotas-img" alt="Mascotas">
 
-      <div class="form-group">
-        <label for="apellidos">Apellidos</label>
-        <input type="text" id="apellidos" name="apellidos" [(ngModel)]="formData.apellidos" required />
-      </div>
+    <!-- TEXTO ENCIMA -->
+    <div class="overlay">
+      <h1>HelpYourPet</h1>
+      <p>Únete a nuestra comunidad</p>
+      <p class="subtitle">Cuidamos a quienes más amas</p>
+    </div>
+  </div>
 
-      <div class="form-group">
-        <label for="correo">Correo</label>
-        <input type="email" id="correo" name="correo" [(ngModel)]="formData.correo" required />
-      </div>
+  <!-- LINEA DIVISORA -->
+  <div class="vertical-divider"></div>
 
-      <div class="form-group">
-        <label for="tipoDocumento">Tipo de Documento</label>
-        <select id="tipoDocumento" name="tipoDocumento" [(ngModel)]="tipoDocumento" required>
-          <option value="">Selecciona tu tipo de documento</option>
-          <option value="Cédula">Cédula</option>
-          <option value="DNI">DNI</option>
-          <option value="Pasaporte">Pasaporte</option>
-          <option value="Tarjeta de Identidad">Tarjeta de Identidad</option>
-          <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-          <option value="Permiso de Residencia">Permiso de Residencia</option>
-          <option value="Documento Nacional">Documento Nacional</option>
-          <option value="Licencia de Conducir">Licencia de Conducir</option>
-        </select>
-      </div>
+  <!-- LADO DERECHO -->
+  <div class="right">
+    <div class="form-box">
+      <div class="titulo">Crear Cuenta</div>
+      
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <input type="text" id="nombres" name="nombres" [(ngModel)]="formData.nombre" placeholder="Nombres" required />
+          </div>
 
-      <div class="form-group">
-        <label for="numDocumento">N° Documento</label>
-        <input type="text" id="numDocumento" name="numDocumento" [(ngModel)]="formData.documento" required />
-      </div>
+          <div class="form-group">
+            <input type="text" id="apellidos" name="apellidos" [(ngModel)]="formData.apellidos" placeholder="Apellidos" required />
+          </div>
 
-      <div class="form-group">
-        <label for="telefono">Teléfono</label>
-        <input type="tel" id="telefono" name="telefono" [(ngModel)]="formData.telefono" required />
-      </div>
+          <div class="form-group">
+            <input type="email" id="correo" name="correo" [(ngModel)]="formData.correo" placeholder="Correo electrónico" required />
+          </div>
 
-      <div class="form-group">
-        <label for="direccion">Dirección</label>
-        <input type="text" id="direccion" name="direccion" [(ngModel)]="formData.direccion" required />
-      </div>
+          <div class="form-group">
+            <select id="tipoDocumento" name="tipoDocumento" [(ngModel)]="tipoDocumento" required>
+              <option value="">Tipo de Documento</option>
+              <option value="Cédula">Cédula</option>
+              <option value="DNI">DNI</option>
+              <option value="Pasaporte">Pasaporte</option>
+              <option value="Tarjeta de Identidad">Tarjeta de Identidad</option>
+              <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+            </select>
+          </div>
 
-      <div class="form-group">
-        <label for="edad">Edad</label>
-        <input type="number" id="edad" name="edad" [(ngModel)]="edad" required min="18" max="120"
-          placeholder="Solo mayores de 18 años" />
-      </div>
+          <div class="form-group">
+            <input type="text" id="numDocumento" name="numDocumento" [(ngModel)]="formData.documento" placeholder="N° Documento" required />
+          </div>
 
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <div class="password-input-container">
-          <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
-            [(ngModel)]="formData.contrasena" required />
-          <i class="fas password-toggle" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"
-            (click)="togglePassword()"></i>
+          <div class="form-group">
+            <input type="tel" id="telefono" name="telefono" [(ngModel)]="formData.telefono" placeholder="Teléfono" required />
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="direccion" name="direccion" [(ngModel)]="formData.direccion" placeholder="Dirección" required />
+          </div>
+
+          <div class="form-group">
+            <input type="number" id="edad" name="edad" [(ngModel)]="edad" placeholder="Edad (18+)" required min="18" max="120" />
+          </div>
+
+          <div class="form-group">
+            <div class="password-input-container">
+              <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                [(ngModel)]="formData.contrasena" placeholder="Contraseña" required />
+              <i class="fas password-toggle" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"
+                (click)="togglePassword()"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="password-input-container">
+              <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" name="confirmPassword"
+                [(ngModel)]="confirmPassword" placeholder="Confirmar Contraseña" required />
+              <i class="fas password-toggle" [class.fa-eye]="!showConfirmPassword"
+                [class.fa-eye-slash]="showConfirmPassword" (click)="toggleConfirmPassword()"></i>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group full-width">
-        <label for="confirmPassword">Confirmar Contraseña</label>
-        <div class="password-input-container">
-          <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" name="confirmPassword"
-            [(ngModel)]="confirmPassword" required />
-          <i class="fas password-toggle" [class.fa-eye]="!showConfirmPassword"
-            [class.fa-eye-slash]="showConfirmPassword" (click)="toggleConfirmPassword()"></i>
+        <div class="terms-section">
+          <input type="checkbox" id="acepto" name="acepto" [(ngModel)]="aceptoTerminos" required>
+          <label for="acepto">
+            Acepto los <a href="#" (click)="showTerms(); $event.preventDefault()">Términos y Condiciones</a>
+          </label>
         </div>
-      </div>
-    </div>
 
-    <div class="terms-section">
-      <input type="checkbox" id="acepto" name="acepto" [(ngModel)]="aceptoTerminos" required>
-      <label for="acepto">
-        Acepto los <a href="#" (click)="showTerms(); $event.preventDefault()">Términos y Condiciones</a>
-      </label>
-    </div>
+        <button type="submit" class="register-btn" [disabled]="!registerForm.valid || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? 'Registrando...' : 'Crear Cuenta' }}
+        </button>
 
-    <button type="submit" class="btn-register" [disabled]="!registerForm.valid || loading">
-      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-      {{ loading ? 'Registrando...' : 'Registrarse' }}
-    </button>
-
-    <div class="login-text">
-      ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+        <div class="login-text">
+          ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>&copy; 2024 HelpYourPet - Todos los derechos reservados</p>
+  </div>
+
 </div>

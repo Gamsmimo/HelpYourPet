@@ -1,7 +1,147 @@
-/* Importar el CSS original de Registro */
-@import url('../../../assets/css/Estilos-registro.css');
+/* Importar fuentes de Google */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Fredoka:wght@300..700&display=swap');
 
-/* Estilos adicionales para los iconos de contraseña */
+.register-container {
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Fredoka', 'Baloo 2', 'Fira Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* LADO IZQUIERDO */
+.left {
+  width: 40%;
+  position: relative;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* IMAGEN DE MASCOTAS */
+.mascotas-img {
+  position: absolute;
+  width: 80%;
+  height: auto;
+  object-fit: contain;
+  max-height: 70%;
+}
+
+/* TEXTO ENCIMA DE LA IMAGEN */
+.overlay {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+.overlay h1 {
+  color: #000000;
+  font-size: 3.5rem;
+  margin: 0.5rem 0;
+  font-weight: bold;
+}
+
+.overlay p {
+  color: #000000;
+  font-size: 1.3rem;
+  margin: 0.3rem 0;
+}
+
+.overlay .subtitle {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* LINEA DIVISORA VERTICAL */
+.vertical-divider {
+  width: 1px;
+  background-color: #ddd;
+  min-height: 100vh;
+  margin: auto 0;
+}
+
+/* LADO DERECHO */
+.right {
+  width: 60%;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+/* FORMULARIO */
+.form-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 25px;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.titulo {
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: 'Baloo 2';
+  text-align: center;
+  color: #303854;
+  margin-bottom: 1rem;
+}
+
+/* GRID DE FORMULARIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* INPUTS Y SELECT */
+input, select {
+  padding: 12px 15px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+  font-size: 0.95rem;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+input:hover, select:hover {
+  border-color: #4ade80;
+}
+
+input:focus, select:focus {
+  border-color: #258e48;
+  box-shadow: 0 0 0 3px rgba(37, 142, 72, 0.1);
+}
+
+select {
+  cursor: pointer;
+  background-color: white;
+}
+
+select option {
+  padding: 10px;
+}
+
+/* INPUTS DE CONTRASEÑA */
 .password-input-container {
   position: relative;
   display: flex;
@@ -10,25 +150,125 @@
 
 .password-input-container input {
   width: 100%;
-  padding-right: 40px;
+  padding-right: 45px;
 }
 
 .password-toggle {
   position: absolute;
-  right: 12px;
+  right: 15px;
   cursor: pointer;
   color: #6c757d;
-  font-size: 16px;
-  transition: color 0.3s ease;
+  font-size: 18px;
+  transition: all 0.3s ease;
   z-index: 10;
 }
 
 .password-toggle:hover {
-  color: #495057;
+  color: #258e48;
+  transform: scale(1.1);
 }
 
 .password-toggle:active {
   transform: scale(0.95);
+}
+
+/* SECCIÓN DE TÉRMINOS */
+.terms-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.terms-section input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.terms-section label {
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.terms-section a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.terms-section a:hover {
+  text-decoration: underline;
+}
+
+/* BOTÓN REGISTRO */
+.register-btn {
+  background: #258e48;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 1rem;
+}
+
+.register-btn:hover {
+  background: #187eb9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 126, 185, 0.3);
+}
+
+.register-btn:active {
+  transform: translateY(0);
+}
+
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* TEXTO DE LOGIN */
+.login-text {
+  text-align: center;
+  color: #555;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+}
+
+.login-text a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-text a:hover {
+  text-decoration: underline;
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #000000;
+  color: #ffffff;
+  text-align: center;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.footer p {
+  margin: 0;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 /* Spinner de carga */
@@ -52,6 +292,73 @@
 @keyframes spinner-border {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .form-box {
+    max-width: 600px;
+  }
+  
+  .overlay h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    flex-direction: column;
+  }
+  
+  .left {
+    display: none;
+  }
+  
+  .vertical-divider {
+    display: none;
+  }
+  
+  .right {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .form-box {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .titulo {
+    font-size: 2rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer {
+    position: relative;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-box {
+    padding: 1rem;
+  }
+  
+  .titulo {
+    font-size: 1.8rem;
+  }
+  
+  input, select {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .register-btn {
+    padding: 12px;
+    font-size: 1rem;
   }
 }
 
