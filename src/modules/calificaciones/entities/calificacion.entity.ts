@@ -1,51 +1,45 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
-import { Servicio } from '../../servicios/entities/servicio.entity';
+import { Veterinaria } from '../../veterinarias/entities/veterinaria.entity';
 
 @Entity('calificacion')
 export class Calificacion {
   @ApiProperty({ description: 'ID único de la calificación', example: 1 })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_calificacion' })
   id: number;
 
-  @ApiProperty({ description: 'Comentario', example: 'Excelente servicio' })
-  @Column({ length: 255, nullable: true })
-  comentario: string;
+  @ApiProperty({ description: 'ID del usuario' })
+  @Column({ name: 'id_usuario' })
+  idUsuario: number;
 
-  @ApiProperty({ description: 'Estado', example: 'Aprobado' })
-  @Column({ length: 255, nullable: true })
-  estado: string;
-
-  @ApiProperty({ description: 'Fecha de la calificación' })
-  @Column({ type: 'date', nullable: true })
-  fecha: Date;
+  @ApiProperty({ description: 'ID de la veterinaria' })
+  @Column({ name: 'id_veterinaria' })
+  idVeterinaria: number;
 
   @ApiProperty({ description: 'Puntuación', example: 5, minimum: 1, maximum: 5 })
   @Column({ type: 'int', nullable: true })
   puntuacion: number;
 
-  @ApiProperty({ description: 'ID del servicio', required: false })
-  @Column({ nullable: true })
-  idServicio: number;
+  @ApiProperty({ description: 'Comentario', example: 'Excelente servicio' })
+  @Column({ type: 'text', nullable: true })
+  comentario: string;
 
-  @ApiProperty({ description: 'ID del usuario' })
-  @Column()
-  idUsuario: number;
+  @ApiProperty({ description: 'Fecha de la calificación' })
+  @Column({ name: 'fecha_calificacion', type: 'timestamp', nullable: true })
+  fechaCalificacion: Date;
 
-  @ApiProperty({ description: 'ID del veterinario', required: false })
-  @Column({ nullable: true })
-  idVeterinario: number;
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @ManyToOne(() => Servicio)
-  @JoinColumn({ name: 'idServicio' })
-  servicio: Servicio;
+  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'idUsuario' })
+  @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 
-  @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'idVeterinario' })
-  veterinario: Usuario;
+  @ManyToOne(() => Veterinaria)
+  @JoinColumn({ name: 'id_veterinaria' })
+  veterinaria: Veterinaria;
 }

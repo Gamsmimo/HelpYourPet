@@ -25,11 +25,11 @@ export class CalificacionesController {
     return this.calificacionesService.findAll();
   }
 
-  @Get('servicio/:idServicio')
-  @ApiOperation({ summary: 'Listar calificaciones de un servicio' })
+  @Get('veterinaria/:idVeterinaria')
+  @ApiOperation({ summary: 'Listar calificaciones de una veterinaria' })
   @ApiResponse({ status: 200, description: 'Lista de calificaciones filtradas', type: [Calificacion] })
-  findByServicio(@Param('idServicio', ParseIntPipe) idServicio: number) {
-    return this.calificacionesService.findByServicio(idServicio);
+  findByVeterinaria(@Param('idVeterinaria', ParseIntPipe) idVeterinaria: number) {
+    return this.calificacionesService.findByVeterinaria(idVeterinaria);
   }
 
   @Get(':id')

@@ -18,20 +18,20 @@ export class CalificacionesService {
   }
 
   async findAll(): Promise<Calificacion[]> {
-    return this.calificacionesRepository.find({ relations: ['servicio', 'usuario', 'veterinario'] });
+    return this.calificacionesRepository.find({ relations: ['usuario', 'veterinaria'] });
   }
 
-  async findByServicio(idServicio: number): Promise<Calificacion[]> {
+  async findByVeterinaria(idVeterinaria: number): Promise<Calificacion[]> {
     return this.calificacionesRepository.find({
-      where: { idServicio },
-      relations: ['servicio', 'usuario', 'veterinario'],
+      where: { idVeterinaria },
+      relations: ['usuario', 'veterinaria'],
     });
   }
 
   async findOne(id: number): Promise<Calificacion> {
     const calificacion = await this.calificacionesRepository.findOne({
       where: { id },
-      relations: ['servicio', 'usuario', 'veterinario'],
+      relations: ['usuario', 'veterinaria'],
     });
     if (!calificacion) {
       throw new NotFoundException(`Calificación con ID ${id} no encontrada`);

@@ -18,13 +18,13 @@ export class AdopcionService {
   }
 
   async findAll(): Promise<Adopcion[]> {
-    return this.adopcionRepository.find({ relations: ['mascota', 'usuario', 'veterinaria'] });
+    return this.adopcionRepository.find({ relations: ['mascota', 'usuario'] });
   }
 
   async findOne(id: number): Promise<Adopcion> {
     const adopcion = await this.adopcionRepository.findOne({
       where: { id },
-      relations: ['mascota', 'usuario', 'veterinaria'],
+      relations: ['mascota', 'usuario'],
     });
     if (!adopcion) {
       throw new NotFoundException(`Adopción con ID ${id} no encontrada`);
