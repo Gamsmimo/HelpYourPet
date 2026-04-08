@@ -11,8 +11,27 @@
   overflow-x: hidden;
 }
 
-/* LADO IZQUIERDO */
+/* LADO IZQUIERDO - FORMULARIO */
 .left {
+  width: 60%;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+/* LINEA DIVISORA VERTICAL */
+.vertical-divider {
+  width: 1px;
+  background-color: #ddd;
+  min-height: 100vh;
+  margin: auto 0;
+}
+
+/* LADO DERECHO - IMAGEN */
+.right {
   width: 40%;
   position: relative;
   background: #ffffff;
@@ -58,25 +77,6 @@
   font-size: 1.1rem;
   color: #333;
   font-weight: 500;
-}
-
-/* LINEA DIVISORA VERTICAL */
-.vertical-divider {
-  width: 1px;
-  background-color: #ddd;
-  min-height: 100vh;
-  margin: auto 0;
-}
-
-/* LADO DERECHO */
-.right {
-  width: 60%;
-  background: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
 }
 
 /* FORMULARIO */
@@ -176,6 +176,7 @@ select option {
 .terms-section {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -214,6 +215,11 @@ select option {
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 1rem;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .register-btn:hover {
@@ -312,7 +318,8 @@ select option {
   }
   
   .left {
-    display: none;
+    width: 100%;
+    padding: 1rem;
   }
   
   .vertical-divider {
@@ -320,8 +327,7 @@ select option {
   }
   
   .right {
-    width: 100%;
-    padding: 1rem;
+    display: none;
   }
   
   .form-box {
