@@ -1,4 +1,4 @@
-<!-- NAVBAR -->
+<!-- NAVBAR ESTÁTICO -->
 <nav class="navbar">
   <div class="navbar-container">
     <!-- Logo -->
@@ -7,20 +7,47 @@
       <span class="brand-name">HelpYourPet</span>
     </div>
 
-    <!-- Botón Modo Oscuro/Claro -->
-    <button class="theme-toggle-btn" (click)="toggleModoOscuro()" [attr.aria-label]="modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro'">
-      <i class="fas" [ngClass]="modoOscuro ? 'fa-sun' : 'fa-moon'"></i>
-    </button>
+    <div class="navbar-actions">
+      <!-- Botón Modo Oscuro/Claro -->
+      <button class="theme-toggle-btn" (click)="toggleModoOscuro()" [attr.aria-label]="modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro'">
+        <i class="fas" [ngClass]="modoOscuro ? 'fa-sun' : 'fa-moon'"></i>
+      </button>
 
-    <!-- Menú Hamburguesa -->
-    <button class="hamburger-btn" (click)="toggleMenu()" aria-label="Menú">
-      <i class="fas fa-bars"></i>
-    </button>
+      <!-- Menú Hamburguesa (solo móvil) -->
+      <button class="hamburger-btn" (click)="toggleMenu()" aria-label="Menú">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
   </div>
 </nav>
 
-<!-- MENÚ LATERAL -->
-<div class="menu-lateral" [class.abierto]="menuAbierto">
+<!-- SIDEBAR DERECHO (Desktop) -->
+<aside class="sidebar-derecho">
+  <div class="sidebar-content">
+    <h3 class="sidebar-title">Menú</h3>
+    <nav class="sidebar-nav">
+      <a (click)="irAPerfil()" class="sidebar-item">
+        <i class="fas fa-user"></i>
+        <span>Perfil</span>
+      </a>
+      <a (click)="irATienda()" class="sidebar-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Tienda</span>
+      </a>
+      <a (click)="irAAdopciones()" class="sidebar-item">
+        <i class="fas fa-heart"></i>
+        <span>Adopciones</span>
+      </a>
+      <a (click)="logout()" class="sidebar-item logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Cerrar Sesión</span>
+      </a>
+    </nav>
+  </div>
+</aside>
+
+<!-- MENÚ HAMBURGUESA (Solo móvil) -->
+<div class="menu-mobile" [class.abierto]="menuAbierto">
   <div class="menu-overlay" (click)="toggleMenu()"></div>
   <div class="menu-content">
     <div class="menu-header">
@@ -49,6 +76,9 @@
     </nav>
   </div>
 </div>
+
+<!-- LAYOUT PRINCIPAL -->
+<div class="layout-principal">
 
 <!-- CONTENEDOR PRINCIPAL -->
 <div class="main-container">
@@ -172,3 +202,6 @@
   </div>
 
 </div>
+
+</div>
+<!-- Fin layout-principal -->

@@ -15,6 +15,8 @@
   --border-color: #e4e6eb;
   --hover-bg: #f2f3f5;
   --liked-color: #e74c3c;
+  --navbar-height: 60px;
+  --sidebar-width: 280px;
 }
 
 body.dark-mode {
@@ -26,25 +28,23 @@ body.dark-mode {
   --hover-bg: #3a3b3c;
 }
 
-/* ===== NAVBAR ===== */
+/* ===== NAVBAR ESTÁTICO ===== */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  z-index: 1000;
+  z-index: 100;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: var(--navbar-height);
 }
 
 .brand-section {
@@ -63,6 +63,12 @@ body.dark-mode {
   font-weight: bold;
   color: var(--primary-color);
   font-family: 'Baloo 2', sans-serif;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
 
 .theme-toggle-btn,
@@ -87,8 +93,89 @@ body.dark-mode {
   transform: scale(1.05);
 }
 
-/* ===== MENÚ LATERAL ===== */
-.menu-lateral {
+.hamburger-btn {
+  display: none;
+}
+
+/* ===== LAYOUT PRINCIPAL ===== */
+.layout-principal {
+  display: flex;
+  min-height: calc(100vh - var(--navbar-height));
+  background: var(--bg-color);
+}
+
+/* ===== SIDEBAR DERECHO (Desktop) ===== */
+.sidebar-derecho {
+  position: sticky;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--navbar-height));
+  background: var(--card-bg);
+  border-left: 1px solid var(--border-color);
+  order: 2;
+  overflow-y: auto;
+}
+
+.sidebar-content {
+  padding: 1.5rem;
+}
+
+.sidebar-title {
+  color: var(--text-color);
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  color: var(--text-color);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.sidebar-item:hover {
+  background: var(--hover-bg);
+  transform: translateX(-5px);
+}
+
+.sidebar-item i {
+  font-size: 1.3rem;
+  width: 30px;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.sidebar-item.logout {
+  color: #e74c3c;
+  margin-top: 1rem;
+}
+
+.sidebar-item.logout i {
+  color: #e74c3c;
+}
+
+.sidebar-item.logout:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* ===== MENÚ MÓVIL (Solo visible en móvil) ===== */
+.menu-mobile {
+  display: none;
   position: fixed;
   top: 0;
   right: -100%;
@@ -98,7 +185,7 @@ body.dark-mode {
   transition: right 0.3s ease;
 }
 
-.menu-lateral.abierto {
+.menu-mobile.abierto {
   right: 0;
 }
 
@@ -197,11 +284,11 @@ body.dark-mode {
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .main-container {
+  flex: 1;
   max-width: 680px;
   margin: 0 auto;
-  padding: 80px 1rem 2rem;
-  min-height: 100vh;
-  background: var(--bg-color);
+  padding: 1.5rem 1rem;
+  width: 100%;
 }
 
 /* ===== CREAR PUBLICACIÓN ===== */
@@ -545,7 +632,41 @@ body.dark-mode {
 }
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .sidebar-derecho {
+    width: 240px;
+  }
+
+  .main-container {
+    max-width: 600px;
+  }
+}
+
 @media (max-width: 768px) {
+  /* Ocultar sidebar en móvil */
+  .sidebar-derecho {
+    display: none;
+  }
+
+  /* Mostrar menú hamburguesa */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Mostrar menú móvil */
+  .menu-mobile {
+    display: block;
+  }
+
+  .layout-principal {
+    display: block;
+  }
+
+  .main-container {
+    max-width: 100%;
+    padding: 1rem 0.5rem;
+  }
+
   .navbar-container {
     padding: 0.6rem 1rem;
   }
@@ -556,14 +677,6 @@ body.dark-mode {
 
   .logo-img {
     height: 32px;
-  }
-
-  .main-container {
-    padding: 70px 0.5rem 1rem;
-  }
-
-  .menu-content {
-    width: 280px;
   }
 }
 
@@ -578,5 +691,9 @@ body.dark-mode {
 
   .menu-content {
     width: 100%;
+  }
+
+  .main-container {
+    padding: 1rem 0.3rem;
   }
 }
