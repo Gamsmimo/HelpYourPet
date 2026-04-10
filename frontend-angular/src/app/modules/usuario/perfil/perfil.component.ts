@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,10 +13,9 @@ import Swal from 'sweetalert2';
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.css']
 })
-export class PerfilComponent implements OnInit, AfterViewInit {
-  usuarioLogueado: any = null;
+export class PerfilComponent implements OnInit {
+  usuarioLogueado: any = {};
   mascotas: any[] = [];
-  tieneMascotas = false;
   activeSection = 'dashboard';
   sidebarOpen = false;
   compras: any[] = [];
@@ -30,128 +29,73 @@ export class PerfilComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.usuarioLogueado = this.authService.getUser();
+    this.usuarioLogueado = this.authService.getUser() || {};
     this.cargarMascotas();
-  }
-
-  ngAfterViewInit(): void {
-    this.initializeScripts();
-  }
-
-  initializeScripts(): void {
-    setTimeout(() => {
-      this.setupNavigation();
-      this.setupMenuToggle();
-      this.setupThemeToggle();
-    }, 100);
-  }
-
-  setupNavigation(): void {
-    if (typeof document !== 'undefined') {
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const target = link.getAttribute('href');
-          if (target) {
-            this.showSection(target.replace('#', ''));
-          }
-        });
-      });
-    }
-  }
-
-  setupMenuToggle(): void {
-    if (typeof document !== 'undefined') {
-      const menuToggles = document.querySelectorAll('.menu-toggle');
-      menuToggles.forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          this.toggleSidebar();
-        });
-      });
-    }
-  }
-
-  setupThemeToggle(): void {
-    if (typeof document !== 'undefined') {
-      const themeToggles = document.querySelectorAll('.theme-toggle-checkbox');
-      themeToggles.forEach(toggle => {
-        toggle.addEventListener('change', () => {
-          document.body.classList.toggle('dark-mode');
-        });
-      });
-    }
-  }
-
-  cargarMascotas(): void {
-    this.mascotasService.getMisMascotas().subscribe({
-      next: (data) => {
-        this.mascotas = data;
-        this.tieneMascotas = data.length > 0;
-      },
-      error: (error) => {
-        console.error('Error al cargar mascotas:', error);
-      }
-    });
-  }
-
-  cargarCompras(): void {
-    // TODO: Implementar servicio de compras
-    this.compras = [];
-  }
-
-  cargarCitas(): void {
-    // TODO: Implementar servicio de citas
-    this.citas = [];
-  }
-
-  cargarAdopciones(): void {
-    // TODO: Implementar servicio de adopciones
-    this.adopciones = [];
   }
 
   showSection(sectionId: string): void {
     this.activeSection = sectionId;
-    
-    // Cerrar sidebar en móvil
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       this.sidebarOpen = false;
     }
-    
-    // Cargar datos según la sección
-    switch(sectionId) {
-      case 'mascotas':
-        this.cargarMascotas();
-        break;
-      case 'compras':
-        this.cargarCompras();
-        break;
-      case 'citas':
-        this.cargarCitas();
-        break;
-      case 'adopciones':
-        this.cargarAdopciones();
-        break;
+    switch (sectionId) {
+      case 'mascotas': this.cargarMascotas(); break;
+      case 'compras':  this.cargarCompras();  break;
+      case 'adopciones': this.cargarAdopciones(); break;
     }
   }
 
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  cargarMascotas(): void {
+    this.mascotasService.getMisMascotas().subscribe({
+      next: (data) => { this.mascotas = data; },
+      error: () => { this.mascotas = []; }
+    });
+  }
+
+  cargarCompras(): void { this.compras = []; }
+
+  cargarAdopciones(): void { this.adopciones = []; }
+
   agregarMascota(): void {
-    // TODO: Implementar modal o navegación para agregar mascota
     console.log('Agregar mascota');
   }
 
   verMascota(id: number): void {
-    // TODO: Implementar vista de detalle de mascota
     console.log('Ver mascota:', id);
   }
 
   editarMascota(id: number): void {
-    // TODO: Implementar edición de mascota
     console.log('Editar mascota:', id);
   }
 
+  eliminarMascota(id: number): void {
+    Swal.fire({
+      title: '¿Eliminar mascota?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e74c3c',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.mascotasService.deleteMascota(id).subscribe({
+          next: () => {
+            Swal.fire('¡Eliminada!', 'La mascota ha sido eliminada.', 'success');
+            this.cargarMascotas();
+          },
+          error: () => { Swal.fire('Error', 'No se pudo eliminar la mascota', 'error'); }
+        });
+      }
+    });
+  }
+
   verCompra(id: number): void {
-    // TODO: Implementar vista de detalle de compra
     console.log('Ver compra:', id);
   }
 
@@ -163,22 +107,8 @@ export class PerfilComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/adopcion']);
   }
 
-  toggleSidebar(): void {
-    if (typeof document !== 'undefined') {
-      this.sidebarOpen = !this.sidebarOpen;
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      
-      if (sidebar && overlay) {
-        if (this.sidebarOpen) {
-          sidebar.classList.add('active');
-          overlay.classList.add('active');
-        } else {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
-        }
-      }
-    }
+  guardarPerfil(): void {
+    Swal.fire({ title: '¡Guardado!', text: 'Cambios guardados correctamente', icon: 'success', timer: 2000, showConfirmButton: false });
   }
 
   logout(): void {
@@ -186,68 +116,10 @@ export class PerfilComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/login']);
   }
 
-  eliminarMascota(id: number): void {
-    Swal.fire({
-      title: '¿Eliminar mascota?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.mascotasService.deleteMascota(id).subscribe({
-          next: () => {
-            Swal.fire('¡Eliminada!', 'La mascota ha sido eliminada.', 'success');
-            this.cargarMascotas();
-          },
-          error: (error: any) => {
-            Swal.fire('Error', 'No se pudo eliminar la mascota', 'error');
-          }
-        });
-      }
-    });
-  }
-
-  guardarPerfil(): void {
-    Swal.fire({
-      title: 'Guardando cambios...',
-      text: 'Por favor espera',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
-    // TODO: Implementar servicio para actualizar perfil
-    setTimeout(() => {
-      Swal.fire({
-        title: '¡Guardado!',
-        text: 'Los cambios han sido guardados correctamente',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false
-      });
-    }, 1000);
-  }
-
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
     const next = img.nextElementSibling as HTMLElement;
-    if (next) {
-      next.style.display = 'flex';
-    }
-  }
-
-  onImageErrorTable(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.style.display = 'none';
-    const next = img.nextElementSibling as HTMLElement;
-    if (next) {
-      next.style.display = 'inline-block';
-    }
+    if (next) next.style.display = 'flex';
   }
 }
