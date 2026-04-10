@@ -113,29 +113,9 @@ export class PerfilComponent implements OnInit, AfterViewInit {
   showSection(sectionId: string): void {
     this.activeSection = sectionId;
     
-    if (typeof document !== 'undefined') {
-      // Ocultar todas las secciones
-      const sections = document.querySelectorAll('.content-section');
-      sections.forEach(section => {
-        (section as HTMLElement).style.display = 'none';
-      });
-      
-      // Mostrar la sección seleccionada
-      const selectedSection = document.getElementById(sectionId);
-      if (selectedSection) {
-        selectedSection.style.display = 'block';
-      }
-      
-      // Actualizar nav links
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-      });
-      
-      const activeLink = document.querySelector(`[href="#${sectionId}"]`);
-      if (activeLink) {
-        activeLink.classList.add('active');
-      }
+    // Cerrar sidebar en móvil
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      this.sidebarOpen = false;
     }
     
     // Cargar datos según la sección
@@ -149,10 +129,38 @@ export class PerfilComponent implements OnInit, AfterViewInit {
       case 'citas':
         this.cargarCitas();
         break;
-      case 'adopcion':
+      case 'adopciones':
         this.cargarAdopciones();
         break;
     }
+  }
+
+  agregarMascota(): void {
+    // TODO: Implementar modal o navegación para agregar mascota
+    console.log('Agregar mascota');
+  }
+
+  verMascota(id: number): void {
+    // TODO: Implementar vista de detalle de mascota
+    console.log('Ver mascota:', id);
+  }
+
+  editarMascota(id: number): void {
+    // TODO: Implementar edición de mascota
+    console.log('Editar mascota:', id);
+  }
+
+  verCompra(id: number): void {
+    // TODO: Implementar vista de detalle de compra
+    console.log('Ver compra:', id);
+  }
+
+  irATienda(): void {
+    this.router.navigate(['/tienda']);
+  }
+
+  irAAdopciones(): void {
+    this.router.navigate(['/adopcion']);
   }
 
   toggleSidebar(): void {
