@@ -137,9 +137,6 @@
     <section class="content-section" [style.display]="activeSection === 'mascotas' ? 'block' : 'none'">
       <div class="section-header">
         <h2><i class="fas fa-paw me-2"></i>Mis Mascotas</h2>
-        <button class="btn btn-primary" (click)="agregarMascota()">
-          <i class="fas fa-plus me-2"></i>Agregar Mascota
-        </button>
       </div>
 
       <div class="pets-grid" *ngIf="mascotas.length > 0; else noMascotas">
@@ -191,6 +188,9 @@
     <section class="content-section" [style.display]="activeSection === 'compras' ? 'block' : 'none'">
       <div class="section-header">
         <h2><i class="fas fa-shopping-cart me-2"></i>Mis Compras</h2>
+        <button class="btn btn-primary" (click)="irATienda()">
+          <i class="fas fa-store me-2"></i>Ir a la Tienda
+        </button>
       </div>
 
       <div class="table-container" *ngIf="compras.length > 0; else noCompras">
@@ -240,6 +240,9 @@
     <section class="content-section" [style.display]="activeSection === 'adopciones' ? 'block' : 'none'">
       <div class="section-header">
         <h2><i class="fas fa-heart me-2"></i>Mis Adopciones</h2>
+        <button class="btn btn-primary" (click)="irAAdopciones()">
+          <i class="fas fa-heart me-2"></i>Ver Adopciones
+        </button>
       </div>
 
       <div class="adopciones-grid" *ngIf="adopciones.length > 0; else noAdopciones">
