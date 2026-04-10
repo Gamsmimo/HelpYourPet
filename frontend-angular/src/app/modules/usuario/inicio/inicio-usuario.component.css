@@ -101,7 +101,9 @@ body.dark-mode {
 /* ===== LAYOUT PRINCIPAL ===== */
 .layout-principal {
   display: flex;
+  justify-content: center;
   background: var(--bg-color);
+  padding-right: var(--sidebar-width);
 }
 
 /* ===== SIDEBAR DERECHO (Desktop) ===== */
@@ -284,11 +286,10 @@ body.dark-mode {
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .main-container {
-  flex: 1;
-  max-width: calc(100% - var(--sidebar-width));
+  width: 100%;
+  max-width: 680px;
   margin: 0 auto;
   padding: 1.5rem 1rem;
-  width: 100%;
 }
 
 /* ===== CREAR PUBLICACIÓN ===== */
@@ -637,8 +638,12 @@ body.dark-mode {
     --sidebar-width: 240px;
   }
 
+  .layout-principal {
+    padding-right: var(--sidebar-width);
+  }
+
   .main-container {
-    max-width: calc(100% - var(--sidebar-width));
+    max-width: 600px;
   }
 }
 
@@ -660,6 +665,7 @@ body.dark-mode {
 
   .layout-principal {
     display: block;
+    padding-right: 0;
   }
 
   .main-container {
