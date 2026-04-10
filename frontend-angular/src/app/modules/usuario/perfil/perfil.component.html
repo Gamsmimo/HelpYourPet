@@ -137,6 +137,9 @@
     <section class="content-section" [style.display]="activeSection === 'mascotas' ? 'block' : 'none'">
       <div class="section-header">
         <h2><i class="fas fa-paw me-2"></i>Mis Mascotas</h2>
+        <button class="btn btn-primary" (click)="agregarMascota()">
+          <i class="fas fa-plus me-2"></i>Agregar Mascota
+        </button>
       </div>
 
       <div class="pets-grid" *ngIf="mascotas.length > 0; else noMascotas">
@@ -177,9 +180,6 @@
           <i class="fas fa-paw"></i>
           <h3>No tienes mascotas registradas</h3>
           <p>Agrega tu primera mascota para comenzar</p>
-          <button class="btn btn-primary" (click)="agregarMascota()">
-            <i class="fas fa-plus me-2"></i>Agregar Mascota
-          </button>
         </div>
       </ng-template>
     </section>
