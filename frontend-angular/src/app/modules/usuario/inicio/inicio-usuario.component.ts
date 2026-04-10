@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -47,7 +47,10 @@ export class InicioUsuarioComponent implements OnInit {
   modoOscuro: boolean = false;
   nuevoComentario: { [key: number]: string } = {};
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.usuarioLogueado = this.authService.getUser();
@@ -219,16 +222,16 @@ export class InicioUsuarioComponent implements OnInit {
 
   irAPerfil(): void {
     this.menuAbierto = false;
-    // Navegar al perfil
+    this.router.navigate(['/usuario/perfil']);
   }
 
   irATienda(): void {
     this.menuAbierto = false;
-    // Navegar a la tienda
+    this.router.navigate(['/tienda']);
   }
 
   irAAdopciones(): void {
     this.menuAbierto = false;
-    // Navegar a adopciones
+    this.router.navigate(['/adopcion']);
   }
 }
