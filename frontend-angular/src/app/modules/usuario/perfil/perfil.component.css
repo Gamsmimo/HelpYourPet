@@ -155,7 +155,7 @@
 .main-content-perfil {
   flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 2rem;
+  padding: 1.2rem 1.5rem;
   min-height: 100vh;
 }
 
@@ -186,14 +186,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--border-color);
 }
 
 .section-header h2 {
   color: var(--text-color);
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -459,14 +459,14 @@
 .config-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .config-card {
   background: var(--card-bg);
-  border-radius: 12px;
-  padding: 2rem;
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
   margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -476,24 +476,25 @@
 .config-card.danger-zone {
   margin-top: 0;
   grid-column: 1 / -1;
+  padding: 1rem 1.4rem;
 }
 
 .config-card-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--border-color);
 }
 
 .config-card-header i {
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: var(--primary-color);
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   background: rgba(37, 142, 72, 0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,7 +502,7 @@
 
 .config-card-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--text-color);
   font-weight: 600;
 }
@@ -518,7 +519,7 @@
 .config-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.7rem;
 }
 
 .form-row {
@@ -530,20 +531,20 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
 .form-group label {
   font-weight: 600;
   color: var(--text-color);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
 }
 
 .form-control {
-  padding: 0.75rem 1rem;
+  padding: 0.45rem 0.75rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
   color: var(--text-color);
   background: var(--card-bg);
   transition: border-color 0.3s ease;
@@ -557,8 +558,9 @@
 
 .form-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: flex-start;
+  margin-top: 0.3rem;
 }
 
 .danger-zone {
@@ -571,10 +573,11 @@
 
 /* ===== BOTONES ===== */
 .btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1.1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   font-weight: 600;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
