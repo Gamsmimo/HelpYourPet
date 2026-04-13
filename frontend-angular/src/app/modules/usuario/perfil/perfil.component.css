@@ -35,8 +35,9 @@
   top: 0;
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--card-bg);
-  border-right: 1px solid var(--border-color);
+  background: #ffffff;
+  border-right: 1px solid #e4e6eb;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
   z-index: 1000;
   transition: transform 0.3s ease;
@@ -44,7 +45,8 @@
 
 .sidebar-header {
   padding: 2rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e4e6eb;
+  background: #fafbfc;
 }
 
 .logo-section {
@@ -100,6 +102,7 @@
 /* ===== NAVEGACIÓN SIDEBAR ===== */
 .sidebar-nav {
   padding: 1rem 0;
+  background: #ffffff;
 }
 
 .nav-item {
@@ -107,22 +110,24 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  color: var(--text-color);
+  color: #050505;
+  background: transparent;
   text-decoration: none;
-  cursor: pointer;
   transition: all 0.3s ease;
+  cursor: pointer;
   border-left: 3px solid transparent;
+  font-weight: 500;
 }
 
 .nav-item:hover {
-  background: var(--hover-bg);
-  border-left-color: var(--primary-color);
+  background: #f0f2f5;
+  border-left-color: #258e48;
 }
 
 .nav-item.active {
   background: rgba(37, 142, 72, 0.1);
-  border-left-color: var(--primary-color);
-  color: var(--primary-color);
+  border-left-color: #258e48;
+  color: #258e48;
   font-weight: 600;
 }
 
