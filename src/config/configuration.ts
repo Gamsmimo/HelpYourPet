@@ -19,7 +19,24 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
   },
   cors: {
-    origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:4200', 'http://localhost:60664'],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001', 
+        'http://localhost:4200',
+        'http://localhost:60664'
+      ];
+      
+      // Permitir localhost y 127.0.0.1 en cualquier puerto
+      if (!origin || 
+          allowedOrigins.includes(origin) || 
+          origin.startsWith('http://localhost:') || 
+          origin.startsWith('http://127.0.0.1:')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   },
   logging: {
