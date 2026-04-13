@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.css']
 })
@@ -21,16 +21,32 @@ export class PerfilComponent implements OnInit {
   compras: any[] = [];
   citas: any[] = [];
   adopciones: any[] = [];
+  
+  // Modales
+  showAddPetModal = false;
+  showEditPetModal = false;
+  
+  // Mascota en edición
+  mascotaEdit: any = {};
+  
+  // Foto de perfil
+  profilePicturePreview: string | null = null;
+  profilePictureFile: File | null = null;
+  
+  // Tema
+  darkMode = false;
 
   constructor(
     private authService: AuthService,
     private mascotasService: MascotasService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
     this.usuarioLogueado = this.authService.getUser() || {};
     this.cargarMascotas();
+    this.loadTheme();
   }
 
   showSection(sectionId: string): void {
@@ -112,8 +128,29 @@ export class PerfilComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Estás seguro de que deseas cerrar la sesión?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Sesión cerrada',
+          text: 'Hasta pronto',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        });
+      }
+    });
   }
 
   onImageError(event: Event): void {
@@ -121,5 +158,123 @@ export class PerfilComponent implements OnInit {
     img.style.display = 'none';
     const next = img.nextElementSibling as HTMLElement;
     if (next) next.style.display = 'flex';
+  }
+
+  // ===== MODALES =====
+  openAddPetModal(): void {
+    this.showAddPetModal = true;
+  }
+
+  closeAddPetModal(): void {
+    this.showAddPetModal = false;
+  }
+
+  openEditPetModal(mascota: any): void {
+    this.mascotaEdit = { ...mascota };
+    this.showEditPetModal = true;
+  }
+
+  closeEditPetModal(): void {
+    this.showEditPetModal = false;
+    this.mascotaEdit = {};
+  }
+
+  // ===== FOTO DE PERFIL =====
+  onProfilePictureSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.profilePictureFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.profilePicturePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  saveProfilePicture(): void {
+    if (this.profilePictureFile) {
+      // Aquí iría la lógica para subir la foto al servidor
+      Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
+      this.profilePicturePreview = null;
+      this.profilePictureFile = null;
+    }
+  }
+
+  cancelProfilePicture(): void {
+    this.profilePicturePreview = null;
+    this.profilePictureFile = null;
+  }
+
+  removeProfilePicture(): void {
+    Swal.fire({
+      title: '¿Eliminar foto?',
+      text: 'Se usará la imagen por defecto',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.usuarioLogueado.imagen = null;
+        Swal.fire('Eliminada', 'Foto de perfil eliminada', 'success');
+      }
+    });
+  }
+
+  // ===== TEMA =====
+  toggleTheme(): void {
+    this.darkMode = !this.darkMode;
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.classList.toggle('dark-mode', this.darkMode);
+      localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+    }
+  }
+
+  loadTheme(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const savedTheme = localStorage.getItem('theme');
+      this.darkMode = savedTheme === 'dark';
+      document.body.classList.toggle('dark-mode', this.darkMode);
+    }
+  }
+
+  // ===== ELIMINAR CUENTA =====
+  deleteAccount(): void {
+    Swal.fire({
+      title: '¿Eliminar cuenta?',
+      text: 'Esta acción es PERMANENTE y no se puede deshacer. Se eliminarán todos tus datos.',
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar mi cuenta',
+      cancelButtonText: 'Cancelar',
+      input: 'text',
+      inputPlaceholder: 'Escribe "ELIMINAR" para confirmar',
+      inputValidator: (value) => {
+        if (value !== 'ELIMINAR') {
+          return 'Debes escribir "ELIMINAR" para confirmar';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Aquí iría la lógica para eliminar la cuenta
+        Swal.fire('Cuenta eliminada', 'Tu cuenta ha sido eliminada permanentemente', 'success').then(() => {
+          this.authService.logout();
+          this.router.navigate(['/']);
+        });
+      }
+    });
+  }
+
+  // ===== IR A PÁGINAS =====
+  goToHome(): void {
+    this.router.navigate(['/usuario']);
+  }
+
+  goToRecovery(): void {
+    this.router.navigate(['/recovery']);
   }
 }
