@@ -170,38 +170,26 @@
   top: 1rem;
   left: 1rem;
   z-index: 999;
-  background: #f0f2f5;
-  color: #050505;
-  border: 1px solid #e4e6eb;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  background: transparent;
+  color: #65676b;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   font-size: 1.4rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   align-items: center;
   justify-content: center;
 }
 
 .menu-toggle-btn:hover {
-  background: #258e48;
-  color: #ffffff;
-  border-color: #258e48;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(37, 142, 72, 0.3);
+  background: rgba(37, 142, 72, 0.1);
+  color: #258e48;
 }
 
 .menu-toggle-btn:active {
-  transform: translateY(0);
-}
-
-.menu-toggle-btn i {
-  transition: transform 0.3s ease;
-}
-
-.menu-toggle-btn:active i {
-  transform: rotate(90deg);
+  transform: scale(0.95);
 }
 
 /* ===== SECCIONES DE CONTENIDO ===== */
