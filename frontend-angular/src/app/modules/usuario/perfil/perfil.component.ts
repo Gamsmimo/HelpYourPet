@@ -95,10 +95,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   cargarMascotas(): void {
-    this.mascotasService.getMisMascotas().subscribe({
-      next: (data) => { this.mascotas = data; },
-      error: () => { this.mascotas = []; }
-    });
+    if (this.usuarioLogueado?.id) {
+      this.mascotasService.getMascotasByUsuario(this.usuarioLogueado.id).subscribe({
+        next: (data) => { this.mascotas = data; },
+        error: () => { this.mascotas = []; }
+      });
+    }
   }
 
   cargarCompras(): void { this.compras = []; }
