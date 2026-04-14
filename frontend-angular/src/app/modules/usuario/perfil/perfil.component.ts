@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AdopcionService } from '../../../core/services/adopcion.service';
+import { PublicacionesService } from '../../../core/services/publicaciones.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import Swal from 'sweetalert2';
@@ -52,6 +53,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
     private mascotasService: MascotasService,
     private usuariosService: UsuariosService,
     private adopcionService: AdopcionService,
+    private publicacionesService: PublicacionesService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -137,18 +139,25 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   cargarPublicaciones(): void {
-    // TODO: Implementar servicio de publicaciones cuando esté disponible
-    // Por ahora, usar datos de ejemplo
-    this.publicaciones = [
-      {
-        id: 1,
-        contenido: 'Mi primera publicación en HelpYourPet! 🐾',
-        imagen: null,
-        fecha: new Date(),
-        likes: 5,
-        comentarios: 2
-      }
-    ];
+    if (this.usuarioLogueado.id) {
+      this.publicacionesService.getPublicacionesByUsuario(this.usuarioLogueado.id).subscribe({
+        next: (data) => {
+          console.log('Publicaciones del usuario:', data);
+          this.publicaciones = data.map(pub => ({
+            id: pub.id,
+            contenido: pub.contenido,
+            imagen: pub.imagen,
+            fecha: new Date(pub.createdAt),
+            likes: pub.likes || 0,
+            comentarios: pub.comentarios || 0
+          }));
+        },
+        error: (error) => {
+          console.error('Error al cargar publicaciones:', error);
+          this.publicaciones = [];
+        }
+      });
+    }
   }
 
   eliminarPublicacion(id: number): void {
@@ -163,9 +172,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        // TODO: Implementar eliminación en el backend
-        this.publicaciones = this.publicaciones.filter(p => p.id !== id);
-        Swal.fire('¡Eliminada!', 'La publicación ha sido eliminada.', 'success');
+        this.publicacionesService.deletePublicacion(id).subscribe({
+          next: () => {
+            this.publicaciones = this.publicaciones.filter(p => p.id !== id);
+            Swal.fire('¡Eliminada!', 'La publicación ha sido eliminada.', 'success');
+          },
+          error: () => {
+            Swal.fire('Error', 'No se pudo eliminar la publicación', 'error');
+          }
+        });
       }
     });
   }

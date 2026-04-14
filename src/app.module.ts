@@ -38,6 +38,7 @@ import { PerfilVeterinarioModule } from './modules/perfil-veterinario/perfil-vet
 import { TokenRecuperacionModule } from './modules/token-recuperacion/token-recuperacion.module';
 import { ReportesMaltratoModule } from './modules/reportes-maltrato/reportes-maltrato.module';
 import { VeterinariaVeterinarioModule } from './modules/veterinaria-veterinario/veterinaria-veterinario.module';
+import { PublicacionesModule } from './modules/publicaciones/publicaciones.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { VeterinariaVeterinarioModule } from './modules/veterinaria-veterinario/
     TokenRecuperacionModule,
     ReportesMaltratoModule,
     VeterinariaVeterinarioModule,
+    PublicacionesModule,
   ],
   controllers: [AppController, MetricsController],
   providers: [
