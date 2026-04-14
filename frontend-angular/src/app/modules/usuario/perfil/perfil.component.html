@@ -77,55 +77,6 @@
             </a>
           </div>
         </div>
-
-        <!-- Mis Mascotas (Preview) -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5><i class="fas fa-paw me-2"></i>Mis Mascotas</h5>
-          </div>
-          <div class="card-body">
-            <div class="row" id="pets-preview">
-              <div *ngIf="mascotas.length === 0" class="col-12">
-                <div class="alert alert-info text-center">
-                  <i class="fas fa-paw me-2"></i>No tienes mascotas registradas aún.
-                </div>
-              </div>
-              <div *ngIf="mascotas.length > 0" class="col-12">
-                <div class="pets-grid">
-                  <div *ngFor="let mascota of mascotas" class="pet-card">
-                    <div class="pet-image-container">
-                      <img *ngIf="mascota.foto" 
-                           [src]="mascota.foto" 
-                           [alt]="'Foto de ' + mascota.nombre"
-                           class="pet-image"
-                           (error)="onImageError($event)">
-                      <div *ngIf="!mascota.foto" class="pet-image-placeholder">
-                        <i class="fas fa-paw"></i>
-                      </div>
-                    </div>
-                    <div class="pet-info">
-                      <h5 class="pet-name">{{ mascota.nombre }}</h5>
-                      <div class="pet-details">
-                        <div class="pet-detail">
-                          <i class="fas fa-paw"></i>
-                          <span>{{ mascota.especie }}</span>
-                        </div>
-                        <div class="pet-detail">
-                          <i class="fas fa-calendar"></i>
-                          <span>{{ mascota.edad }} {{ mascota.unidadEdad }}</span>
-                        </div>
-                        <div class="pet-detail" *ngIf="mascota.raza">
-                          <i class="fas fa-dna"></i>
-                          <span>{{ mascota.raza }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- Sección Mis Mascotas -->
