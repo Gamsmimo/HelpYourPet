@@ -35,7 +35,15 @@ export class AdopcionService {
   async findByEstado(estado: string): Promise<Adopcion[]> {
     return this.adopcionRepository.find({
       where: { estado },
-      relations: ['mascota', 'usuario', 'veterinaria'],
+      relations: ['mascota', 'usuario'],
+    });
+  }
+
+  async findByUsuario(idUsuario: number): Promise<Adopcion[]> {
+    return this.adopcionRepository.find({
+      where: { idUsuario },
+      relations: ['mascota', 'usuario'],
+      order: { createdAt: 'DESC' },
     });
   }
 

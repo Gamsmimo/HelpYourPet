@@ -32,6 +32,14 @@ export class AdopcionController {
     return this.adopcionService.findByEstado(estado);
   }
 
+  @Get('usuario/:idUsuario')
+  @ApiOperation({ summary: 'Obtener adopciones publicadas por un usuario' })
+  @ApiResponse({ status: 200, description: 'Lista de adopciones del usuario', type: [Adopcion] })
+  @ApiBearerAuth('JWT-auth')
+  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.adopcionService.findByUsuario(idUsuario);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener adopción por ID' })
   @ApiResponse({ status: 200, description: 'Adopción encontrada', type: Adopcion })

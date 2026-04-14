@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
+import { AdopcionService } from '../../../core/services/adopcion.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -41,9 +42,10 @@ export class PerfilComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private router: Router,
     private mascotasService: MascotasService,
     private usuariosService: UsuariosService,
-    private router: Router,
+    private adopcionService: AdopcionService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -51,6 +53,7 @@ export class PerfilComponent implements OnInit {
     this.usuarioLogueado = this.authService.getUser() || {};
     this.cargarDatosUsuario();
     this.cargarMascotas();
+    this.cargarAdopciones();
     this.loadTheme();
   }
 
@@ -78,8 +81,6 @@ export class PerfilComponent implements OnInit {
   }
 
   cargarCompras(): void { this.compras = []; }
-
-  cargarAdopciones(): void { this.adopciones = []; }
 
   agregarMascota(): void {
     console.log('Agregar mascota');
@@ -114,6 +115,31 @@ export class PerfilComponent implements OnInit {
         });
       }
     });
+  }
+
+  cargarAdopciones(): void {
+    if (this.usuarioLogueado.id) {
+      this.adopcionService.getAdopcionesByUsuario(this.usuarioLogueado.id).subscribe({
+        next: (data) => {
+          console.log('Adopciones del usuario:', data);
+          this.adopciones = data.map(adopcion => ({
+            id: adopcion.id,
+            nombreMascota: adopcion.mascota?.nombre || 'Sin nombre',
+            tipoMascota: adopcion.mascota?.especie || 'Desconocido',
+            raza: adopcion.mascota?.raza || 'Mestizo',
+            edad: adopcion.mascota?.edad || 0,
+            tamano: adopcion.mascota?.peso ? `${adopcion.mascota.peso} kg` : '',
+            imagen: adopcion.mascota?.foto || 'assets/IMG/default-pet.jpg',
+            descripcion: adopcion.observaciones || 'Sin descripción',
+            estado: adopcion.estado || 'DISPONIBLE'
+          }));
+        },
+        error: (error) => {
+          console.error('Error al cargar adopciones:', error);
+          this.adopciones = [];
+        }
+      });
+    }
   }
 
   verCompra(id: number): void {
