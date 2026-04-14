@@ -12,7 +12,7 @@ export class PublicacionesService {
     private publicacionesRepository: Repository<Publicacion>,
   ) {}
 
-  async create(idUsuario: number, createPublicacionDto: CreatePublicacionDto): Promise<Publicacion> {
+  async create(idUsuario: number, createPublicacionDto: Omit<CreatePublicacionDto, 'idUsuario'>): Promise<Publicacion> {
     const publicacion = this.publicacionesRepository.create({
       ...createPublicacionDto,
       idUsuario,
