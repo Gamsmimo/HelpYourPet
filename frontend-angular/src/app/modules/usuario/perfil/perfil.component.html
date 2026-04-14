@@ -387,7 +387,7 @@
                     <!-- Foto de Perfil - Columna Izquierda -->
                     <div class="col-md-1 text-center d-flex flex-column">
                       <div class="profile-picture-container">
-                        <img [src]="usuarioLogueado?.imagen || 'assets/IMG/humano.jpg'"
+                        <img [src]="getImageUrl(usuarioLogueado?.imagen)"
                              alt="Foto de perfil" 
                              class="rounded-circle img-fluid mb-1"
                              style="width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--pastel-blue);"

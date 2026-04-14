@@ -254,6 +254,22 @@ export class PerfilComponent implements OnInit {
   }
 
   // ===== FOTO DE PERFIL =====
+  getImageUrl(imagen: string | null | undefined): string {
+    if (!imagen || imagen === '') {
+      return 'assets/IMG/humano.jpg';
+    }
+    // Si la imagen ya tiene http:// o https://, retornarla tal cual
+    if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
+      return imagen;
+    }
+    // Si empieza con /uploads, agregar la URL del servidor
+    if (imagen.startsWith('/uploads')) {
+      return `http://localhost:3000${imagen}`;
+    }
+    // Si es una ruta relativa, agregar la URL del servidor
+    return `http://localhost:3000/${imagen}`;
+  }
+
   onProfilePictureSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -295,11 +311,22 @@ export class PerfilComponent implements OnInit {
     if (this.profilePictureFile) {
       this.usuariosService.updateProfilePicture(this.usuarioLogueado.id, this.profilePictureFile).subscribe({
         next: (data) => {
+          // Actualizar todos los objetos con la nueva imagen
           this.usuarioLogueado.imagen = data.imagen;
+          this.usuarioEdit.imagen = data.imagen;
+          this.usuarioOriginal.imagen = data.imagen;
+          
+          // Actualizar en AuthService para sincronizar con sidebar
           this.authService.updateUserData(data);
-          Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
+          
+          // Limpiar preview y archivo
+          if (this.profilePicturePreview) {
+            URL.revokeObjectURL(this.profilePicturePreview);
+          }
           this.profilePicturePreview = null;
           this.profilePictureFile = null;
+          
+          Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
         },
         error: (error) => {
           Swal.fire('Error', 'No se pudo actualizar la foto de perfil', 'error');
@@ -329,8 +356,14 @@ export class PerfilComponent implements OnInit {
       if (result.isConfirmed) {
         this.usuariosService.deleteProfilePicture(this.usuarioLogueado.id).subscribe({
           next: (data) => {
-            this.usuarioLogueado.imagen = null;
+            // Actualizar todos los objetos
+            this.usuarioLogueado.imagen = '';
+            this.usuarioEdit.imagen = '';
+            this.usuarioOriginal.imagen = '';
+            
+            // Actualizar en AuthService para sincronizar con sidebar
             this.authService.updateUserData(data);
+            
             Swal.fire('Eliminada', 'Foto de perfil eliminada', 'success');
           },
           error: (error) => {
