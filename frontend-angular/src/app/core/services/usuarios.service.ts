@@ -21,12 +21,12 @@ export class UsuariosService {
 
   updateProfilePicture(id: number, file: File): Observable<any> {
     const formData = new FormData();
-    formData.append('imagen', file);
-    return this.http.patch(`${this.apiUrl}/${id}`, formData);
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/${id}/foto-perfil`, formData);
   }
 
   deleteProfilePicture(id: number): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}`, { imagen: null });
+    return this.http.delete(`${this.apiUrl}/${id}/foto-perfil`);
   }
 
   deleteAccount(id: number): Observable<any> {

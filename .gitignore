@@ -93,6 +93,7 @@ logs/application-*.log
 # Uploads
 uploads/*
 !uploads/.gitkeep
+!uploads/profile-pictures/.gitkeep
  
 # Temp files
 temp/*

@@ -83,6 +83,18 @@ export class UsuariosService {
     return this.usuariosRepository.save(usuario);
   }
 
+  async updateProfilePicture(id: number, filename: string): Promise<Usuario> {
+    const usuario = await this.findOne(id);
+    usuario.imagen = `/uploads/profile-pictures/${filename}`;
+    return this.usuariosRepository.save(usuario);
+  }
+
+  async deleteProfilePicture(id: number): Promise<Usuario> {
+    const usuario = await this.findOne(id);
+    usuario.imagen = undefined;
+    return this.usuariosRepository.save(usuario);
+  }
+
   async remove(id: number): Promise<void> {
     const usuario = await this.findOne(id);
     usuario.estado = false;
