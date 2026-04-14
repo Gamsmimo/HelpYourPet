@@ -331,12 +331,16 @@ export class PerfilComponent implements OnInit {
           this.profilePicturePreview = null;
           this.profilePictureFile = null;
           
-          // Forzar detección de cambios
-          setTimeout(() => {
-            this.usuarioLogueado = { ...this.usuarioLogueado };
-          }, 100);
-          
-          Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
+          // Mostrar mensaje y recargar página
+          Swal.fire({
+            title: '¡Guardado!',
+            text: 'Foto de perfil actualizada',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.reload();
+          });
         },
         error: (error) => {
           Swal.fire('Error', 'No se pudo actualizar la foto de perfil', 'error');
