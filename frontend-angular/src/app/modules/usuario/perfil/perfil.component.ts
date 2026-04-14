@@ -1,11 +1,13 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AdopcionService } from '../../../core/services/adopcion.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,7 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.css']
 })
-export class PerfilComponent implements OnInit {
+export class PerfilComponent implements OnInit, OnDestroy {
   usuarioLogueado: any = {};
   usuarioEdit: any = {}; // Copia para editar
   usuarioOriginal: any = {}; // Copia original para comparar cambios
@@ -40,6 +42,9 @@ export class PerfilComponent implements OnInit {
   // Tema
   darkMode = false;
 
+  // Suscripción a navegación
+  private navigationSubscription: Subscription | null = null;
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -50,6 +55,26 @@ export class PerfilComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.inicializarDatos();
+    
+    // Suscribirse a eventos de navegación para recargar datos
+    this.navigationSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url.includes('/usuario/perfil')) {
+          console.log('Navegación detectada a perfil, recargando datos...');
+          this.inicializarDatos();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+    }
+  }
+
+  inicializarDatos(): void {
     this.usuarioLogueado = this.authService.getUser() || {};
     this.cargarDatosUsuario();
     this.cargarMascotas();
