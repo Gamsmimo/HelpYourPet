@@ -482,7 +482,7 @@
 
                         <!-- Botón Guardar -->
                         <div class="col-12 text-center mt-2">
-                          <button type="submit" class="btn btn-primary btn-sm px-4">
+                          <button type="submit" class="btn btn-primary btn-sm px-4" [disabled]="!hasChanges()">
                             <i class="fas fa-save me-1"></i>Guardar Cambios
                           </button>
                         </div>

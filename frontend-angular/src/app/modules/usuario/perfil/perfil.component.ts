@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
 export class PerfilComponent implements OnInit {
   usuarioLogueado: any = {};
   usuarioEdit: any = {}; // Copia para editar
+  usuarioOriginal: any = {}; // Copia original para comparar cambios
   mascotas: any[] = [];
   activeSection = 'dashboard';
   sidebarOpen = false;
@@ -134,6 +135,7 @@ export class PerfilComponent implements OnInit {
           console.log('Datos del usuario recibidos:', data);
           this.usuarioLogueado = data;
           this.usuarioEdit = { ...data };
+          this.usuarioOriginal = { ...data }; // Guardar copia original
           // Actualizar en AuthService
           this.authService.updateUserData(data);
         },
@@ -142,6 +144,18 @@ export class PerfilComponent implements OnInit {
         }
       });
     }
+  }
+
+  hasChanges(): boolean {
+    if (!this.usuarioOriginal || !this.usuarioEdit) {
+      return false;
+    }
+    
+    return this.usuarioEdit.nombres !== this.usuarioOriginal.nombres ||
+           this.usuarioEdit.apellidos !== this.usuarioOriginal.apellidos ||
+           this.usuarioEdit.telefono !== this.usuarioOriginal.telefono ||
+           this.usuarioEdit.direccion !== this.usuarioOriginal.direccion ||
+           this.usuarioEdit.edad !== this.usuarioOriginal.edad;
   }
 
   guardarPerfil(): void {
@@ -166,6 +180,7 @@ export class PerfilComponent implements OnInit {
       next: (data) => {
         this.usuarioLogueado = data;
         this.usuarioEdit = { ...data };
+        this.usuarioOriginal = { ...data }; // Actualizar copia original
         this.authService.updateUserData(data);
         Swal.fire({
           title: '¡Guardado!',
