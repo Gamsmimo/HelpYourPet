@@ -463,7 +463,7 @@
                           <div class="row g-2">
                             <div class="col-12">
                               <label for="profile-edad" class="form-label fw-bold">Edad</label>
-                              <input type="text" class="form-control" id="profile-edad" [value]="usuarioEdit.edad || 'No especificado'" name="edad" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Tu edad">
+                              <input type="number" class="form-control" id="profile-edad" [(ngModel)]="usuarioEdit.edad" name="edad" min="18" max="120" placeholder="Tu edad">
                             </div>
                             <div class="col-12">
                               <label for="profile-address" class="form-label fw-bold">Dirección</label>
