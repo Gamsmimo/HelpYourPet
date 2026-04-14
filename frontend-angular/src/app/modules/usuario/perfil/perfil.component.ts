@@ -131,6 +131,7 @@ export class PerfilComponent implements OnInit {
     if (this.usuarioLogueado.id) {
       this.usuariosService.getUsuario(this.usuarioLogueado.id).subscribe({
         next: (data) => {
+          console.log('Datos del usuario recibidos:', data);
           this.usuarioLogueado = data;
           this.usuarioEdit = { ...data };
           // Actualizar en AuthService
