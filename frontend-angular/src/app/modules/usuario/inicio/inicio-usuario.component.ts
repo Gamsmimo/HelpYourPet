@@ -222,10 +222,8 @@ export class InicioUsuarioComponent implements OnInit {
 
   irAPerfil(): void {
     this.menuAbierto = false;
-    // Forzar recarga del componente usando skipLocationChange y luego navegando
-    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-      this.router.navigate(['/usuario/perfil']);
-    });
+    // Usar window.location para forzar recarga completa de la página
+    window.location.href = '/usuario/perfil';
   }
 
   irATienda(): void {

@@ -55,17 +55,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.inicializarDatos();
-    
-    // Suscribirse a eventos de navegación para recargar datos
-    this.navigationSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        if (event.url.includes('/usuario/perfil')) {
-          console.log('Navegación detectada a perfil, recargando datos...');
-          this.inicializarDatos();
-        }
-      });
+    // Usar setTimeout para asegurar que los servicios estén disponibles
+    setTimeout(() => {
+      this.inicializarDatos();
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -76,26 +69,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   inicializarDatos(): void {
     this.usuarioLogueado = this.authService.getUser() || {};
-    
-    // Verificar que los servicios estén disponibles antes de usarlos
-    if (this.usuariosService && typeof this.usuariosService.getUsuario === 'function') {
-      this.cargarDatosUsuario();
-    } else {
-      console.error('UsuariosService no está disponible');
-    }
-    
-    if (this.mascotasService && typeof this.mascotasService.getMisMascotas === 'function') {
-      this.cargarMascotas();
-    } else {
-      console.error('MascotasService no está disponible');
-    }
-    
-    if (this.adopcionService && typeof this.adopcionService.getAdopcionesByUsuario === 'function') {
-      this.cargarAdopciones();
-    } else {
-      console.error('AdopcionService no está disponible');
-    }
-    
+    this.cargarDatosUsuario();
+    this.cargarMascotas();
+    this.cargarAdopciones();
     this.loadTheme();
   }
 
