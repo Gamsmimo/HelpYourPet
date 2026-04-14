@@ -311,13 +311,18 @@ export class PerfilComponent implements OnInit {
     if (this.profilePictureFile) {
       this.usuariosService.updateProfilePicture(this.usuarioLogueado.id, this.profilePictureFile).subscribe({
         next: (data) => {
+          console.log('Respuesta del servidor:', data);
+          
           // Actualizar todos los objetos con la nueva imagen
           this.usuarioLogueado.imagen = data.imagen;
           this.usuarioEdit.imagen = data.imagen;
           this.usuarioOriginal.imagen = data.imagen;
           
           // Actualizar en AuthService para sincronizar con sidebar
-          this.authService.updateUserData(data);
+          this.authService.updateUserData({
+            ...this.usuarioLogueado,
+            imagen: data.imagen
+          });
           
           // Limpiar preview y archivo
           if (this.profilePicturePreview) {
@@ -325,6 +330,11 @@ export class PerfilComponent implements OnInit {
           }
           this.profilePicturePreview = null;
           this.profilePictureFile = null;
+          
+          // Forzar detección de cambios
+          setTimeout(() => {
+            this.usuarioLogueado = { ...this.usuarioLogueado };
+          }, 100);
           
           Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
         },

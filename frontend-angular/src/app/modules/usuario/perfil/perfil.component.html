@@ -7,7 +7,7 @@
       <div class="sidebar-header">
         <h3 class="text-center">HelpYourPet</h3>
         <div class="user-profile text-center">
-          <img [src]="usuarioLogueado?.imagen || 'assets/IMG/humano.jpg'" 
+          <img [src]="getImageUrl(usuarioLogueado?.imagen)" 
                alt="Foto de perfil" 
                class="rounded-circle mb-2" 
                id="sidebar-profile-picture">
