@@ -176,8 +176,18 @@ export class InicioUsuarioComponent implements OnInit {
 
   publicar(): void {
     if (this.nuevaPublicacion.trim() || this.imagenPreview) {
+      // Obtener ID del usuario (puede estar en 'id' o 'id_usuario')
+      const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
+      console.log('Usuario logueado:', this.usuarioLogueado);
+      console.log('ID Usuario:', userId);
+      
+      if (!userId) {
+        alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.');
+        return;
+      }
+      
       // Enviar al backend
-      this.publicacionesService.createPublicacion(this.usuarioLogueado?.id, this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
+      this.publicacionesService.createPublicacion(userId, this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
         next: (data) => {
           console.log('Publicación creada:', data);
           // Agregar a la lista local

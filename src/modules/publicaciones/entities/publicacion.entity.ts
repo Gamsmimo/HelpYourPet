@@ -16,8 +16,8 @@ export class Publicacion {
   @Column({ type: 'text' })
   contenido: string;
 
-  @ApiProperty({ description: 'URL de la imagen (opcional)', required: false })
-  @Column({ length: 255, nullable: true })
+  @ApiProperty({ description: 'Imagen en base64 o URL (opcional)', required: false })
+  @Column({ type: 'text', nullable: true })
   imagen: string;
 
   @ApiProperty({ description: 'Cantidad de likes', example: 0 })

@@ -13,10 +13,11 @@ export class PublicacionesService {
 
   createPublicacion(idUsuario: number, contenido: string, imagen?: string): Observable<any> {
     const data: any = {
-      idUsuario,
+      idUsuario: Number(idUsuario),
       contenido,
       ...(imagen && { imagen })
     };
+    console.log('Enviando publicación:', data);
     return this.http.post(this.apiUrl, data);
   }
 
