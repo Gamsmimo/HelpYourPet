@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { PublicacionesService } from '../../../core/services/publicaciones.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface Publicacion {
   id: number;
@@ -38,7 +40,7 @@ interface Comentario {
   templateUrl: './inicio-usuario.component.html',
   styleUrls: ['./inicio-usuario.component.css']
 })
-export class InicioUsuarioComponent implements OnInit {
+export class InicioUsuarioComponent implements OnInit, OnDestroy {
   usuarioLogueado: any = null;
   publicaciones: Publicacion[] = [];
   nuevaPublicacion: string = '';
@@ -47,6 +49,7 @@ export class InicioUsuarioComponent implements OnInit {
   menuAbierto: boolean = false;
   modoOscuro: boolean = false;
   nuevoComentario: { [key: number]: string } = {};
+  private navigationSubscription: Subscription | null = null;
 
   constructor(
     private authService: AuthService,
@@ -55,6 +58,25 @@ export class InicioUsuarioComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.inicializarDatos();
+    
+    // Suscribirse a eventos de navegación para recargar cuando se vuelve a esta ruta
+    this.navigationSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url === '/usuario' || event.urlAfterRedirects === '/usuario') {
+          this.inicializarDatos();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+    }
+  }
+
+  inicializarDatos(): void {
     this.usuarioLogueado = this.authService.getUser();
     this.cargarPublicaciones();
     this.cargarModoOscuro();
@@ -273,8 +295,7 @@ export class InicioUsuarioComponent implements OnInit {
 
   irAPerfil(): void {
     this.menuAbierto = false;
-    // Usar window.location para forzar recarga completa de la página
-    window.location.href = '/usuario/perfil';
+    this.router.navigate(['/usuario/perfil']);
   }
 
   irATienda(): void {

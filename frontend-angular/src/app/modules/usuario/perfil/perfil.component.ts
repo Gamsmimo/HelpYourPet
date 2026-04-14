@@ -58,10 +58,17 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Usar setTimeout para asegurar que los servicios estén disponibles
-    setTimeout(() => {
-      this.inicializarDatos();
-    }, 0);
+    // Inicializar datos inmediatamente
+    this.inicializarDatos();
+    
+    // Suscribirse a eventos de navegación para recargar cuando se vuelve a esta ruta
+    this.navigationSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url === '/usuario/perfil' || event.urlAfterRedirects === '/usuario/perfil') {
+          this.inicializarDatos();
+        }
+      });
   }
 
   ngOnDestroy(): void {
