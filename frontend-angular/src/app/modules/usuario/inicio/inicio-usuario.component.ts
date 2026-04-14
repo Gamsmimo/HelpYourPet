@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -54,7 +54,8 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private publicacionesService: PublicacionesService
+    private publicacionesService: PublicacionesService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -97,15 +98,19 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
           imagen: pub.imagen,
           fecha: new Date(pub.createdAt),
           likes: pub.likes || 0,
-          comentarios: [], // TODO: Cargar comentarios cuando estén disponibles
+          comentarios: [],
           compartidos: 0,
           likedByUser: false,
           mostrarComentarios: false
         }));
+        // Forzar detección de cambios para actualizar la vista
+        this.cdr.detectChanges();
+        console.log('Publicaciones asignadas:', this.publicaciones.length);
       },
       error: (error) => {
         console.error('Error al cargar publicaciones:', error);
         this.publicaciones = [];
+        this.cdr.detectChanges();
       }
     });
   }
