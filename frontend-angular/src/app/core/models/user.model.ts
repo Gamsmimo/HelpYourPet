@@ -22,7 +22,9 @@ export interface RegisterDto {
   apellidos: string;
   correo: string;
   contrasena: string;
-  documento?: string;
+  tipo_documento?: string;
+  num_documento?: string;
+  edad?: number;
   telefono?: string;
   direccion?: string;
   idRol?: number;

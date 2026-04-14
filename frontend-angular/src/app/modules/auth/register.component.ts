@@ -22,13 +22,12 @@ export class RegisterComponent {
     apellidos: '',
     correo: '',
     contrasena: '',
+    tipo_documento: '',
+    num_documento: '',
+    edad: 18,
     telefono: '',
-    documento: '',
     direccion: ''
   };
-
-  tipoDocumento = '';
-  edad = 18;
   confirmPassword = '';
   aceptoTerminos = false;
   showPassword = false;

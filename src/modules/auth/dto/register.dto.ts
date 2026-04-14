@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength, IsInt, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsInt, IsOptional, IsEnum } from 'class-validator';
+
+export enum TipoDocumento {
+  CC = 'CC',
+  TI = 'TI',
+  CE = 'CE',
+  PA = 'PA',
+}
 
 export class RegisterDto {
   @ApiProperty({ description: 'Nombre del usuario', example: 'Juan' })
@@ -19,10 +26,20 @@ export class RegisterDto {
   @MinLength(6)
   contrasena: string;
 
-  @ApiProperty({ description: 'Documento de identidad', example: '1234567890', required: false })
+  @ApiProperty({ description: 'Tipo de documento', enum: TipoDocumento, example: 'CC', required: false })
+  @IsOptional()
+  @IsEnum(TipoDocumento)
+  tipo_documento?: TipoDocumento;
+
+  @ApiProperty({ description: 'Número de documento', example: '1234567890', required: false })
   @IsOptional()
   @IsString()
-  documento?: string;
+  num_documento?: string;
+
+  @ApiProperty({ description: 'Edad', example: 25, required: false })
+  @IsOptional()
+  @IsInt()
+  edad?: number;
 
   @ApiProperty({ description: 'Teléfono', example: '3001234567', required: false })
   @IsOptional()

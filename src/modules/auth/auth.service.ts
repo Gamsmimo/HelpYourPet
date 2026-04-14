@@ -29,6 +29,9 @@ export class AuthService {
       apellidos: registerDto.apellidos,
       correo: registerDto.correo,
       rol_id: registerDto.idRol || 3,
+      tipo_documento: registerDto.tipo_documento,
+      num_documento: registerDto.num_documento,
+      edad: registerDto.edad,
     });
     
     const usuario = await this.usuariosService.create({
@@ -38,6 +41,9 @@ export class AuthService {
       password: registerDto.contrasena,
       telefono: registerDto.telefono || '',
       direccion: registerDto.direccion || '',
+      tipo_documento: registerDto.tipo_documento,
+      num_documento: registerDto.num_documento,
+      edad: registerDto.edad,
       rol_id: registerDto.idRol || 3,
       estado: true,
     });

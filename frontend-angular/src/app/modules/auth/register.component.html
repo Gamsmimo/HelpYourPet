@@ -20,18 +20,17 @@
           </div>
 
           <div class="form-group">
-            <select id="tipoDocumento" name="tipoDocumento" [(ngModel)]="tipoDocumento" required>
+            <select id="tipoDocumento" name="tipoDocumento" [(ngModel)]="formData.tipo_documento" required>
               <option value="">Tipo de Documento</option>
-              <option value="Cédula">Cédula</option>
-              <option value="DNI">DNI</option>
-              <option value="Pasaporte">Pasaporte</option>
-              <option value="Tarjeta de Identidad">Tarjeta de Identidad</option>
-              <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+              <option value="CC">Cédula de Ciudadanía (CC)</option>
+              <option value="TI">Tarjeta de Identidad (TI)</option>
+              <option value="CE">Cédula de Extranjería (CE)</option>
+              <option value="PA">Pasaporte (PA)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <input type="text" id="numDocumento" name="numDocumento" [(ngModel)]="formData.documento" placeholder="N° Documento" required />
+            <input type="text" id="numDocumento" name="numDocumento" [(ngModel)]="formData.num_documento" placeholder="N° Documento" required />
           </div>
 
           <div class="form-group">
@@ -43,7 +42,7 @@
           </div>
 
           <div class="form-group">
-            <input type="number" id="edad" name="edad" [(ngModel)]="edad" placeholder="Edad (18+)" required min="18" max="120" />
+            <input type="number" id="edad" name="edad" [(ngModel)]="formData.edad" placeholder="Edad (18+)" required min="18" max="120" />
           </div>
 
           <div class="form-group">
