@@ -257,12 +257,37 @@ export class PerfilComponent implements OnInit {
   onProfilePictureSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        Swal.fire({
+          title: 'Tipo de archivo no válido',
+          text: 'Solo se permiten imágenes (JPG, PNG, GIF, WEBP)',
+          icon: 'error'
+        });
+        event.target.value = '';
+        return;
+      }
+
+      // Validar tamaño (5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        Swal.fire({
+          title: 'Archivo muy grande',
+          text: 'El tamaño máximo permitido es 5MB',
+          icon: 'error'
+        });
+        event.target.value = '';
+        return;
+      }
+
       this.profilePictureFile = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.profilePicturePreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      
+      // Crear preview usando createObjectURL (más rápido que FileReader)
+      if (this.profilePicturePreview) {
+        URL.revokeObjectURL(this.profilePicturePreview);
+      }
+      this.profilePicturePreview = URL.createObjectURL(file);
     }
   }
 
@@ -285,6 +310,9 @@ export class PerfilComponent implements OnInit {
   }
 
   cancelProfilePicture(): void {
+    if (this.profilePicturePreview) {
+      URL.revokeObjectURL(this.profilePicturePreview);
+    }
     this.profilePicturePreview = null;
     this.profilePictureFile = null;
   }

@@ -91,7 +91,7 @@ export class UsuariosService {
 
   async deleteProfilePicture(id: number): Promise<Usuario> {
     const usuario = await this.findOne(id);
-    usuario.imagen = undefined;
+    usuario.imagen = '';
     return this.usuariosRepository.save(usuario);
   }
 
