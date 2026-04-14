@@ -157,9 +157,7 @@ export class PerfilComponent implements OnInit {
       nombres: this.usuarioEdit.nombres,
       apellidos: this.usuarioEdit.apellidos,
       telefono: this.usuarioEdit.telefono,
-      direccion: this.usuarioEdit.direccion,
-      tipoDocumento: this.usuarioEdit.tipoDocumento,
-      numeroDocumento: this.usuarioEdit.numeroDocumento
+      direccion: this.usuarioEdit.direccion
     };
 
     this.usuariosService.updateUsuario(this.usuarioLogueado.id, datosActualizar).subscribe({

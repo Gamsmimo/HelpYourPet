@@ -36,6 +36,18 @@ export class Usuario {
   @Column({ length: 255, nullable: true, name: 'foto_perfil' })
   imagen: string;
 
+  @ApiProperty({ description: 'Tipo de documento', example: 'CC', required: false })
+  @Column({ length: 10, nullable: true })
+  tipo_documento: string;
+
+  @ApiProperty({ description: 'Número de documento', example: '1234567890', required: false })
+  @Column({ length: 50, nullable: true })
+  num_documento: string;
+
+  @ApiProperty({ description: 'Edad del usuario', example: 25, required: false })
+  @Column({ type: 'int', nullable: true })
+  edad: number;
+
   @ApiProperty({ description: 'ID del rol', required: false })
   @Column({ name: 'id_rol' })
   rol_id: number;
