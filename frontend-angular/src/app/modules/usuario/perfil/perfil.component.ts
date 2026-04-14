@@ -27,6 +27,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   compras: any[] = [];
   citas: any[] = [];
   adopciones: any[] = [];
+  publicaciones: any[] = [];
   
   // Modales
   showAddPetModal = false;
@@ -71,7 +72,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.usuarioLogueado = this.authService.getUser() || {};
     this.cargarDatosUsuario();
     this.cargarMascotas();
-    this.cargarAdopciones();
+    this.cargarPublicaciones();
     this.loadTheme();
   }
 
@@ -83,7 +84,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
     switch (sectionId) {
       case 'mascotas': this.cargarMascotas(); break;
       case 'compras':  this.cargarCompras();  break;
-      case 'adopciones': this.cargarAdopciones(); break;
+      case 'adopciones-usuario': this.cargarPublicaciones(); break;
     }
   }
 
@@ -135,29 +136,38 @@ export class PerfilComponent implements OnInit, OnDestroy {
     });
   }
 
-  cargarAdopciones(): void {
-    if (this.usuarioLogueado.id) {
-      this.adopcionService.getAdopcionesByUsuario(this.usuarioLogueado.id).subscribe({
-        next: (data) => {
-          console.log('Adopciones del usuario:', data);
-          this.adopciones = data.map(adopcion => ({
-            id: adopcion.id,
-            nombreMascota: adopcion.mascota?.nombre || 'Sin nombre',
-            tipoMascota: adopcion.mascota?.especie || 'Desconocido',
-            raza: adopcion.mascota?.raza || 'Mestizo',
-            edad: adopcion.mascota?.edad || 0,
-            tamano: adopcion.mascota?.peso ? `${adopcion.mascota.peso} kg` : '',
-            imagen: adopcion.mascota?.foto || 'assets/IMG/default-pet.jpg',
-            descripcion: adopcion.observaciones || 'Sin descripción',
-            estado: adopcion.estado || 'DISPONIBLE'
-          }));
-        },
-        error: (error) => {
-          console.error('Error al cargar adopciones:', error);
-          this.adopciones = [];
-        }
-      });
-    }
+  cargarPublicaciones(): void {
+    // TODO: Implementar servicio de publicaciones cuando esté disponible
+    // Por ahora, usar datos de ejemplo
+    this.publicaciones = [
+      {
+        id: 1,
+        contenido: 'Mi primera publicación en HelpYourPet! 🐾',
+        imagen: null,
+        fecha: new Date(),
+        likes: 5,
+        comentarios: 2
+      }
+    ];
+  }
+
+  eliminarPublicacion(id: number): void {
+    Swal.fire({
+      title: '¿Eliminar publicación?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e74c3c',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // TODO: Implementar eliminación en el backend
+        this.publicaciones = this.publicaciones.filter(p => p.id !== id);
+        Swal.fire('¡Eliminada!', 'La publicación ha sido eliminada.', 'success');
+      }
+    });
   }
 
   verCompra(id: number): void {

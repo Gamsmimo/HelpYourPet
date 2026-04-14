@@ -34,7 +34,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" [class.active]="activeSection === 'adopciones-usuario'" (click)="showSection('adopciones-usuario')" href="javascript:void(0)">
-            <i class="fas fa-heart me-2"></i>Mis Adopciones
+            <i class="fas fa-newspaper me-2"></i>Mis Publicaciones
           </a>
         </li>
         <li class="nav-item">
@@ -278,10 +278,10 @@
         </div>
       </section>
 
-      <!-- Sección Mis Mascotas en Adopción -->
+      <!-- Sección Mis Publicaciones y Reportes -->
       <section id="adopciones-usuario" class="content-section" *ngIf="activeSection === 'adopciones-usuario'">
         <div class="section-header">
-          <h1 class="h2"><i class="fas fa-heart me-2"></i>Mis Mascotas en Adopción</h1>
+          <h1 class="h2"><i class="fas fa-newspaper me-2"></i>Mis Publicaciones y Reportes</h1>
           <div class="d-flex gap-2 align-items-center">
             <button class="menu-toggle" id="menuToggle7" (click)="toggleSidebar()">
               <i class="fas fa-bars"></i>
@@ -296,58 +296,66 @@
             <a (click)="goToHome()" class="btn-volver-inicio" style="cursor: pointer;">
               <i class="fas fa-home"></i>
             </a>
-            <a (click)="irAAdopciones()" class="btn btn-primary" style="cursor: pointer;">
-              <i class="fas fa-plus me-2"></i>Publicar Mascota en Adopción
-            </a>
           </div>
         </div>
 
-        <div *ngIf="adopciones.length === 0"
+        <!-- Mensaje cuando no hay publicaciones -->
+        <div *ngIf="publicaciones.length === 0"
              class="text-center py-5"
              style="background: var(--card-bg); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
-          <i class="fas fa-heart fa-4x mb-4" style="color: var(--rosa-fuerte); opacity: 0.5;"></i>
+          <i class="fas fa-newspaper fa-4x mb-4" style="color: var(--pastel-blue); opacity: 0.5;"></i>
           <h3 style="color: var(--text-color); font-weight: 700; margin-bottom: 15px;">
-            No has publicado mascotas en adopción
+            No tienes publicaciones aún
           </h3>
           <p style="color: var(--text-color); opacity: 0.7; font-size: 1.1rem; margin-bottom: 30px;">
-            ¡Ayuda a encontrar un hogar a una mascota que necesite amor!
+            Comparte momentos especiales con tu mascota en la comunidad
           </p>
-          <a (click)="irAAdopciones()" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer;">
-            <i class="fas fa-plus me-2"></i>Publicar Primera Mascota
+          <a (click)="goToHome()" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer;">
+            <i class="fas fa-home me-2"></i>Ir al Inicio
           </a>
         </div>
 
-        <!-- Grid de tarjetas de adopción -->
-        <div *ngIf="adopciones.length > 0" class="lista-mascotas" style="margin-top: 30px;">
-          <div class="card-mascota" *ngFor="let adopcion of adopciones">
-            <div class="mascota-imagen-container">
-              <span class="badge-estado"
-                    [class.bg-success]="adopcion.estado === 'DISPONIBLE'"
-                    [class.bg-warning]="adopcion.estado === 'EN_PROCESO'"
-                    [class.bg-secondary]="adopcion.estado === 'ADOPTADO'">
-                {{ adopcion.estado === 'DISPONIBLE' ? 'En espera' : (adopcion.estado === 'EN_PROCESO' ? 'En Proceso' : 'Adoptado') }}
-              </span>
-              <img [src]="adopcion.imagen" [alt]="adopcion.nombreMascota">
+        <!-- Lista de publicaciones -->
+        <div *ngIf="publicaciones.length > 0" class="publicaciones-container" style="margin-top: 30px;">
+          <div class="publicacion-card" *ngFor="let pub of publicaciones" 
+               style="background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            
+            <!-- Header de la publicación -->
+            <div class="publicacion-header" style="display: flex; align-items: center; margin-bottom: 15px;">
+              <img [src]="getImageUrl(usuarioLogueado?.imagen)" 
+                   alt="Avatar" 
+                   class="rounded-circle me-3" 
+                   style="width: 50px; height: 50px; object-fit: cover;">
+              <div style="flex: 1;">
+                <h5 style="margin: 0; color: var(--text-color); font-weight: 600;">
+                  {{ usuarioLogueado?.nombres }} {{ usuarioLogueado?.apellidos }}
+                </h5>
+                <small style="color: var(--text-color); opacity: 0.6;">
+                  {{ pub.fecha | date:'dd/MM/yyyy HH:mm' }}
+                </small>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminarPublicacion(pub.id)" title="Eliminar publicación">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
 
-            <div class="mascota-info">
-              <h3 class="mascota-nombre">{{ adopcion.nombreMascota }}</h3>
+            <!-- Contenido de la publicación -->
+            <div class="publicacion-contenido" style="margin-bottom: 15px;">
+              <p style="color: var(--text-color); white-space: pre-wrap; margin-bottom: 10px;">{{ pub.contenido }}</p>
+              <img *ngIf="pub.imagen" 
+                   [src]="pub.imagen" 
+                   alt="Imagen de publicación" 
+                   style="width: 100%; border-radius: 10px; max-height: 500px; object-fit: cover;">
+            </div>
 
-              <div class="mascota-detalles">
-                <span>{{ adopcion.tipoMascota }}</span>
-                <span *ngIf="adopcion.tamano">{{ adopcion.tamano }}</span>
-                <span *ngIf="adopcion.edad">{{ adopcion.edad }} Año{{ adopcion.edad > 1 ? 's' : '' }}</span>
-              </div>
-
-              <h6 class="mascota-raza">Raza: {{ adopcion.raza || 'Mestizo' }}</h6>
-
-              <p class="mascota-descripcion">{{ adopcion.descripcion }}</p>
-
-              <div class="mascota-acciones">
-                <a (click)="irAAdopciones()" class="btn-ver-detalles" style="cursor: pointer;">
-                  <i class="fas fa-eye"></i> Ver en Adopciones
-                </a>
-              </div>
+            <!-- Footer de la publicación -->
+            <div class="publicacion-footer" style="display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+              <span style="color: var(--text-color); opacity: 0.7;">
+                <i class="fas fa-heart me-1"></i> {{ pub.likes || 0 }} Me gusta
+              </span>
+              <span style="color: var(--text-color); opacity: 0.7;">
+                <i class="fas fa-comment me-1"></i> {{ pub.comentarios || 0 }} Comentarios
+              </span>
             </div>
           </div>
         </div>
