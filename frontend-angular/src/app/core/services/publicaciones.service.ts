@@ -11,8 +11,9 @@ export class PublicacionesService {
 
   constructor(private http: HttpClient) {}
 
-  createPublicacion(contenido: string, imagen?: string): Observable<any> {
-    const data = {
+  createPublicacion(idUsuario: number, contenido: string, imagen?: string): Observable<any> {
+    const data: any = {
+      idUsuario,
       contenido,
       ...(imagen && { imagen })
     };

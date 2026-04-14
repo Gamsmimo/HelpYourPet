@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacionDto } from './dto/create-publicacion.dto';
@@ -13,11 +13,9 @@ export class PublicacionesController {
   @Post()
   @ApiOperation({ summary: 'Crear nueva publicación' })
   @ApiResponse({ status: 201, description: 'Publicación creada', type: Publicacion })
-  @ApiBearerAuth('JWT-auth')
-  create(@Body() createPublicacionDto: CreatePublicacionDto, @Param('idUsuario', ParseIntPipe) idUsuario?: number) {
-    // El idUsuario debería venir del JWT en un caso real
-    const userId = idUsuario || 1;
-    return this.publicacionesService.create(userId, createPublicacionDto);
+  create(@Body() createPublicacionDto: CreatePublicacionDto) {
+    const { idUsuario, ...resto } = createPublicacionDto;
+    return this.publicacionesService.create(idUsuario, resto);
   }
 
   @Get()

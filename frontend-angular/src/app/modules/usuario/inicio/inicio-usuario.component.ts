@@ -177,7 +177,7 @@ export class InicioUsuarioComponent implements OnInit {
   publicar(): void {
     if (this.nuevaPublicacion.trim() || this.imagenPreview) {
       // Enviar al backend
-      this.publicacionesService.createPublicacion(this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
+      this.publicacionesService.createPublicacion(this.usuarioLogueado?.id, this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
         next: (data) => {
           console.log('Publicación creada:', data);
           // Agregar a la lista local
