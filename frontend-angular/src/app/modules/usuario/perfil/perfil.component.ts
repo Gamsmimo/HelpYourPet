@@ -76,9 +76,26 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   inicializarDatos(): void {
     this.usuarioLogueado = this.authService.getUser() || {};
-    this.cargarDatosUsuario();
-    this.cargarMascotas();
-    this.cargarAdopciones();
+    
+    // Verificar que los servicios estén disponibles antes de usarlos
+    if (this.usuariosService && typeof this.usuariosService.getUsuario === 'function') {
+      this.cargarDatosUsuario();
+    } else {
+      console.error('UsuariosService no está disponible');
+    }
+    
+    if (this.mascotasService && typeof this.mascotasService.getMisMascotas === 'function') {
+      this.cargarMascotas();
+    } else {
+      console.error('MascotasService no está disponible');
+    }
+    
+    if (this.adopcionService && typeof this.adopcionService.getAdopcionesByUsuario === 'function') {
+      this.cargarAdopciones();
+    } else {
+      console.error('AdopcionService no está disponible');
+    }
+    
     this.loadTheme();
   }
 

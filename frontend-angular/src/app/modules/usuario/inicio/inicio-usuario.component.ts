@@ -222,7 +222,10 @@ export class InicioUsuarioComponent implements OnInit {
 
   irAPerfil(): void {
     this.menuAbierto = false;
-    this.router.navigate(['/usuario/perfil']);
+    // Forzar recarga del componente usando skipLocationChange y luego navegando
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/usuario/perfil']);
+    });
   }
 
   irATienda(): void {
