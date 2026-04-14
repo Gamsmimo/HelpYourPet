@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { PublicacionesService } from '../../../core/services/publicaciones.service';
 
 interface Publicacion {
   id: number;
@@ -49,7 +50,8 @@ export class InicioUsuarioComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private publicacionesService: PublicacionesService
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +61,35 @@ export class InicioUsuarioComponent implements OnInit {
   }
 
   cargarPublicaciones(): void {
-    // Publicaciones de ejemplo
+    // Cargar publicaciones desde el backend
+    this.publicacionesService.getAllPublicaciones().subscribe({
+      next: (data) => {
+        console.log('Publicaciones cargadas:', data);
+        this.publicaciones = data.map(pub => ({
+          id: pub.id,
+          usuario: {
+            nombre: pub.usuario?.nombres || 'Usuario',
+            avatar: pub.usuario?.imagen || `https://ui-avatars.com/api/?name=${pub.usuario?.nombres || 'Usuario'}&background=4ade80&color=fff`
+          },
+          contenido: pub.contenido,
+          imagen: pub.imagen,
+          fecha: new Date(pub.createdAt),
+          likes: pub.likes || 0,
+          comentarios: [], // TODO: Cargar comentarios cuando estén disponibles
+          compartidos: 0,
+          likedByUser: false,
+          mostrarComentarios: false
+        }));
+      },
+      error: (error) => {
+        console.error('Error al cargar publicaciones:', error);
+        this.publicaciones = [];
+      }
+    });
+  }
+
+  cargarPublicacionesEjemplo(): void {
+    // Publicaciones de ejemplo (solo fallback)
     this.publicaciones = [
       {
         id: 1,
@@ -146,24 +176,35 @@ export class InicioUsuarioComponent implements OnInit {
 
   publicar(): void {
     if (this.nuevaPublicacion.trim() || this.imagenPreview) {
-      const nuevaPublicacion: Publicacion = {
-        id: this.publicaciones.length + 1,
-        usuario: {
-          nombre: this.usuarioLogueado?.nombre || 'Usuario',
-          avatar: `https://ui-avatars.com/api/?name=${this.usuarioLogueado?.nombre || 'Usuario'}&background=4ade80&color=fff`
+      // Enviar al backend
+      this.publicacionesService.createPublicacion(this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
+        next: (data) => {
+          console.log('Publicación creada:', data);
+          // Agregar a la lista local
+          const nuevaPublicacion: Publicacion = {
+            id: data.id,
+            usuario: {
+              nombre: this.usuarioLogueado?.nombres || 'Usuario',
+              avatar: this.usuarioLogueado?.imagen || `https://ui-avatars.com/api/?name=${this.usuarioLogueado?.nombres || 'Usuario'}&background=4ade80&color=fff`
+            },
+            contenido: this.nuevaPublicacion,
+            imagen: this.imagenPreview || undefined,
+            fecha: new Date(),
+            likes: 0,
+            comentarios: [],
+            compartidos: 0,
+            likedByUser: false,
+            mostrarComentarios: false
+          };
+          this.publicaciones.unshift(nuevaPublicacion);
+          this.nuevaPublicacion = '';
+          this.eliminarImagen();
         },
-        contenido: this.nuevaPublicacion,
-        imagen: this.imagenPreview || undefined,
-        fecha: new Date(),
-        likes: 0,
-        comentarios: [],
-        compartidos: 0,
-        likedByUser: false,
-        mostrarComentarios: false
-      };
-      this.publicaciones.unshift(nuevaPublicacion);
-      this.nuevaPublicacion = '';
-      this.eliminarImagen();
+        error: (error) => {
+          console.error('Error al crear publicación:', error);
+          alert('Error al publicar. Por favor intenta de nuevo.');
+        }
+      });
     }
   }
 
