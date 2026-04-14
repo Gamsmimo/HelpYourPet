@@ -212,25 +212,11 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
       this.publicacionesService.createPublicacion(userId, this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
         next: (data) => {
           console.log('Publicación creada:', data);
-          // Agregar a la lista local
-          const nuevaPublicacion: Publicacion = {
-            id: data.id,
-            usuario: {
-              nombre: this.usuarioLogueado?.nombres || 'Usuario',
-              avatar: this.usuarioLogueado?.imagen || `https://ui-avatars.com/api/?name=${this.usuarioLogueado?.nombres || 'Usuario'}&background=4ade80&color=fff`
-            },
-            contenido: this.nuevaPublicacion,
-            imagen: this.imagenPreview || undefined,
-            fecha: new Date(),
-            likes: 0,
-            comentarios: [],
-            compartidos: 0,
-            likedByUser: false,
-            mostrarComentarios: false
-          };
-          this.publicaciones.unshift(nuevaPublicacion);
+          // Limpiar el formulario
           this.nuevaPublicacion = '';
           this.eliminarImagen();
+          // Recargar publicaciones desde el backend para mostrar la nueva correctamente
+          this.cargarPublicaciones();
         },
         error: (error) => {
           console.error('Error al crear publicación:', error);
