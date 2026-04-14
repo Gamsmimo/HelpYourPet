@@ -57,7 +57,7 @@ import { VeterinariaVeterinarioModule } from './modules/veterinaria-veterinario/
         password: configService.get('database.password'),
         database: configService.get('database.database'),
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: configService.get('database.synchronize'),
         logging: configService.get('database.logging'),
         extra: configService.get('database.extra'),
       }),

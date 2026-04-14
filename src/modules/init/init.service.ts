@@ -15,23 +15,29 @@ export class InitService implements OnModuleInit {
   }
 
   private async createInitialRoles() {
-    const count = await this.rolesRepository.count();
-    
-    if (count === 0) {
-      console.log('Creando roles iniciales...');
+    try {
+      const count = await this.rolesRepository.count();
       
-      // Crear roles con IDs específicos: 1=ADMIN, 2=VETERINARIO, 3=USUARIO
-      await this.rolesRepository.query(`
-        INSERT INTO rol (id, nombre, descripcion) VALUES
-        (1, 'ADMIN', 'Administrador del sistema'),
-        (2, 'VETERINARIO', 'Veterinario'),
-        (3, 'USUARIO', 'Usuario regular')
-        ON DUPLICATE KEY UPDATE
-        nombre = VALUES(nombre),
-        descripcion = VALUES(descripcion)
-      `);
+      if (count === 0) {
+        console.log('Creando roles iniciales...');
+        
+        // Crear roles con IDs específicos: 1=ADMIN, 2=VETERINARIO, 3=USUARIO
+        // Usando sintaxis de PostgreSQL (ON CONFLICT en lugar de ON DUPLICATE KEY)
+        await this.rolesRepository.query(`
+          INSERT INTO rol (id_rol, nombre_rol, descripcion) VALUES
+          (1, 'ADMIN', 'Administrador del sistema'),
+          (2, 'VETERINARIO', 'Veterinario'),
+          (3, 'USUARIO', 'Usuario regular')
+          ON CONFLICT (id_rol) DO UPDATE SET
+          nombre_rol = EXCLUDED.nombre_rol,
+          descripcion = EXCLUDED.descripcion
+        `);
 
-      console.log('Roles iniciales creados: 1=ADMIN, 2=VETERINARIO, 3=USUARIO');
+        console.log('Roles iniciales creados: 1=ADMIN, 2=VETERINARIO, 3=USUARIO');
+      }
+    } catch (error) {
+      console.error('Error al crear roles iniciales:', error.message);
+      // No lanzar el error para permitir que la aplicación continúe
     }
   }
 }

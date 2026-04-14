@@ -95,6 +95,14 @@ export class AuthService {
     return null;
   }
 
+  updateUserData(userData: any): void {
+    if (typeof localStorage !== 'undefined') {
+      const currentUser = this.getUser();
+      const updatedUser = { ...currentUser, ...userData };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  }
+
   getUserRole(): number {
     const user = this.getUser();
     return user?.rol_id || 0;

@@ -441,19 +441,19 @@
                           <div class="row g-2">
                             <div class="col-12">
                               <label for="profile-name" class="form-label fw-bold">Nombres</label>
-                              <input type="text" class="form-control" id="profile-name" [(ngModel)]="usuarioLogueado.nombres" name="nombres" required placeholder="Ingresa tus nombres">
+                              <input type="text" class="form-control" id="profile-name" [(ngModel)]="usuarioEdit.nombres" name="nombres" required placeholder="Ingresa tus nombres">
                             </div>
                             <div class="col-12">
                               <label for="profile-apellidos" class="form-label fw-bold">Apellidos</label>
-                              <input type="text" class="form-control" id="profile-apellidos" [(ngModel)]="usuarioLogueado.apellidos" name="apellidos" required placeholder="Ingresa tus apellidos">
+                              <input type="text" class="form-control" id="profile-apellidos" [(ngModel)]="usuarioEdit.apellidos" name="apellidos" required placeholder="Ingresa tus apellidos">
                             </div>
                             <div class="col-12">
                               <label for="profile-email" class="form-label fw-bold">Correo Electrónico</label>
-                              <input type="email" class="form-control" id="profile-email" [(ngModel)]="usuarioLogueado.correo" name="correo" required placeholder="correo@ejemplo.com">
+                              <input type="email" class="form-control" id="profile-email" [value]="usuarioEdit.correo" name="correo" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="correo@ejemplo.com">
                             </div>
                             <div class="col-12">
                               <label for="profile-phone" class="form-label fw-bold">Teléfono</label>
-                              <input type="tel" class="form-control" id="profile-phone" [(ngModel)]="usuarioLogueado.telefono" name="telefono" placeholder="+57 123 456 7890">
+                              <input type="tel" class="form-control" id="profile-phone" [(ngModel)]="usuarioEdit.telefono" name="telefono" placeholder="+57 123 456 7890">
                             </div>
                           </div>
                         </div>
@@ -463,19 +463,19 @@
                           <div class="row g-2">
                             <div class="col-12">
                               <label for="profile-edad" class="form-label fw-bold">Edad</label>
-                              <input type="number" class="form-control" id="profile-edad" [(ngModel)]="usuarioLogueado.edad" name="edad" placeholder="Tu edad">
+                              <input type="number" class="form-control" id="profile-edad" [value]="usuarioEdit.edad" name="edad" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Tu edad">
                             </div>
                             <div class="col-12">
                               <label for="profile-address" class="form-label fw-bold">Dirección</label>
-                              <input type="text" class="form-control" id="profile-address" [(ngModel)]="usuarioLogueado.direccion" name="direccion" placeholder="Ingresa tu dirección completa">
+                              <input type="text" class="form-control" id="profile-address" [(ngModel)]="usuarioEdit.direccion" name="direccion" placeholder="Ingresa tu dirección completa">
                             </div>
                             <div class="col-12">
                               <label for="profile-tipoDocumento" class="form-label fw-bold">Tipo Documento</label>
-                              <input type="text" class="form-control" id="profile-tipoDocumento" [value]="usuarioLogueado.tipoDocumento" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Tipo de documento">
+                              <input type="text" class="form-control" id="profile-tipoDocumento" [(ngModel)]="usuarioEdit.tipoDocumento" name="tipoDocumento" placeholder="Tipo de documento">
                             </div>
                             <div class="col-12">
                               <label for="profile-numDocumento" class="form-label fw-bold">Número Documento</label>
-                              <input type="text" class="form-control" id="profile-numDocumento" [(ngModel)]="usuarioLogueado.numDocumento" name="numDocumento" placeholder="Número de documento">
+                              <input type="text" class="form-control" id="profile-numDocumento" [(ngModel)]="usuarioEdit.numeroDocumento" name="numeroDocumento" placeholder="Número de documento">
                             </div>
                           </div>
                         </div>

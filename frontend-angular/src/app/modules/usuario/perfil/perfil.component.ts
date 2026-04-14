@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
+import { UsuariosService } from '../../../core/services/usuarios.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,6 +16,7 @@ import Swal from 'sweetalert2';
 })
 export class PerfilComponent implements OnInit {
   usuarioLogueado: any = {};
+  usuarioEdit: any = {}; // Copia para editar
   mascotas: any[] = [];
   activeSection = 'dashboard';
   sidebarOpen = false;
@@ -39,12 +41,14 @@ export class PerfilComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private mascotasService: MascotasService,
+    private usuariosService: UsuariosService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
     this.usuarioLogueado = this.authService.getUser() || {};
+    this.cargarDatosUsuario();
     this.cargarMascotas();
     this.loadTheme();
   }
@@ -123,8 +127,63 @@ export class PerfilComponent implements OnInit {
     this.router.navigate(['/adopcion']);
   }
 
+  cargarDatosUsuario(): void {
+    if (this.usuarioLogueado.id) {
+      this.usuariosService.getUsuario(this.usuarioLogueado.id).subscribe({
+        next: (data) => {
+          this.usuarioLogueado = data;
+          this.usuarioEdit = { ...data };
+          // Actualizar en AuthService
+          this.authService.updateUserData(data);
+        },
+        error: (error) => {
+          console.error('Error al cargar datos del usuario:', error);
+        }
+      });
+    }
+  }
+
   guardarPerfil(): void {
-    Swal.fire({ title: '¡Guardado!', text: 'Cambios guardados correctamente', icon: 'success', timer: 2000, showConfirmButton: false });
+    if (!this.usuarioEdit.nombres || !this.usuarioEdit.apellidos) {
+      Swal.fire({
+        title: 'Campos requeridos',
+        text: 'Por favor completa los campos de nombres y apellidos',
+        icon: 'warning'
+      });
+      return;
+    }
+
+    const datosActualizar = {
+      nombres: this.usuarioEdit.nombres,
+      apellidos: this.usuarioEdit.apellidos,
+      telefono: this.usuarioEdit.telefono,
+      direccion: this.usuarioEdit.direccion,
+      tipoDocumento: this.usuarioEdit.tipoDocumento,
+      numeroDocumento: this.usuarioEdit.numeroDocumento
+    };
+
+    this.usuariosService.updateUsuario(this.usuarioLogueado.id, datosActualizar).subscribe({
+      next: (data) => {
+        this.usuarioLogueado = data;
+        this.usuarioEdit = { ...data };
+        this.authService.updateUserData(data);
+        Swal.fire({
+          title: '¡Guardado!',
+          text: 'Cambios guardados correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudieron guardar los cambios',
+          icon: 'error'
+        });
+        console.error('Error al actualizar perfil:', error);
+      }
+    });
   }
 
   logout(): void {
@@ -194,10 +253,19 @@ export class PerfilComponent implements OnInit {
 
   saveProfilePicture(): void {
     if (this.profilePictureFile) {
-      // Aquí iría la lógica para subir la foto al servidor
-      Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
-      this.profilePicturePreview = null;
-      this.profilePictureFile = null;
+      this.usuariosService.updateProfilePicture(this.usuarioLogueado.id, this.profilePictureFile).subscribe({
+        next: (data) => {
+          this.usuarioLogueado.imagen = data.imagen;
+          this.authService.updateUserData(data);
+          Swal.fire('¡Guardado!', 'Foto de perfil actualizada', 'success');
+          this.profilePicturePreview = null;
+          this.profilePictureFile = null;
+        },
+        error: (error) => {
+          Swal.fire('Error', 'No se pudo actualizar la foto de perfil', 'error');
+          console.error('Error al actualizar foto:', error);
+        }
+      });
     }
   }
 
@@ -216,8 +284,17 @@ export class PerfilComponent implements OnInit {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.usuarioLogueado.imagen = null;
-        Swal.fire('Eliminada', 'Foto de perfil eliminada', 'success');
+        this.usuariosService.deleteProfilePicture(this.usuarioLogueado.id).subscribe({
+          next: (data) => {
+            this.usuarioLogueado.imagen = null;
+            this.authService.updateUserData(data);
+            Swal.fire('Eliminada', 'Foto de perfil eliminada', 'success');
+          },
+          error: (error) => {
+            Swal.fire('Error', 'No se pudo eliminar la foto de perfil', 'error');
+            console.error('Error al eliminar foto:', error);
+          }
+        });
       }
     });
   }
@@ -260,10 +337,17 @@ export class PerfilComponent implements OnInit {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí iría la lógica para eliminar la cuenta
-        Swal.fire('Cuenta eliminada', 'Tu cuenta ha sido eliminada permanentemente', 'success').then(() => {
-          this.authService.logout();
-          this.router.navigate(['/']);
+        this.usuariosService.deleteAccount(this.usuarioLogueado.id).subscribe({
+          next: () => {
+            Swal.fire('Cuenta eliminada', 'Tu cuenta ha sido eliminada permanentemente', 'success').then(() => {
+              this.authService.logout();
+              this.router.navigate(['/']);
+            });
+          },
+          error: (error) => {
+            Swal.fire('Error', 'No se pudo eliminar la cuenta', 'error');
+            console.error('Error al eliminar cuenta:', error);
+          }
         });
       }
     });
