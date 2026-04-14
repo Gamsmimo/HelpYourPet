@@ -269,12 +269,12 @@ export class PerfilComponent implements OnInit {
         return;
       }
 
-      // Validar tamaño (5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      // Validar tamaño (10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
         Swal.fire({
           title: 'Archivo muy grande',
-          text: 'El tamaño máximo permitido es 5MB',
+          text: 'El tamaño máximo permitido es 10MB',
           icon: 'error'
         });
         event.target.value = '';
