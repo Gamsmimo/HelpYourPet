@@ -180,8 +180,14 @@ export class PerfilComponent implements OnInit, OnDestroy {
   cargarMascotas(): void {
     if (this.usuarioLogueado?.id) {
       this.mascotasService.getMascotasByUsuario(this.usuarioLogueado.id).subscribe({
-        next: (data) => { this.mascotas = data; },
-        error: () => { this.mascotas = []; }
+        next: (data) => { 
+          this.mascotas = data; 
+          this.cdr.detectChanges();
+        },
+        error: () => { 
+          this.mascotas = []; 
+          this.cdr.detectChanges();
+        }
       });
     }
   }
@@ -282,9 +288,11 @@ export class PerfilComponent implements OnInit, OnDestroy {
           next: () => {
             this.publicaciones = this.publicaciones.filter(p => p.id !== id);
             Swal.fire('¡Eliminada!', 'La publicación ha sido eliminada.', 'success');
+            this.cdr.detectChanges();
           },
           error: () => {
             Swal.fire('Error', 'No se pudo eliminar la publicación', 'error');
+            this.cdr.detectChanges();
           }
         });
       }
@@ -361,7 +369,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
           icon: 'success',
           timer: 2000,
           showConfirmButton: false
+        }).then(() => {
+          window.location.reload();
         });
+        this.cdr.detectChanges();
       },
       error: (error) => {
         Swal.fire({
@@ -370,6 +381,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
           icon: 'error'
         });
         console.error('Error al actualizar perfil:', error);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -501,11 +513,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
             icon: 'success',
             timer: 1500,
             showConfirmButton: false
+          }).then(() => {
+            window.location.reload();
           });
+          this.cdr.detectChanges();
         },
         error: (error) => {
           Swal.fire('Error', 'No se pudo actualizar la foto de perfil', 'error');
           console.error('Error al actualizar foto:', error);
+          this.cdr.detectChanges();
         }
       });
     }
@@ -540,11 +556,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
               imagen: null
             });
 
-            Swal.fire('Eliminada', 'Foto de perfil eliminada. Se usará la imagen por defecto.', 'success');
+            Swal.fire('Eliminada', 'Foto de perfil eliminada. Se usará la imagen por defecto.', 'success').then(() => {
+              window.location.reload();
+            });
+            this.cdr.detectChanges();
           },
           error: (error) => {
             Swal.fire('Error', 'No se pudo eliminar la foto de perfil', 'error');
             console.error('Error al eliminar foto:', error);
+            this.cdr.detectChanges();
           }
         });
       }

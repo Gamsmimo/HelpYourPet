@@ -53,7 +53,7 @@ export class PublicacionesService {
 
   async findByUsuario(idUsuario: number): Promise<any[]> {
     const publicaciones = await this.publicacionesRepository.find({
-      where: { idUsuario },
+      where: { usuario: { id: idUsuario } },
       relations: ['usuario'],
       order: { createdAt: 'DESC' },
     });
