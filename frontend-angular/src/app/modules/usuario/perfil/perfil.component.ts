@@ -20,8 +20,8 @@ import Swal from 'sweetalert2';
 })
 export class PerfilComponent implements OnInit, OnDestroy {
   usuarioLogueado: any = {};
-  usuarioEdit: any = {}; // Copia para editar
-  usuarioOriginal: any = {}; // Copia original para comparar cambios
+  usuarioEdit: any = {};
+  usuarioOriginal: any = {};
   mascotas: any[] = [];
   activeSection = 'dashboard';
   sidebarOpen = false;
@@ -29,26 +29,35 @@ export class PerfilComponent implements OnInit, OnDestroy {
   citas: any[] = [];
   adopciones: any[] = [];
   publicaciones: any[] = [];
-  
+
   // Modales
   showAddPetModal = false;
   showEditPetModal = false;
-  
+
   // Mascota en edición
   mascotaEdit: any = {};
-  
+
   // Foto de perfil
   profilePicturePreview: string | null = null;
   profilePictureFile: File | null = null;
-  
+
   // Tema
   darkMode = false;
 
   // Estado de carga
   isLoadingUser = true;
-  isLoadingPublicaciones = true;
+  isLoadingPublicaciones = false; // CORRECCIÓN: Inicializar en false, solo se activa al pedir la sección
   userImageLoaded = false;
   dataInitialized = false;
+
+  // CORRECCIÓN: Estados de error explícitos
+  errorCargaUsuario = false;
+  errorCargaPublicaciones = false;
+  errorMensajeUsuario = '';
+  errorMensajePublicaciones = '';
+
+  // Control para evitar llamadas duplicadas
+  private publicacionesCargadas = false;
 
   // Suscripción a navegación
   private navigationSubscription: Subscription | null = null;
@@ -64,14 +73,14 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Inicializar datos inmediatamente
     this.inicializarDatos();
-    
-    // Suscribirse a eventos de navegación para recargar cuando se vuelve a esta ruta
+
+    // Re-inicializar cuando el usuario navega de vuelta a este perfil
     this.navigationSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         if (event.url === '/usuario/perfil' || event.urlAfterRedirects === '/usuario/perfil') {
+          this.publicacionesCargadas = false; // Resetear para forzar recarga
           this.inicializarDatos();
         }
       });
@@ -85,60 +94,69 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   inicializarDatos(): void {
     this.isLoadingUser = true;
-    this.isLoadingPublicaciones = true;
+    this.errorCargaUsuario = false;
+    this.errorMensajeUsuario = '';
     this.dataInitialized = false;
-    
-    // Obtener datos completos del usuario desde localStorage (ya hidratados por AppInitService)
+
     const userData = this.authService.getUser();
     const userId = userData?.id || userData?.id_usuario;
-    
+
     if (!userId) {
-      console.error('No se encontró ID de usuario en el token');
-      this.isLoadingUser = false;
-      this.isLoadingPublicaciones = false;
+      console.error('No se encontró ID de usuario. Redirigiendo al login...');
+      this.router.navigate(['/login']);
       return;
     }
-    
-    // Asignar datos completos del usuario (incluyendo imagen si ya fue hidratada)
+
+    // CORRECCIÓN: Mostrar inmediatamente los datos que existen en localStorage
+    // para una experiencia más rápida (aunque estén incompletos)
     this.usuarioLogueado = { ...userData, id: userId };
     this.usuarioEdit = { ...userData, id: userId };
     this.usuarioOriginal = { ...userData, id: userId };
-    
-    // Si ya hay imagen en los datos, marcar como cargada
+
+    // Si ya hay imagen en caché, no esperar la llamada HTTP para mostrarla
     if (userData?.imagen) {
       this.userImageLoaded = true;
-      this.isLoadingUser = false;
-      this.dataInitialized = true;
     }
-    
-    // Cargar/actualizar datos completos del usuario desde el backend
-    this.cargarDatosUsuarioYPublicaciones(userId);
+
+    // CORRECCIÓN: Una sola llamada HTTP al backend (eliminando condición de carrera con AppInitService)
+    this.cargarDatosCompletosUsuario(userId);
     this.cargarMascotas();
     this.loadTheme();
   }
 
-  private cargarDatosUsuarioYPublicaciones(userId: number): void {
+  // CORRECCIÓN: Método unificado de carga, sin doble llamada HTTP
+  private cargarDatosCompletosUsuario(userId: number): void {
     this.usuariosService.getUsuario(userId).subscribe({
       next: (data) => {
+        // Actualizar con datos frescos del backend
         this.usuarioLogueado = { ...data, id: userId };
         this.usuarioEdit = { ...data, id: userId };
         this.usuarioOriginal = { ...data, id: userId };
         this.isLoadingUser = false;
         this.userImageLoaded = true;
         this.dataInitialized = true;
-        
-        // Actualizar en AuthService para que esté disponible en toda la app
+        this.errorCargaUsuario = false;
+
+        // Sincronizar en localStorage para toda la app
         this.authService.updateUserData(data);
-        
-        // Cargar publicaciones automáticamente
-        this.cargarPublicacionesInterno(userId);
       },
       error: (error) => {
         console.error('Error al cargar datos del usuario:', error);
         this.isLoadingUser = false;
         this.dataInitialized = true;
-        // Intentar cargar publicaciones incluso si falla la carga del usuario
-        this.cargarPublicacionesInterno(userId);
+        this.errorCargaUsuario = true;
+
+        // Mensaje amigable según el tipo de error
+        if (error.status === 401) {
+          this.errorMensajeUsuario = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
+          setTimeout(() => {
+            this.authService.logout();
+          }, 2000);
+        } else if (error.status === 0) {
+          this.errorMensajeUsuario = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+        } else {
+          this.errorMensajeUsuario = 'No se pudieron cargar los datos de tu perfil. Intenta recargar la página.';
+        }
       }
     });
   }
@@ -149,13 +167,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
       this.sidebarOpen = false;
     }
     switch (sectionId) {
-      case 'mascotas': this.cargarMascotas(); break;
-      case 'compras':  this.cargarCompras();  break;
-      case 'adopciones-usuario': 
-        // Solo recargar si ya se habían cargado antes
-        if (this.publicaciones.length > 0 || !this.isLoadingPublicaciones) {
-          this.cargarPublicaciones(); 
-        }
+      case 'mascotas':
+        this.cargarMascotas();
+        break;
+      case 'compras':
+        this.cargarCompras();
+        break;
+      case 'adopciones-usuario':
+        // CORRECCIÓN: Siempre cargar publicaciones al entrar a la sección
+        this.cargarPublicaciones();
         break;
     }
   }
@@ -210,15 +230,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
     });
   }
 
+  // CORRECCIÓN: Método público limpio que siempre carga desde el backend
   cargarPublicaciones(): void {
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
-    if (userId) {
-      this.cargarPublicacionesInterno(userId);
-    }
-  }
+    if (!userId) return;
 
-  private cargarPublicacionesInterno(userId: number): void {
     this.isLoadingPublicaciones = true;
+    this.errorCargaPublicaciones = false;
+    this.errorMensajePublicaciones = '';
+
     this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
       next: (data) => {
         this.publicaciones = data.map(pub => ({
@@ -231,11 +251,19 @@ export class PerfilComponent implements OnInit, OnDestroy {
           compartidos: 0
         }));
         this.isLoadingPublicaciones = false;
+        this.publicacionesCargadas = true;
       },
       error: (error) => {
         console.error('Error al cargar publicaciones:', error);
         this.publicaciones = [];
         this.isLoadingPublicaciones = false;
+        this.errorCargaPublicaciones = true;
+
+        if (error.status === 0) {
+          this.errorMensajePublicaciones = 'No se pudo conectar con el servidor.';
+        } else {
+          this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
+        }
       }
     });
   }
@@ -277,38 +305,27 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.router.navigate(['/adopcion']);
   }
 
+  // Mantener por compatibilidad con código existente
   cargarDatosUsuario(): void {
-    // Este método ahora es un wrapper para compatibilidad
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
     if (userId) {
-      this.usuariosService.getUsuario(userId).subscribe({
-        next: (data) => {
-          console.log('Datos del usuario recibidos:', data);
-          this.usuarioLogueado = { ...data, id: userId };
-          this.usuarioEdit = { ...data, id: userId };
-          this.usuarioOriginal = { ...data, id: userId };
-          this.isLoadingUser = false;
-          this.userImageLoaded = true;
-          this.dataInitialized = true;
-          this.authService.updateUserData(data);
-        },
-        error: (error) => {
-          console.error('Error al cargar datos del usuario:', error);
-          this.isLoadingUser = false;
-          this.dataInitialized = true;
-        }
-      });
-    } else {
-      this.isLoadingUser = false;
-      this.dataInitialized = true;
+      this.cargarDatosCompletosUsuario(userId);
     }
+  }
+
+  reintentar(): void {
+    this.inicializarDatos();
+  }
+
+  reintentarPublicaciones(): void {
+    this.cargarPublicaciones();
   }
 
   hasChanges(): boolean {
     if (!this.usuarioOriginal || !this.usuarioEdit) {
       return false;
     }
-    
+
     return this.usuarioEdit.nombres !== this.usuarioOriginal.nombres ||
            this.usuarioEdit.apellidos !== this.usuarioOriginal.apellidos ||
            this.usuarioEdit.telefono !== this.usuarioOriginal.telefono ||
@@ -338,7 +355,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.usuarioLogueado = data;
         this.usuarioEdit = { ...data };
-        this.usuarioOriginal = { ...data }; // Actualizar copia original
+        this.usuarioOriginal = { ...data };
         this.authService.updateUserData(data);
         Swal.fire({
           title: '¡Guardado!',
@@ -413,30 +430,21 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   // ===== FOTO DE PERFIL =====
   getImageUrl(imagen: string | null | undefined): string {
-    // Jerarquía simple: Imagen de Usuario > Imagen por Defecto
-    
-    // Si hay imagen del usuario, procesarla
     if (imagen && imagen !== '' && imagen !== 'null' && imagen !== 'undefined') {
-      // Si la imagen ya tiene http:// o https://, retornarla tal cual
       if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
         return imagen;
       }
-      // Si empieza con /uploads, agregar la URL del servidor
       if (imagen.startsWith('/uploads')) {
         return `http://localhost:3000${imagen}`;
       }
-      // Si es una ruta relativa, agregar la URL del servidor
       return `http://localhost:3000/${imagen}`;
     }
-    
-    // Si no hay imagen, retornar imagen por defecto
     return 'assets/img/humano.jpg';
   }
 
   onProfilePictureSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Validar tipo de archivo
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
         Swal.fire({
@@ -448,8 +456,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // Validar tamaño (10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB
+      const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         Swal.fire({
           title: 'Archivo muy grande',
@@ -461,8 +468,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       }
 
       this.profilePictureFile = file;
-      
-      // Crear preview usando createObjectURL (más rápido que FileReader)
+
       if (this.profilePicturePreview) {
         URL.revokeObjectURL(this.profilePicturePreview);
       }
@@ -479,21 +485,18 @@ export class PerfilComponent implements OnInit, OnDestroy {
       this.usuariosService.updateProfilePicture(this.usuarioLogueado.id, this.profilePictureFile).subscribe({
         next: (data) => {
           console.log('Respuesta del servidor:', data);
-          
-          // Actualizar todos los objetos con la nueva imagen
+
           this.usuarioLogueado = { ...this.usuarioLogueado, imagen: data.imagen };
           this.usuarioEdit = { ...this.usuarioEdit, imagen: data.imagen };
           this.usuarioOriginal = { ...this.usuarioOriginal, imagen: data.imagen };
-          
-          // Actualizar en AuthService para sincronizar con toda la app
+
           this.authService.updateUserData({
             ...this.usuarioLogueado,
             imagen: data.imagen
           });
-          
-          // Limpiar preview
+
           this.cancelProfilePicture();
-          
+
           Swal.fire({
             title: '¡Actualizada!',
             text: 'Foto de perfil actualizada correctamente',
@@ -530,17 +533,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.usuariosService.deleteProfilePicture(this.usuarioLogueado.id).subscribe({
           next: (data) => {
-            // Actualizar todos los objetos con imagen vacía o null
             this.usuarioLogueado = { ...this.usuarioLogueado, imagen: null };
             this.usuarioEdit = { ...this.usuarioEdit, imagen: null };
             this.usuarioOriginal = { ...this.usuarioOriginal, imagen: null };
-            
-            // Actualizar en AuthService para sincronizar con toda la app
+
             this.authService.updateUserData({
               ...this.usuarioLogueado,
               imagen: null
             });
-            
+
             Swal.fire('Eliminada', 'Foto de perfil eliminada. Se usará la imagen por defecto.', 'success');
           },
           error: (error) => {

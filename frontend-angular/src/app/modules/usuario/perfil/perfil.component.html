@@ -7,11 +7,20 @@
       <div class="sidebar-header">
         <h3 class="text-center">HelpYourPet</h3>
         <div class="user-profile text-center">
-          <img [src]="getImageUrl(usuarioLogueado?.imagen)" 
+          <!-- Spinner pequeño mientras carga la imagen de perfil en sidebar -->
+          <div *ngIf="isLoadingUser" class="rounded-circle mb-2 d-flex align-items-center justify-content-center mx-auto"
+               style="width:80px;height:80px;background:rgba(255,255,255,0.1);">
+            <div class="spinner-border spinner-border-sm text-light" role="status"></div>
+          </div>
+          <img *ngIf="!isLoadingUser"
+               [src]="getImageUrl(usuarioLogueado?.imagen)" 
                alt="Foto de perfil" 
                class="rounded-circle mb-2" 
                id="sidebar-profile-picture">
-          <h5 id="username">{{ usuarioLogueado?.nombres }} {{ usuarioLogueado?.apellidos }}</h5>
+          <h5 id="username">
+            <span *ngIf="isLoadingUser">Cargando...</span>
+            <span *ngIf="!isLoadingUser">{{ usuarioLogueado?.nombres }} {{ usuarioLogueado?.apellidos }}</span>
+          </h5>
           <p class="text-muted">Dueño de mascotas</p>
         </div>
       </div>
@@ -57,8 +66,29 @@
       
       <!-- Sección Dashboard -->
       <section id="dashboard" class="content-section" *ngIf="activeSection === 'dashboard'">
+
+        <!-- BANNER DE ERROR GLOBAL (visible en todas las secciones) -->
+        <div *ngIf="errorCargaUsuario"
+             class="alert alert-danger d-flex align-items-center gap-3 mb-3"
+             role="alert"
+             style="border-radius: 12px; border-left: 4px solid #dc3545;">
+          <i class="fas fa-exclamation-circle fa-lg"></i>
+          <div style="flex: 1;">
+            <strong>Error al cargar perfil</strong><br>
+            <small>{{ errorMensajeUsuario }}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" (click)="reintentar()">
+            <i class="fas fa-redo me-1"></i>Reintentar
+          </button>
+        </div>
+
         <div class="section-header">
-          <h1 class="h2">Hola, <span id="username-header">{{ usuarioLogueado?.nombres }}</span></h1>
+          <h1 class="h2">Hola,
+            <span id="username-header">
+              <span *ngIf="isLoadingUser" class="placeholder col-4 bg-secondary" style="display:inline-block;"></span>
+              <span *ngIf="!isLoadingUser">{{ usuarioLogueado?.nombres }}</span>
+            </span>
+          </h1>
           <div class="d-flex gap-2 align-items-center">
             <!-- Botón Hamburguesa (solo móviles) -->
             <button class="menu-toggle" id="menuToggle1" (click)="toggleSidebar()">
@@ -250,7 +280,7 @@
           </div>
         </div>
 
-        <!-- Estado de carga -->
+        <!-- Estado de carga de publicaciones -->
         <div *ngIf="isLoadingPublicaciones"
              class="text-center py-5"
              style="background: var(--card-bg); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
@@ -258,6 +288,21 @@
             <span class="visually-hidden">Cargando...</span>
           </div>
           <h4 style="color: var(--text-color); font-weight: 600;">Cargando publicaciones...</h4>
+        </div>
+
+        <!-- CORRECCIÓN: Banner de error al cargar publicaciones -->
+        <div *ngIf="!isLoadingPublicaciones && errorCargaPublicaciones"
+             class="alert alert-warning d-flex align-items-center gap-3"
+             role="alert"
+             style="border-radius: 12px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <i class="fas fa-exclamation-triangle fa-lg"></i>
+          <div style="flex: 1;">
+            <strong>No se pudieron cargar las publicaciones</strong><br>
+            <small>{{ errorMensajePublicaciones }}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-warning" (click)="reintentarPublicaciones()">
+            <i class="fas fa-redo me-1"></i>Reintentar
+          </button>
         </div>
 
         <!-- Mensaje cuando no hay publicaciones (solo mostrar cuando ya cargó) -->
