@@ -4,6 +4,8 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { PublicacionesService } from '../../../core/services/publicaciones.service';
+import { UsuariosService } from '../../../core/services/usuarios.service';
+import { environment } from '../../../../environments/environment';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -49,12 +51,15 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
   menuAbierto: boolean = false;
   modoOscuro: boolean = false;
   nuevoComentario: { [key: number]: string } = {};
+  isLoadingUser: boolean = true;
+  isLoadingPublicaciones: boolean = false;
   private navigationSubscription: Subscription | null = null;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private publicacionesService: PublicacionesService,
+    private usuariosService: UsuariosService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -78,12 +83,62 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
   }
 
   inicializarDatos(): void {
-    this.usuarioLogueado = this.authService.getUser();
-    this.cargarPublicaciones();
+    this.isLoadingUser = true;
+    const user = this.authService.getUser();
+    const userId = user?.id || user?.id_usuario;
+    
+    if (userId) {
+      // Cargar datos completos del usuario desde el backend
+      this.usuariosService.getUsuario(userId).subscribe({
+        next: (userData) => {
+          const nombre = userData?.nombres || 'Usuario';
+          this.usuarioLogueado = {
+            ...user,
+            ...userData,
+            avatar: this.buildAvatarUrl(userData?.imagen, nombre),
+            nombre: nombre
+          };
+          this.isLoadingUser = false;
+          this.cdr.detectChanges();
+          // Cargar publicaciones DESPUÉS de que el usuario esté cargado
+          this.cargarPublicaciones();
+        },
+        error: (error) => {
+          console.error('Error al cargar usuario:', error);
+          // Fallback con datos del token
+          const nombre = user?.nombres || 'Usuario';
+          this.usuarioLogueado = {
+            ...user,
+            avatar: this.buildAvatarUrl(user?.imagen, nombre),
+            nombre: nombre
+          };
+          this.isLoadingUser = false;
+          // Cargar publicaciones incluso si falla la carga del usuario
+          this.cargarPublicaciones();
+        }
+      });
+    } else {
+      const nombre = user?.nombres || 'Usuario';
+      this.usuarioLogueado = {
+        ...user,
+        avatar: this.buildAvatarUrl(user?.imagen, nombre),
+        nombre: nombre
+      };
+      this.isLoadingUser = false;
+      // Cargar publicaciones
+      this.cargarPublicaciones();
+    }
+    
     this.cargarModoOscuro();
   }
 
   cargarPublicaciones(): void {
+    // No cargar publicaciones si el usuario no está cargado
+    if (!this.usuarioLogueado) {
+      return;
+    }
+    
+    this.isLoadingPublicaciones = true;
     // Cargar publicaciones desde el backend
     this.publicacionesService.getAllPublicaciones().subscribe({
       next: (data) => {
@@ -92,17 +147,26 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
           id: pub.id,
           usuario: {
             nombre: pub.usuario?.nombres || 'Usuario',
-            avatar: pub.usuario?.imagen || `https://ui-avatars.com/api/?name=${pub.usuario?.nombres || 'Usuario'}&background=4ade80&color=fff`
+            avatar: this.buildAvatarUrl(pub.usuario?.imagen, pub.usuario?.nombres)
           },
           contenido: pub.contenido,
           imagen: pub.imagen,
           fecha: new Date(pub.createdAt),
-          likes: pub.likes || 0,
-          comentarios: [],
+          likes: pub.reaccionesData?.length || pub.likes || 0,
+          comentarios: (pub.comentariosData || []).map((c: any) => ({
+            id: c.id,
+            usuario: {
+              nombre: c.usuario?.nombres || 'Usuario',
+              avatar: this.buildAvatarUrl(c.usuario?.imagen, c.usuario?.nombres)
+            },
+            contenido: c.contenido,
+            fecha: new Date(c.createdAt)
+          })),
           compartidos: 0,
-          likedByUser: false,
+          likedByUser: this.checkIfUserLiked(pub.reaccionesData || []),
           mostrarComentarios: false
         }));
+        this.isLoadingPublicaciones = false;
         // Forzar detección de cambios para actualizar la vista
         this.cdr.detectChanges();
         console.log('Publicaciones asignadas:', this.publicaciones.length);
@@ -110,6 +174,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error al cargar publicaciones:', error);
         this.publicaciones = [];
+        this.isLoadingPublicaciones = false;
         this.cdr.detectChanges();
       }
     });
@@ -232,12 +297,22 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
   }
 
   darLike(publicacion: Publicacion): void {
-    if (publicacion.likedByUser) {
-      publicacion.likes--;
-    } else {
-      publicacion.likes++;
+    const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
+    if (!userId) {
+      alert('Debes iniciar sesión para dar like');
+      return;
     }
-    publicacion.likedByUser = !publicacion.likedByUser;
+
+    this.publicacionesService.toggleReaccion(publicacion.id, userId).subscribe({
+      next: (response) => {
+        publicacion.likedByUser = response.liked;
+        publicacion.likes = response.totalLikes;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al dar like:', error);
+      }
+    });
   }
 
   toggleComentarios(publicacion: Publicacion): void {
@@ -246,18 +321,34 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
 
   agregarComentario(publicacion: Publicacion): void {
     const contenido = this.nuevoComentario[publicacion.id];
+    const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
+    
+    if (!userId) {
+      alert('Debes iniciar sesión para comentar');
+      return;
+    }
+
     if (contenido && contenido.trim()) {
-      const nuevoComentario: Comentario = {
-        id: publicacion.comentarios.length + 1,
-        usuario: {
-          nombre: this.usuarioLogueado?.nombre || 'Usuario',
-          avatar: `https://ui-avatars.com/api/?name=${this.usuarioLogueado?.nombre || 'Usuario'}&background=4ade80&color=fff`
+      this.publicacionesService.createComentario(publicacion.id, userId, contenido.trim()).subscribe({
+        next: (comentarioCreado) => {
+          const nuevoComentario: Comentario = {
+            id: comentarioCreado.id,
+            usuario: {
+              nombre: comentarioCreado.usuario?.nombres || this.usuarioLogueado?.nombres || 'Usuario',
+              avatar: this.buildAvatarUrl(comentarioCreado.usuario?.imagen || this.usuarioLogueado?.imagen, comentarioCreado.usuario?.nombres || this.usuarioLogueado?.nombres)
+            },
+            contenido: comentarioCreado.contenido,
+            fecha: new Date(comentarioCreado.createdAt)
+          };
+          publicacion.comentarios.push(nuevoComentario);
+          this.nuevoComentario[publicacion.id] = '';
+          this.cdr.detectChanges();
         },
-        contenido: contenido,
-        fecha: new Date()
-      };
-      publicacion.comentarios.push(nuevoComentario);
-      this.nuevoComentario[publicacion.id] = '';
+        error: (error) => {
+          console.error('Error al crear comentario:', error);
+          alert('Error al publicar el comentario');
+        }
+      });
     }
   }
 
@@ -297,5 +388,29 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
   irAAdopciones(): void {
     this.menuAbierto = false;
     this.router.navigate(['/adopcion']);
+  }
+
+  private checkIfUserLiked(reacciones: any[]): boolean {
+    const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
+    if (!userId || !reacciones) return false;
+    return reacciones.some(r => r.idUsuario === userId);
+  }
+
+  private buildAvatarUrl(imagen: string | null | undefined, nombre: string | null | undefined): string {
+    // Si está cargando y no hay imagen, retornar placeholder de carga
+    if (this.isLoadingUser && !imagen) {
+      return 'https://ui-avatars.com/api/?name=Loading&background=e0e0e0&color=999&size=200';
+    }
+    
+    if (!imagen) {
+      const displayName = nombre || 'Usuario';
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=4ade80&color=fff`;
+    }
+    // Si ya es una URL completa
+    if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
+      return imagen;
+    }
+    // Si es una ruta relativa, construir la URL completa
+    return `${environment.apiUrl}${imagen}`;
   }
 }

@@ -113,10 +113,25 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
-  user: any;
+  user: any = null;
+  isLoading: boolean = true;
 
   ngOnInit(): void {
+    this.loadUserData();
+  }
+
+  loadUserData(): void {
+    this.isLoading = true;
     this.user = this.authService.getUser();
+    
+    // Validar que el usuario existe antes de renderizar
+    if (!this.user) {
+      console.warn('No se encontró usuario en el dashboard');
+      this.authService.logout();
+      return;
+    }
+    
+    this.isLoading = false;
   }
 
   logout(): void {

@@ -109,6 +109,10 @@ import { PublicacionesModule } from './modules/publicaciones/publicaciones.modul
       provide: APP_INTERCEPTOR,
       useClass: MetricsInterceptor,
     },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {

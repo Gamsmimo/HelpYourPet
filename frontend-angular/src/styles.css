@@ -39,3 +39,89 @@ body.dark-mode {
   background: #18191a;
   color: #e4e6eb;
 }
+
+/* Cursor de texto (caret) siempre visible en inputs y textareas */
+/* Usar color negro/oscuro para máxima visibilidad en fondos claros */
+input,
+textarea,
+select,
+input.form-control,
+textarea.form-control,
+.form-control {
+  caret-color: #1a1a1a !important;
+}
+
+/* Asegurar que el caret sea visible en inputs específicos */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+textarea {
+  caret-color: #1a1a1a !important;
+}
+
+/* Focus state - mantener caret visible */
+input:focus,
+textarea:focus,
+input.form-control:focus,
+textarea.form-control:focus,
+.form-control:focus {
+  caret-color: #1a1a1a !important;
+}
+
+/* En modo oscuro, usar un color más claro para el cursor */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode .form-control {
+  caret-color: #ffffff !important;
+}
+
+/* Tema oscuro alternativo con data-theme */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .form-control {
+  caret-color: #ffffff !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] .form-control:focus {
+  caret-color: #ffffff !important;
+}
+
+/* Cursor pointer para labels y elementos interactivos */
+label {
+  cursor: pointer;
+}
+
+/* Cursor pointer para botones y enlaces */
+button,
+a,
+.clickable {
+  cursor: pointer;
+}
+
+/* Cursor de texto para inputs y áreas de texto */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+textarea {
+  cursor: text;
+}
+
+/* Cursor pointer para checkboxes y radios */
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+/* Cursor pointer para selects */
+select {
+  cursor: pointer;
+}

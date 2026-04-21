@@ -48,4 +48,39 @@ export class PublicacionesService {
   incrementarComentarios(id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/comentarios`, {});
   }
+
+  // ==================== COMENTARIOS ====================
+
+  createComentario(idPublicacion: number, idUsuario: number, contenido: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/comentarios`, {
+      idPublicacion,
+      idUsuario,
+      contenido
+    });
+  }
+
+  getComentarios(idPublicacion: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${idPublicacion}/comentarios/list`);
+  }
+
+  deleteComentario(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/comentarios/${id}`);
+  }
+
+  // ==================== REACCIONES (LIKES) ====================
+
+  toggleReaccion(idPublicacion: number, idUsuario: number): Observable<{ liked: boolean; totalLikes: number }> {
+    return this.http.post<{ liked: boolean; totalLikes: number }>(`${this.apiUrl}/reacciones`, {
+      idPublicacion,
+      idUsuario
+    });
+  }
+
+  getReacciones(idPublicacion: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${idPublicacion}/reacciones`);
+  }
+
+  checkUserReaction(idPublicacion: number, idUsuario: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/${idPublicacion}/reacciones/check/${idUsuario}`);
+  }
 }

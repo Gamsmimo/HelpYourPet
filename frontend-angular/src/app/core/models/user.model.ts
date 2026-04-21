@@ -10,6 +10,8 @@ export interface User {
   edad?: number;
   rol_id: number;
   activo: boolean;
+  imagen?: string | null;
+  rol?: string;
 }
 
 export interface LoginDto {

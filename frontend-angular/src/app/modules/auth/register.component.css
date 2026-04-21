@@ -121,6 +121,13 @@ input, select {
   transition: 0.3s;
   font-size: 0.95rem;
   font-family: 'Fira Sans', sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+input {
+  cursor: text;
+  caret-color: #000000;
 }
 
 input:hover, select:hover {
@@ -130,11 +137,18 @@ input:hover, select:hover {
 input:focus, select:focus {
   border-color: #258e48;
   box-shadow: 0 0 0 3px rgba(37, 142, 72, 0.1);
+  cursor: text;
+  caret-color: #000000;
 }
 
 select {
   cursor: pointer;
   background-color: white;
+}
+
+/* Labels con cursor pointer */
+label {
+  cursor: pointer;
 }
 
 select option {

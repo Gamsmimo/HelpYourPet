@@ -3,12 +3,43 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacionDto } from './dto/create-publicacion.dto';
 import { UpdatePublicacionDto } from './dto/update-publicacion.dto';
+import { CreateComentarioDto } from './dto/create-comentario.dto';
+import { CreateReaccionDto } from './dto/create-reaccion.dto';
 import { Publicacion } from './entities/publicacion.entity';
+import { Comentario } from './entities/comentario.entity';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('publicaciones')
 @Controller('publicaciones')
 export class PublicacionesController {
   constructor(private readonly publicacionesService: PublicacionesService) {}
+
+  // ==================== COMENTARIOS (rutas estáticas primero) ====================
+
+  @Post('comentarios')
+  @ApiOperation({ summary: 'Crear un comentario en una publicación' })
+  @ApiResponse({ status: 201, description: 'Comentario creado', type: Comentario })
+  createComentario(@Body() createComentarioDto: CreateComentarioDto) {
+    return this.publicacionesService.createComentario(createComentarioDto);
+  }
+
+  @Delete('comentarios/:id')
+  @ApiOperation({ summary: 'Eliminar un comentario' })
+  @ApiResponse({ status: 200, description: 'Comentario eliminado' })
+  deleteComentario(@Param('id', ParseIntPipe) id: number) {
+    return this.publicacionesService.deleteComentario(id);
+  }
+
+  // ==================== REACCIONES (rutas estáticas primero) ====================
+
+  @Post('reacciones')
+  @ApiOperation({ summary: 'Dar o quitar like a una publicación' })
+  @ApiResponse({ status: 200, description: 'Reacción actualizada' })
+  toggleReaccion(@Body() createReaccionDto: CreateReaccionDto) {
+    return this.publicacionesService.toggleReaccion(createReaccionDto);
+  }
+
+  // ==================== PUBLICACIONES ====================
 
   @Post()
   @ApiOperation({ summary: 'Crear nueva publicación' })
@@ -18,6 +49,7 @@ export class PublicacionesController {
     return this.publicacionesService.create(idUsuario, resto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Obtener todas las publicaciones' })
   @ApiResponse({ status: 200, description: 'Lista de publicaciones', type: [Publicacion] })
@@ -25,6 +57,7 @@ export class PublicacionesController {
     return this.publicacionesService.findAll();
   }
 
+  @Public()
   @Get('usuario/:idUsuario')
   @ApiOperation({ summary: 'Obtener publicaciones de un usuario' })
   @ApiResponse({ status: 200, description: 'Publicaciones del usuario', type: [Publicacion] })
@@ -32,6 +65,7 @@ export class PublicacionesController {
     return this.publicacionesService.findByUsuario(idUsuario);
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obtener publicación por ID' })
   @ApiResponse({ status: 200, description: 'Publicación encontrada', type: Publicacion })
@@ -67,11 +101,30 @@ export class PublicacionesController {
     return this.publicacionesService.incrementarLikes(id);
   }
 
-  @Post(':id/comentarios')
-  @ApiOperation({ summary: 'Incrementar comentarios de una publicación' })
-  @ApiResponse({ status: 200, description: 'Comentarios incrementados', type: Publicacion })
-  @ApiBearerAuth('JWT-auth')
-  incrementarComentarios(@Param('id', ParseIntPipe) id: number) {
-    return this.publicacionesService.incrementarComentarios(id);
+  @Public()
+  @Get(':id/comentarios/list')
+  @ApiOperation({ summary: 'Obtener comentarios de una publicación' })
+  @ApiResponse({ status: 200, description: 'Lista de comentarios', type: [Comentario] })
+  getComentarios(@Param('id', ParseIntPipe) id: number) {
+    return this.publicacionesService.getComentariosByPublicacion(id);
+  }
+
+  @Public()
+  @Get(':id/reacciones')
+  @ApiOperation({ summary: 'Obtener reacciones de una publicación' })
+  @ApiResponse({ status: 200, description: 'Lista de reacciones' })
+  getReacciones(@Param('id', ParseIntPipe) id: number) {
+    return this.publicacionesService.getReaccionesByPublicacion(id);
+  }
+
+  @Public()
+  @Get(':id/reacciones/check/:idUsuario')
+  @ApiOperation({ summary: 'Verificar si un usuario ya reaccionó a una publicación' })
+  @ApiResponse({ status: 200, description: 'Estado de la reacción' })
+  checkUserReaction(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+  ) {
+    return this.publicacionesService.checkUserReaction(id, idUsuario);
   }
 }

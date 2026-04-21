@@ -1220,6 +1220,7 @@ html {
 	font-size: 0.95rem;
 	font-weight: 600;
 	font-family: 'Fredoka', sans-serif;
+	cursor: pointer;
 }
 
 .form-control,
@@ -1235,18 +1236,59 @@ html {
 	font-family: 'Fredoka', sans-serif;
 }
 
+.form-control {
+	cursor: text;
+	caret-color: #1a1a1a !important;
+	color: #2C3E50;
+	background-color: #ffffff;
+}
+
+/* Inputs en el perfil - forzar caret visible */
+input.form-control,
+textarea.form-control {
+	caret-color: #1a1a1a !important;
+}
+
+.form-select {
+	cursor: pointer;
+}
+
 .form-control:focus,
 .form-select:focus {
 	outline: none;
 	border-color: var(--primary-color);
 	box-shadow: 0 0 0 0.2rem rgba(137, 168, 213, 0.2);
+	background-color: #ffffff;
+	color: #2C3E50;
+	cursor: text;
+	caret-color: #1a1a1a !important;
+}
+
+/* En tema oscuro, caret blanco */
+[data-theme="dark"] .form-control {
+	caret-color: #ffffff !important;
 	background-color: var(--bg-card);
 	color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+	caret-color: #ffffff !important;
+	background-color: var(--bg-card);
+}
+
+[data-theme="dark"] input.form-control,
+[data-theme="dark"] textarea.form-control {
+	caret-color: #ffffff !important;
+}
+
+.form-select:focus {
+	cursor: pointer;
 }
 
 textarea.form-control {
 	resize: vertical;
 	min-height: 80px;
+	cursor: text;
 }
 
 /* ===== UTILITIES ===== */

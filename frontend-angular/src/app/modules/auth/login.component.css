@@ -100,10 +100,20 @@ input {
     border: 1px solid #ccc;
     outline: none;
     transition: 0.3s;
+    cursor: text;
+    caret-color: #000000;
+    color: #000000;
+    background-color: #ffffff;
 }
 
 input:hover {
     border-color: #4ade80;
+}
+
+input:focus {
+    cursor: text;
+    caret-color: #000000;
+    outline: 2px solid #4ade80;
 }
 
 /* BOTÓN LOGIN */
