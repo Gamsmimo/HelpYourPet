@@ -59,9 +59,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
   // Control para evitar llamadas duplicadas
   private publicacionesCargadas = false;
 
-  // Suscripción a navegación
-  private navigationSubscription: Subscription | null = null;
-
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -70,31 +67,19 @@ export class PerfilComponent implements OnInit, OnDestroy {
     private adopcionService: AdopcionService,
     private publicacionesService: PublicacionesService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
     this.inicializarDatos();
-
-    // Re-inicializar cuando el usuario navega de vuelta a este perfil
-    this.navigationSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        if (event.url === '/usuario/perfil' || event.urlAfterRedirects === '/usuario/perfil') {
-          this.publicacionesCargadas = false; // Resetear para forzar recarga
-          this.inicializarDatos();
-        }
-      });
   }
 
   ngOnDestroy(): void {
-    if (this.navigationSubscription) {
-      this.navigationSubscription.unsubscribe();
-    }
+    // Ya no hay subscripciones activas que requieran cleanup manual
   }
 
   inicializarDatos(): void {
+    console.log('[PERFIL] inicializarDatos llamado');
     this.isLoadingUser = true;
     this.errorCargaUsuario = false;
     this.errorMensajeUsuario = '';
@@ -128,51 +113,44 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   // CORRECCIÓN: Método unificado de carga, sin doble llamada HTTP
   private cargarDatosCompletosUsuario(userId: number): void {
+    console.log('[PERFIL] Iniciando HTTP GET para usuario:', userId);
     this.usuariosService.getUsuario(userId).subscribe({
       next: (data) => {
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            // Actualizar con datos frescos del backend
-            this.usuarioLogueado = { ...data, id: userId };
-            this.usuarioEdit = { ...data, id: userId };
-            this.usuarioOriginal = { ...data, id: userId };
-            this.isLoadingUser = false;
-            this.userImageLoaded = true;
-            this.dataInitialized = true;
-            this.errorCargaUsuario = false;
+        console.log('[PERFIL] HTTP GET EXITOSO:', data.nombres);
+        this.usuarioLogueado = { ...data, id: userId };
+        this.usuarioEdit = { ...data, id: userId };
+        this.usuarioOriginal = { ...data, id: userId };
+        this.isLoadingUser = false;
+        this.userImageLoaded = true;
+        this.dataInitialized = true;
+        this.errorCargaUsuario = false;
 
-            // Sincronizar en localStorage para toda la app
-            this.authService.updateUserData(data);
+        // Sincronizar en localStorage para toda la app
+        this.authService.updateUserData(data);
 
-            // Forzar detección de cambios para actualizar sidebar e imagen
-            this.cdr.detectChanges();
-          });
-        });
+        // Forzar detección de cambios para actualizar sidebar e imagen
+        this.cdr.markForCheck();
       },
       error: (error) => {
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            console.error('Error al cargar datos del usuario:', error);
-            this.isLoadingUser = false;
-            this.dataInitialized = true;
-            this.errorCargaUsuario = true;
+        console.error('[PERFIL] HTTP GET ERROR:', error);
+        this.isLoadingUser = false;
+        this.dataInitialized = true;
+        this.errorCargaUsuario = true;
 
-            // Mensaje amigable según el tipo de error
-            if (error.status === 401) {
-              this.errorMensajeUsuario = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
-              setTimeout(() => {
-                this.authService.logout();
-              }, 2000);
-            } else if (error.status === 0) {
-              this.errorMensajeUsuario = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-            } else {
-              this.errorMensajeUsuario = 'No se pudieron cargar los datos de tu perfil. Intenta recargar la página.';
-            }
+        // Mensaje amigable según el tipo de error
+        if (error.status === 401) {
+          this.errorMensajeUsuario = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
+          setTimeout(() => {
+            this.authService.logout();
+          }, 2000);
+        } else if (error.status === 0) {
+          this.errorMensajeUsuario = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+        } else {
+          this.errorMensajeUsuario = 'No se pudieron cargar los datos de tu perfil. Intenta recargar la página.';
+        }
 
-            // Forzar detección de cambios para mostrar el error
-            this.cdr.detectChanges();
-          });
-        });
+        // Forzar detección de cambios para mostrar el error
+        this.cdr.markForCheck();
       }
     });
   }
@@ -248,6 +226,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   // CORRECCIÓN: Método público limpio que siempre carga desde el backend
   cargarPublicaciones(): void {
+    console.log('[PERFIL] cargarPublicaciones llamado');
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
     if (!userId) return;
 
@@ -255,41 +234,35 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.errorCargaPublicaciones = false;
     this.errorMensajePublicaciones = '';
 
+    console.log('[PERFIL] Iniciando HTTP GET publicaciones');
     this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
       next: (data) => {
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            this.publicaciones = data.map(pub => ({
-              id: pub.id,
-              contenido: pub.contenido,
-              imagen: pub.imagen,
-              fecha: new Date(pub.createdAt),
-              likes: pub.likesCount || pub.reaccionesData?.length || 0,
-              comentarios: pub.comentariosCount || pub.comentariosData?.length || 0,
-              compartidos: 0
-            }));
-            this.isLoadingPublicaciones = false;
-            this.publicacionesCargadas = true;
-            this.cdr.detectChanges();
-          });
-        });
+        console.log('[PERFIL] HTTP GET publicaciones EXITOSO. Recibidas:', data.length);
+        this.publicaciones = data.map(pub => ({
+          id: pub.id,
+          contenido: pub.contenido,
+          imagen: pub.imagen,
+          fecha: new Date(pub.createdAt),
+          likes: pub.likesCount || pub.reaccionesData?.length || 0,
+          comentarios: pub.comentariosCount || pub.comentariosData?.length || 0,
+          compartidos: 0
+        }));
+        this.isLoadingPublicaciones = false;
+        this.publicacionesCargadas = true;
+        this.cdr.markForCheck();
       },
       error: (error) => {
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            console.error('Error al cargar publicaciones:', error);
-            this.publicaciones = [];
-            this.isLoadingPublicaciones = false;
-            this.errorCargaPublicaciones = true;
+        console.error('Error al cargar publicaciones:', error);
+        this.publicaciones = [];
+        this.isLoadingPublicaciones = false;
+        this.errorCargaPublicaciones = true;
 
-            if (error.status === 0) {
-              this.errorMensajePublicaciones = 'No se pudo conectar con el servidor.';
-            } else {
-              this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
-            }
-            this.cdr.detectChanges();
-          });
-        });
+        if (error.status === 0) {
+          this.errorMensajePublicaciones = 'No se pudo conectar con el servidor.';
+        } else {
+          this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
+        }
+        this.cdr.markForCheck();
       }
     });
   }
