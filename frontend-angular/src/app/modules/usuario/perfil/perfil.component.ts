@@ -80,7 +80,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   inicializarDatos(): void {
     console.log('[PERFIL] inicializarDatos llamado');
-    this.isLoadingUser = true;
     this.errorCargaUsuario = false;
     this.errorMensajeUsuario = '';
     this.dataInitialized = false;
@@ -94,16 +93,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // CORRECCIÓN: Mostrar inmediatamente los datos que existen en localStorage
-    // para una experiencia más rápida (aunque estén incompletos)
+    // CORRECCIÓN OPTIMISTA: Mostrar inmediatamente los datos del localStorage sin spinner
     this.usuarioLogueado = { ...userData, id: userId };
     this.usuarioEdit = { ...userData, id: userId };
     this.usuarioOriginal = { ...userData, id: userId };
-
-    // Si ya hay imagen en caché, no esperar la llamada HTTP para mostrarla
-    if (userData?.imagen) {
-      this.userImageLoaded = true;
-    }
+    
+    // Si ya tenemos los datos en memoria, apagamos el spinner de carga inmediatamente.
+    // Esto previene que al transicionar desde Inicio se quede colgado en el loading de Angular.
+    this.isLoadingUser = !userData?.nombres;
+    this.userImageLoaded = !!userData?.imagen;
 
     // CORRECCIÓN: Una sola llamada HTTP al backend (eliminando condición de carrera con AppInitService)
     this.cargarDatosCompletosUsuario(userId);
@@ -128,8 +126,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
         // Sincronizar en localStorage para toda la app
         this.authService.updateUserData(data);
 
-        // Forzar detección de cambios para actualizar sidebar e imagen
-        this.cdr.markForCheck();
+        // Forzar detección de cambios sincrónica (detectChanges en lugar de markForCheck) 
+        // para garantizar la iteración completa independientemente de cómo Angular Router maneje el Zone
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('[PERFIL] HTTP GET ERROR:', error);
@@ -150,7 +149,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         }
 
         // Forzar detección de cambios para mostrar el error
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -249,7 +248,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         }));
         this.isLoadingPublicaciones = false;
         this.publicacionesCargadas = true;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error al cargar publicaciones:', error);
@@ -262,7 +261,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         } else {
           this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
         }
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       }
     });
   }
