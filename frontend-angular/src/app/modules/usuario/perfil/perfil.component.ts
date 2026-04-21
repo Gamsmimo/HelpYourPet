@@ -130,44 +130,48 @@ export class PerfilComponent implements OnInit, OnDestroy {
   private cargarDatosCompletosUsuario(userId: number): void {
     this.usuariosService.getUsuario(userId).subscribe({
       next: (data) => {
-        this.ngZone.run(() => {
-          // Actualizar con datos frescos del backend
-          this.usuarioLogueado = { ...data, id: userId };
-          this.usuarioEdit = { ...data, id: userId };
-          this.usuarioOriginal = { ...data, id: userId };
-          this.isLoadingUser = false;
-          this.userImageLoaded = true;
-          this.dataInitialized = true;
-          this.errorCargaUsuario = false;
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            // Actualizar con datos frescos del backend
+            this.usuarioLogueado = { ...data, id: userId };
+            this.usuarioEdit = { ...data, id: userId };
+            this.usuarioOriginal = { ...data, id: userId };
+            this.isLoadingUser = false;
+            this.userImageLoaded = true;
+            this.dataInitialized = true;
+            this.errorCargaUsuario = false;
 
-          // Sincronizar en localStorage para toda la app
-          this.authService.updateUserData(data);
+            // Sincronizar en localStorage para toda la app
+            this.authService.updateUserData(data);
 
-          // Forzar detección de cambios para actualizar sidebar e imagen
-          this.cdr.detectChanges();
+            // Forzar detección de cambios para actualizar sidebar e imagen
+            this.cdr.detectChanges();
+          });
         });
       },
       error: (error) => {
-        this.ngZone.run(() => {
-          console.error('Error al cargar datos del usuario:', error);
-          this.isLoadingUser = false;
-          this.dataInitialized = true;
-          this.errorCargaUsuario = true;
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            console.error('Error al cargar datos del usuario:', error);
+            this.isLoadingUser = false;
+            this.dataInitialized = true;
+            this.errorCargaUsuario = true;
 
-          // Mensaje amigable según el tipo de error
-          if (error.status === 401) {
-            this.errorMensajeUsuario = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
-            setTimeout(() => {
-              this.authService.logout();
-            }, 2000);
-          } else if (error.status === 0) {
-            this.errorMensajeUsuario = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-          } else {
-            this.errorMensajeUsuario = 'No se pudieron cargar los datos de tu perfil. Intenta recargar la página.';
-          }
+            // Mensaje amigable según el tipo de error
+            if (error.status === 401) {
+              this.errorMensajeUsuario = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
+              setTimeout(() => {
+                this.authService.logout();
+              }, 2000);
+            } else if (error.status === 0) {
+              this.errorMensajeUsuario = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+            } else {
+              this.errorMensajeUsuario = 'No se pudieron cargar los datos de tu perfil. Intenta recargar la página.';
+            }
 
-          // Forzar detección de cambios para mostrar el error
-          this.cdr.detectChanges();
+            // Forzar detección de cambios para mostrar el error
+            this.cdr.detectChanges();
+          });
         });
       }
     });
@@ -253,34 +257,38 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
       next: (data) => {
-        this.ngZone.run(() => {
-          this.publicaciones = data.map(pub => ({
-            id: pub.id,
-            contenido: pub.contenido,
-            imagen: pub.imagen,
-            fecha: new Date(pub.createdAt),
-            likes: pub.likesCount || pub.reaccionesData?.length || 0,
-            comentarios: pub.comentariosCount || pub.comentariosData?.length || 0,
-            compartidos: 0
-          }));
-          this.isLoadingPublicaciones = false;
-          this.publicacionesCargadas = true;
-          this.cdr.detectChanges();
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.publicaciones = data.map(pub => ({
+              id: pub.id,
+              contenido: pub.contenido,
+              imagen: pub.imagen,
+              fecha: new Date(pub.createdAt),
+              likes: pub.likesCount || pub.reaccionesData?.length || 0,
+              comentarios: pub.comentariosCount || pub.comentariosData?.length || 0,
+              compartidos: 0
+            }));
+            this.isLoadingPublicaciones = false;
+            this.publicacionesCargadas = true;
+            this.cdr.detectChanges();
+          });
         });
       },
       error: (error) => {
-        this.ngZone.run(() => {
-          console.error('Error al cargar publicaciones:', error);
-          this.publicaciones = [];
-          this.isLoadingPublicaciones = false;
-          this.errorCargaPublicaciones = true;
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            console.error('Error al cargar publicaciones:', error);
+            this.publicaciones = [];
+            this.isLoadingPublicaciones = false;
+            this.errorCargaPublicaciones = true;
 
-          if (error.status === 0) {
-            this.errorMensajePublicaciones = 'No se pudo conectar con el servidor.';
-          } else {
-            this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
-          }
-          this.cdr.detectChanges();
+            if (error.status === 0) {
+              this.errorMensajePublicaciones = 'No se pudo conectar con el servidor.';
+            } else {
+              this.errorMensajePublicaciones = 'No se pudieron cargar tus publicaciones. Intenta de nuevo.';
+            }
+            this.cdr.detectChanges();
+          });
         });
       }
     });
