@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginDto, RegisterDto, AuthResponse, User } from '../models/user.model';
 import { jwtDecode } from 'jwt-decode';
@@ -19,6 +19,12 @@ export class AuthService {
       tap(response => {
         this.setToken(response.access_token);
         this.setUserFromToken(response.access_token);
+
+        // CORRECCIÓN: Si el backend devuelve el objeto user con datos completos,
+        // guardarlos inmediatamente en localStorage para que el perfil los tenga
+        if ((response as any).user) {
+          this.updateUserData((response as any).user);
+        }
       })
     );
   }
@@ -28,6 +34,11 @@ export class AuthService {
       tap(response => {
         this.setToken(response.access_token);
         this.setUserFromToken(response.access_token);
+
+        // Guardar datos completos si el backend los devuelve
+        if ((response as any).user) {
+          this.updateUserData((response as any).user);
+        }
       })
     );
   }
