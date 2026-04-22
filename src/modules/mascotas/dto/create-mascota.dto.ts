@@ -25,10 +25,10 @@ export class CreateMascotaDto {
   @Min(0)
   edad?: number;
 
-  @ApiProperty({ description: 'Género', example: 'Macho', required: false })
+  @ApiProperty({ description: 'Sexo/Género', example: 'Macho', required: false })
   @IsOptional()
   @IsString()
-  genero?: string;
+  sexo?: string;
 
   @ApiProperty({ description: 'Descripción', required: false })
   @IsOptional()
@@ -43,9 +43,9 @@ export class CreateMascotaDto {
   @ApiProperty({ description: 'Tamaño', example: 'Mediano', required: false })
   @IsOptional()
   @IsString()
-  tamaño?: string;
+  tamano?: string;
 
-  @ApiProperty({ description: 'Unidad de edad', example: 'años', required: false })
+  @ApiProperty({ description: 'Unidad de edad', example: 'Años', required: false })
   @IsOptional()
   @IsString()
   unidadEdad?: string;

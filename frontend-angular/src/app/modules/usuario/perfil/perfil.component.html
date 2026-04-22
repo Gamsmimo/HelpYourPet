@@ -8,18 +8,17 @@
         <h3 class="text-center">HelpYourPet</h3>
         <div class="user-profile text-center">
           <!-- Spinner pequeño mientras carga la imagen de perfil en sidebar -->
-          <div *ngIf="isLoadingUser" class="rounded-circle mb-2 d-flex align-items-center justify-content-center mx-auto"
-               style="width:80px;height:80px;background:rgba(255,255,255,0.1);">
+          <div *ngIf="isLoadingUser"
+            class="rounded-circle mb-2 d-flex align-items-center justify-content-center mx-auto"
+            style="width:80px;height:80px;background:rgba(255,255,255,0.1);">
             <div class="spinner-border spinner-border-sm text-light" role="status"></div>
           </div>
-          <img *ngIf="!isLoadingUser"
-               [src]="getImageUrl(usuarioLogueado?.imagen)" 
-               alt="Foto de perfil" 
-               class="rounded-circle mb-2" 
-               id="sidebar-profile-picture">
+          <img *ngIf="!isLoadingUser" [src]="getImageUrl(usuarioLogueado?.imagen)" alt="Foto de perfil"
+            class="rounded-circle mb-2" id="sidebar-profile-picture">
           <h5 id="username">
             <span *ngIf="isLoadingUser">Cargando...</span>
-            <span *ngIf="!isLoadingUser">{{ usuarioEdit?.nombres || usuarioLogueado?.nombres }} {{ usuarioEdit?.apellidos || usuarioLogueado?.apellidos }}</span>
+            <span *ngIf="!isLoadingUser">{{ usuarioEdit?.nombres || usuarioLogueado?.nombres }} {{
+              usuarioEdit?.apellidos || usuarioLogueado?.apellidos }}</span>
           </h5>
           <p class="text-muted">Dueño de mascotas</p>
         </div>
@@ -27,27 +26,28 @@
 
       <ul class="nav flex-column">
         <li class="nav-item">
-          <a class="nav-link" [class.active]="activeSection === 'dashboard'" (click)="showSection('dashboard')" href="javascript:void(0)">
-            <i class="fas fa-home me-2"></i>Inicio
-          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [class.active]="activeSection === 'mascotas'" (click)="showSection('mascotas')" href="javascript:void(0)">
+          <a class="nav-link" [class.active]="activeSection === 'mascotas'" (click)="showSection('mascotas')"
+            href="javascript:void(0)">
             <i class="fas fa-paw me-2"></i>Mis Mascotas
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [class.active]="activeSection === 'compras'" (click)="showSection('compras')" href="javascript:void(0)">
+          <a class="nav-link" [class.active]="activeSection === 'compras'" (click)="showSection('compras')"
+            href="javascript:void(0)">
             <i class="fas fa-shopping-cart me-2"></i>Mis Compras
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [class.active]="activeSection === 'adopciones-usuario'" (click)="showSection('adopciones-usuario')" href="javascript:void(0)">
+          <a class="nav-link" [class.active]="activeSection === 'adopciones-usuario'"
+            (click)="showSection('adopciones-usuario')" href="javascript:void(0)">
             <i class="fas fa-newspaper me-2"></i>Mis Publicaciones
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [class.active]="activeSection === 'configuracion'" (click)="showSection('configuracion')" href="javascript:void(0)">
+          <a class="nav-link" [class.active]="activeSection === 'configuracion'" (click)="showSection('configuracion')"
+            href="javascript:void(0)">
             <i class="fas fa-cog me-2"></i>Configuración
           </a>
         </li>
@@ -63,51 +63,19 @@
 
     <!-- Contenido Principal -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-      
-      <!-- Sección Dashboard -->
-      <section id="dashboard" class="content-section" *ngIf="activeSection === 'dashboard'">
 
-        <!-- BANNER DE ERROR GLOBAL (visible en todas las secciones) -->
-        <div *ngIf="errorCargaUsuario"
-             class="alert alert-danger d-flex align-items-center gap-3 mb-3"
-             role="alert"
-             style="border-radius: 12px; border-left: 4px solid #dc3545;">
-          <i class="fas fa-exclamation-circle fa-lg"></i>
-          <div style="flex: 1;">
-            <strong>Error al cargar perfil</strong><br>
-            <small>{{ errorMensajeUsuario }}</small>
-          </div>
-          <button class="btn btn-sm btn-outline-danger" (click)="reintentar()">
-            <i class="fas fa-redo me-1"></i>Reintentar
-          </button>
+      <!-- BANNER DE ERROR GLOBAL (visible en todas las secciones) -->
+      <div *ngIf="errorCargaUsuario" class="alert alert-danger d-flex align-items-center gap-3 mb-3 mt-3" role="alert"
+        style="border-radius: 12px; border-left: 4px solid #dc3545;">
+        <i class="fas fa-exclamation-circle fa-lg"></i>
+        <div style="flex: 1;">
+          <strong>Error al cargar perfil</strong><br>
+          <small>{{ errorMensajeUsuario }}</small>
         </div>
-
-        <div class="section-header">
-          <h1 class="h2">Hola,
-            <span id="username-header">
-              <span *ngIf="isLoadingUser" class="placeholder col-4 bg-secondary" style="display:inline-block;"></span>
-              <span *ngIf="!isLoadingUser">{{ usuarioEdit?.nombres || usuarioLogueado?.nombres }}</span>
-            </span>
-          </h1>
-          <div class="d-flex gap-2 align-items-center">
-            <!-- Botón Hamburguesa (solo móviles) -->
-            <button class="menu-toggle" id="menuToggle1" (click)="toggleSidebar()">
-              <i class="fas fa-bars"></i>
-            </button>
-            <!-- Botón de cambio de tema -->
-            <div class="theme-toggle-container">
-              <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" [(ngModel)]="darkMode" (change)="toggleTheme()">
-              <label for="themeToggle" class="theme-toggle-label">
-                <i class="fas fa-moon toggle-icon moon-icon"></i>
-                <i class="fas fa-sun toggle-icon sun-icon"></i>
-              </label>
-            </div>
-            <a (click)="goToHome()" class="btn-volver-inicio" style="cursor: pointer;">
-              <i class="fas fa-home"></i>
-            </a>
-          </div>
-        </div>
-      </section>
+        <button class="btn btn-sm btn-outline-danger" (click)="reintentar()">
+          <i class="fas fa-redo me-1"></i>Reintentar
+        </button>
+      </div>
 
       <!-- Sección Mis Mascotas -->
       <section id="mascotas" class="content-section" *ngIf="activeSection === 'mascotas'">
@@ -120,7 +88,8 @@
             </button>
             <!-- Botón de cambio de tema -->
             <div class="theme-toggle-container">
-              <input type="checkbox" id="themeToggle2" class="theme-toggle-checkbox" [(ngModel)]="darkMode" (change)="toggleTheme()">
+              <input type="checkbox" id="themeToggle2" class="theme-toggle-checkbox" [(ngModel)]="darkMode"
+                (change)="toggleTheme()">
               <label for="themeToggle2" class="theme-toggle-label">
                 <i class="fas fa-moon toggle-icon moon-icon"></i>
                 <i class="fas fa-sun toggle-icon sun-icon"></i>
@@ -160,29 +129,22 @@
                 <tbody>
                   <tr *ngFor="let mascota of mascotas">
                     <td>
-                      <img *ngIf="mascota.foto" 
-                           [src]="mascota.foto" 
-                           [alt]="'Foto de ' + mascota.nombre"
-                           class="rounded" 
-                           width="50" 
-                           height="50"
-                           (error)="onImageError($event)">
+                      <img *ngIf="mascota.foto" [src]="getMascotaImageUrl(mascota.foto)" [alt]="'Foto de ' + mascota.nombre" class="rounded"
+                        width="50" height="50" (error)="onImageError($event)">
                       <span *ngIf="!mascota.foto" class="text-muted">Sin foto</span>
                     </td>
                     <td><strong>{{ mascota.nombre }}</strong></td>
                     <td>{{ mascota.especie }}</td>
                     <td>{{ mascota.edad }} {{ mascota.unidadEdad }}</td>
-                    <td>{{ mascota.genero }}</td>
+                    <td>{{ mascota.sexo || mascota.genero || 'N/A' }}</td>
                     <td>{{ mascota.raza || 'N/A' }}</td>
                     <td>
                       <div class="d-flex gap-2 flex-wrap">
-                        <button type="button"
-                                class="btn btn-sm btn-outline-primary edit-pet-btn"
-                                (click)="openEditPetModal(mascota)">
+                        <button type="button" class="btn btn-sm btn-outline-primary edit-pet-btn"
+                          (click)="openEditPetModal(mascota)">
                           <i class="fas fa-edit"></i> Editar
                         </button>
-                        <button class="btn btn-sm btn-outline-danger"
-                                (click)="eliminarMascota(mascota.id)">
+                        <button class="btn btn-sm btn-outline-danger" (click)="eliminarMascota(mascota.id)">
                           <i class="fas fa-trash"></i> Eliminar
                         </button>
                       </div>
@@ -204,7 +166,8 @@
               <i class="fas fa-bars"></i>
             </button>
             <div class="theme-toggle-container">
-              <input type="checkbox" id="themeToggle4" class="theme-toggle-checkbox" [(ngModel)]="darkMode" (change)="toggleTheme()">
+              <input type="checkbox" id="themeToggle4" class="theme-toggle-checkbox" [(ngModel)]="darkMode"
+                (change)="toggleTheme()">
               <label for="themeToggle4" class="theme-toggle-label">
                 <i class="fas fa-moon toggle-icon moon-icon"></i>
                 <i class="fas fa-sun toggle-icon sun-icon"></i>
@@ -213,7 +176,7 @@
             <a (click)="goToHome()" class="btn-volver-inicio" style="cursor: pointer;">
               <i class="fas fa-home"></i>
             </a>
-            <button class="btn btn-primary" id="go-to-shop-btn" (click)="irATienda()">
+            <button class="btn btn-primary" id="go-to-shop-btn" [routerLink]="['/tienda']">
               <i class="fas fa-store me-2"></i>Ir a la Tienda
             </button>
           </div>
@@ -268,7 +231,8 @@
               <i class="fas fa-bars"></i>
             </button>
             <div class="theme-toggle-container">
-              <input type="checkbox" id="themeToggle7" class="theme-toggle-checkbox" [(ngModel)]="darkMode" (change)="toggleTheme()">
+              <input type="checkbox" id="themeToggle7" class="theme-toggle-checkbox" [(ngModel)]="darkMode"
+                (change)="toggleTheme()">
               <label for="themeToggle7" class="theme-toggle-label">
                 <i class="fas fa-moon toggle-icon moon-icon"></i>
                 <i class="fas fa-sun toggle-icon sun-icon"></i>
@@ -281,9 +245,8 @@
         </div>
 
         <!-- Estado de carga de publicaciones -->
-        <div *ngIf="isLoadingPublicaciones"
-             class="text-center py-5"
-             style="background: var(--bg-card); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+        <div *ngIf="isLoadingPublicaciones" class="text-center py-5"
+          style="background: var(--bg-card); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
           <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Cargando...</span>
           </div>
@@ -292,9 +255,8 @@
 
         <!-- CORRECCIÓN: Banner de error al cargar publicaciones -->
         <div *ngIf="!isLoadingPublicaciones && errorCargaPublicaciones"
-             class="alert alert-warning d-flex align-items-center gap-3"
-             role="alert"
-             style="border-radius: 12px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          class="alert alert-warning d-flex align-items-center gap-3" role="alert"
+          style="border-radius: 12px; border-left: 4px solid #ffc107; margin: 20px 0;">
           <i class="fas fa-exclamation-triangle fa-lg"></i>
           <div style="flex: 1;">
             <strong>No se pudieron cargar las publicaciones</strong><br>
@@ -306,9 +268,8 @@
         </div>
 
         <!-- Mensaje cuando no hay publicaciones (solo mostrar cuando ya cargó) -->
-        <div *ngIf="!isLoadingPublicaciones && publicaciones.length === 0"
-             class="text-center py-5"
-             style="background: var(--bg-card); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+        <div *ngIf="!isLoadingPublicaciones && publicaciones.length === 0" class="text-center py-5"
+          style="background: var(--bg-card); border-radius: 20px; padding: 60px 20px; margin: 20px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
           <i class="fas fa-newspaper fa-4x mb-4" style="color: var(--pastel-blue); opacity: 0.5;"></i>
           <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 15px;">
             No tienes publicaciones aún
@@ -316,31 +277,33 @@
           <p style="color: var(--text-primary); opacity: 0.7; font-size: 1.1rem; margin-bottom: 30px;">
             Comparte momentos especiales con tu mascota en la comunidad
           </p>
-          <a (click)="goToHome()" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer;">
+          <a (click)="goToHome()" class="btn btn-primary"
+            style="padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer;">
             <i class="fas fa-home me-2"></i>Ir al Inicio
           </a>
         </div>
 
         <!-- Lista de publicaciones -->
-        <div *ngIf="!isLoadingPublicaciones && publicaciones.length > 0" class="publicaciones-container" style="margin-top: 30px;">
-          <div class="publicacion-card" *ngFor="let pub of publicaciones" 
-               style="background: var(--bg-card); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            
+        <div *ngIf="!isLoadingPublicaciones && publicaciones.length > 0" class="publicaciones-container"
+          style="margin-top: 30px;">
+          <div class="publicacion-card" *ngFor="let pub of publicaciones"
+            style="background: var(--bg-card); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
             <!-- Header de la publicación -->
             <div class="publicacion-header" style="display: flex; align-items: center; margin-bottom: 15px;">
-              <img [src]="getImageUrl(usuarioLogueado?.imagen)" 
-                   alt="Avatar" 
-                   class="rounded-circle me-3" 
-                   style="width: 50px; height: 50px; object-fit: cover;">
+              <img [src]="getImageUrl(usuarioLogueado?.imagen)" alt="Avatar" class="rounded-circle me-3"
+                style="width: 50px; height: 50px; object-fit: cover;">
               <div style="flex: 1;">
                 <h5 style="margin: 0; color: var(--text-primary); font-weight: 600;">
-                  {{ usuarioEdit?.nombres || usuarioLogueado?.nombres }} {{ usuarioEdit?.apellidos || usuarioLogueado?.apellidos }}
+                  {{ usuarioEdit?.nombres || usuarioLogueado?.nombres }} {{ usuarioEdit?.apellidos ||
+                  usuarioLogueado?.apellidos }}
                 </h5>
                 <small style="color: var(--text-primary); opacity: 0.6;">
                   {{ pub.fecha | date:'dd/MM/yyyy HH:mm' }}
                 </small>
               </div>
-              <button class="btn btn-sm btn-outline-danger" (click)="eliminarPublicacion(pub.id)" title="Eliminar publicación">
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminarPublicacion(pub.id)"
+                title="Eliminar publicación">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -348,14 +311,13 @@
             <!-- Contenido de la publicación -->
             <div class="publicacion-contenido" style="margin-bottom: 15px;">
               <p style="color: var(--text-primary); white-space: pre-wrap; margin-bottom: 10px;">{{ pub.contenido }}</p>
-              <img *ngIf="pub.imagen" 
-                   [src]="pub.imagen" 
-                   alt="Imagen de publicación" 
-                   style="width: 100%; border-radius: 10px; max-height: 500px; object-fit: cover;">
+              <img *ngIf="pub.imagen" [src]="pub.imagen" alt="Imagen de publicación"
+                style="width: 100%; border-radius: 10px; max-height: 500px; object-fit: cover;">
             </div>
 
             <!-- Footer de la publicación -->
-            <div class="publicacion-footer" style="display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+            <div class="publicacion-footer"
+              style="display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
               <span style="color: var(--text-primary); opacity: 0.7;">
                 <i class="fas fa-heart me-1"></i> {{ pub.likes || 0 }} Me gusta
               </span>
@@ -376,7 +338,8 @@
               <i class="fas fa-bars"></i>
             </button>
             <div class="theme-toggle-container">
-              <input type="checkbox" id="themeToggle6" class="theme-toggle-checkbox" [(ngModel)]="darkMode" (change)="toggleTheme()">
+              <input type="checkbox" id="themeToggle6" class="theme-toggle-checkbox" [(ngModel)]="darkMode"
+                (change)="toggleTheme()">
               <label for="themeToggle6" class="theme-toggle-label">
                 <i class="fas fa-moon toggle-icon moon-icon"></i>
                 <i class="fas fa-sun toggle-icon sun-icon"></i>
@@ -401,23 +364,19 @@
                     <!-- Foto de Perfil - Columna Izquierda -->
                     <div class="col-md-1 text-center d-flex flex-column">
                       <div class="profile-picture-container">
-                        <img [src]="getImageUrl(usuarioLogueado?.imagen)"
-                             alt="Foto de perfil" 
-                             class="rounded-circle img-fluid mb-1"
-                             style="width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--pastel-blue);"
-                             id="current-profile-picture">
+                        <img [src]="getImageUrl(usuarioLogueado?.imagen)" alt="Foto de perfil"
+                          class="rounded-circle img-fluid mb-1"
+                          style="width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--pastel-blue);"
+                          id="current-profile-picture">
                         <p class="text-muted" style="font-size: 0.65rem; margin: 0.2rem 0;">JPG, PNG</p>
-                        <input type="file" #fileInput accept="image/*" (change)="onProfilePictureSelected($event)" style="display: none;">
-                        <button type="button"
-                                class="btn btn-outline-primary btn-sm w-100 mb-1"
-                                style="font-size: 0.65rem; padding: 0.2rem;"
-                                (click)="fileInput.click()">
+                        <input type="file" #fileInput accept="image/*" (change)="onProfilePictureSelected($event)"
+                          style="display: none;">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-1"
+                          style="font-size: 0.65rem; padding: 0.2rem;" (click)="fileInput.click()">
                           <i class="fas fa-upload"></i> Cambiar
                         </button>
-                        <button type="button"
-                                class="btn btn-outline-secondary btn-sm w-100 mb-2"
-                                style="font-size: 0.65rem; padding: 0.2rem;"
-                                (click)="removeProfilePicture()">
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-2"
+                          style="font-size: 0.65rem; padding: 0.2rem;" (click)="removeProfilePicture()">
                           <i class="fas fa-trash"></i> Eliminar
                         </button>
                       </div>
@@ -426,21 +385,15 @@
                       <div *ngIf="profilePicturePreview" id="new-picture-preview" class="preview-container">
                         <hr style="margin: 0.5rem 0; border-color: var(--border-color);">
                         <p class="text-muted mb-2" style="font-size: 0.75rem;">Preview:</p>
-                        <img [src]="profilePicturePreview" 
-                             id="picture-preview" 
-                             class="rounded-circle mb-2"
-                             style="width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--secondary-color);">
+                        <img [src]="profilePicturePreview" id="picture-preview" class="rounded-circle mb-2"
+                          style="width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--secondary-color);">
                         <div class="d-flex flex-column gap-1">
-                          <button type="button" 
-                                  class="btn btn-success btn-sm w-100"
-                                  style="font-size: 0.7rem; padding: 0.3rem;"
-                                  (click)="saveProfilePicture()">
+                          <button type="button" class="btn btn-success btn-sm w-100"
+                            style="font-size: 0.7rem; padding: 0.3rem;" (click)="saveProfilePicture()">
                             <i class="fas fa-check me-1"></i>Guardar
                           </button>
-                          <button type="button" 
-                                  class="btn btn-secondary btn-sm w-100"
-                                  style="font-size: 0.7rem; padding: 0.3rem;"
-                                  (click)="cancelProfilePicture()">
+                          <button type="button" class="btn btn-secondary btn-sm w-100"
+                            style="font-size: 0.7rem; padding: 0.3rem;" (click)="cancelProfilePicture()">
                             <i class="fas fa-times me-1"></i>Cancelar
                           </button>
                         </div>
@@ -455,19 +408,26 @@
                           <div class="row g-2">
                             <div class="col-12">
                               <label for="profile-name" class="form-label fw-bold">Nombres</label>
-                              <input type="text" class="form-control" id="profile-name" [(ngModel)]="usuarioEdit.nombres" name="nombres" required placeholder="Ingresa tus nombres">
+                              <input type="text" class="form-control" id="profile-name"
+                                [(ngModel)]="usuarioEdit.nombres" name="nombres" required
+                                placeholder="Ingresa tus nombres">
                             </div>
                             <div class="col-12">
                               <label for="profile-apellidos" class="form-label fw-bold">Apellidos</label>
-                              <input type="text" class="form-control" id="profile-apellidos" [(ngModel)]="usuarioEdit.apellidos" name="apellidos" required placeholder="Ingresa tus apellidos">
+                              <input type="text" class="form-control" id="profile-apellidos"
+                                [(ngModel)]="usuarioEdit.apellidos" name="apellidos" required
+                                placeholder="Ingresa tus apellidos">
                             </div>
                             <div class="col-12">
                               <label for="profile-email" class="form-label fw-bold">Correo Electrónico</label>
-                              <input type="email" class="form-control" id="profile-email" [value]="usuarioEdit.correo" name="correo" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="correo@ejemplo.com">
+                              <input type="email" class="form-control" id="profile-email" [value]="usuarioEdit.correo"
+                                name="correo" readonly style="background-color: #f8f9fa; cursor: not-allowed;"
+                                placeholder="correo@ejemplo.com">
                             </div>
                             <div class="col-12">
                               <label for="profile-phone" class="form-label fw-bold">Teléfono</label>
-                              <input type="tel" class="form-control" id="profile-phone" [(ngModel)]="usuarioEdit.telefono" name="telefono" placeholder="+57 123 456 7890">
+                              <input type="tel" class="form-control" id="profile-phone"
+                                [(ngModel)]="usuarioEdit.telefono" name="telefono" placeholder="+57 123 456 7890">
                             </div>
                           </div>
                         </div>
@@ -477,19 +437,27 @@
                           <div class="row g-2">
                             <div class="col-12">
                               <label for="profile-edad" class="form-label fw-bold">Edad</label>
-                              <input type="number" class="form-control" id="profile-edad" [(ngModel)]="usuarioEdit.edad" name="edad" min="18" max="120" placeholder="Tu edad">
+                              <input type="number" class="form-control" id="profile-edad" [(ngModel)]="usuarioEdit.edad"
+                                name="edad" min="18" max="120" placeholder="Tu edad">
                             </div>
                             <div class="col-12">
                               <label for="profile-address" class="form-label fw-bold">Dirección</label>
-                              <input type="text" class="form-control" id="profile-address" [(ngModel)]="usuarioEdit.direccion" name="direccion" placeholder="Ingresa tu dirección completa">
+                              <input type="text" class="form-control" id="profile-address"
+                                [(ngModel)]="usuarioEdit.direccion" name="direccion"
+                                placeholder="Ingresa tu dirección completa">
                             </div>
                             <div class="col-12">
                               <label for="profile-tipoDocumento" class="form-label fw-bold">Tipo Documento</label>
-                              <input type="text" class="form-control" id="profile-tipoDocumento" [value]="usuarioEdit.tipo_documento || 'No especificado'" name="tipoDocumento" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Tipo de documento">
+                              <input type="text" class="form-control" id="profile-tipoDocumento"
+                                [value]="usuarioEdit.tipo_documento || 'No especificado'" name="tipoDocumento" readonly
+                                style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Tipo de documento">
                             </div>
                             <div class="col-12">
                               <label for="profile-numDocumento" class="form-label fw-bold">Número Documento</label>
-                              <input type="text" class="form-control" id="profile-numDocumento" [value]="usuarioEdit.num_documento || 'No especificado'" name="numeroDocumento" readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Número de documento">
+                              <input type="text" class="form-control" id="profile-numDocumento"
+                                [value]="usuarioEdit.num_documento || 'No especificado'" name="numeroDocumento" readonly
+                                style="background-color: #f8f9fa; cursor: not-allowed;"
+                                placeholder="Número de documento">
                             </div>
                           </div>
                         </div>
@@ -529,7 +497,8 @@
               <div class="col-md-6">
                 <div class="card border-danger">
                   <div class="card-header bg-danger text-white" style="padding: 0.4rem 0.6rem;">
-                    <h6 class="mb-0" style="font-size: 0.9rem;"><i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro</h6>
+                    <h6 class="mb-0" style="font-size: 0.9rem;"><i class="fas fa-exclamation-triangle me-2"></i>Zona de
+                      Peligro</h6>
                   </div>
                   <div class="card-body text-center" style="padding: 0.6rem;">
                     <p class="text-muted mb-2" style="font-size: 0.8rem;">Eliminación permanente de cuenta</p>
@@ -552,7 +521,8 @@
 <!-- ========== MODALES ========== -->
 
 <!-- Modal para agregar mascota -->
-<div class="modal fade" *ngIf="showAddPetModal" style="display: block; background: rgba(0,0,0,0.5);" (click)="closeAddPetModal()">
+<div class="modal fade show" *ngIf="showAddPetModal" style="display: block; background: rgba(0,0,0,0.5);"
+  (click)="closeAddPetModal()">
   <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
@@ -562,68 +532,75 @@
         <button type="button" class="btn-close" (click)="closeAddPetModal()"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="add-pet-form" (ngSubmit)="guardarNuevaMascota()">
           <div class="row g-3">
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="nombre" class="form-label fw-bold">Nombre de la Mascota</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="Ej: Max, Luna">
+                <input type="text" class="form-control" id="nombre" [(ngModel)]="nuevaMascota.nombre" name="nombre" required
+                  placeholder="Ej. Max">
               </div>
               <div class="mb-3">
                 <label for="especie" class="form-label fw-bold">Especie</label>
-                <select class="form-select" id="especie" name="especie" required>
-                  <option value="" selected disabled>Selecciona una especie</option>
-                  <option value="perro">Perro</option>
-                  <option value="gato">Gato</option>
-                  <option value="ave">Ave</option>
-                  <option value="roedor">Roedor</option>
-                  <option value="reptil">Reptil</option>
-                  <option value="otro">Otro</option>
+                <select class="form-select" id="especie" [(ngModel)]="nuevaMascota.especie" name="especie" required>
+                  <option value="">Selecciona una especie</option>
+                  <option value="Perro">Perro</option>
+                  <option value="Gato">Gato</option>
+                  <option value="Ave">Ave</option>
+                  <option value="Roedor">Roedor</option>
+                  <option value="Reptil">Reptil</option>
+                  <option value="Otro">Otro</option>
                 </select>
-              </div>
-              <div class="mb-3">
-                <label for="raza" class="form-label fw-bold">Raza</label>
-                <input type="text" class="form-control" id="raza" name="raza" placeholder="Ej: Labrador, Siames">
               </div>
               <div class="mb-3">
                 <label for="fotoFile" class="form-label fw-bold">Foto de la Mascota</label>
-                <input class="form-control" type="file" id="fotoFile" name="fotoFile" accept="image/*">
-                <div class="form-text">Formatos: JPG, PNG, GIF. Máx: 5MB</div>
+                <input type="file" class="form-control" id="fotoFile" accept="image/*" (change)="onNuevaMascotaFotoSelected($event)">
+                <small class="text-muted">Sube una foto de tu mascota (JPG, PNG)</small>
               </div>
             </div>
+
             <div class="col-md-6">
-              <div class="row mb-3">
-                <div class="col-6">
-                  <label for="edad" class="form-label fw-bold">Edad</label>
-                  <div class="input-group">
-                    <input type="number" class="form-control" id="edad" name="edad" min="0" max="50" required placeholder="0">
-                    <select class="form-select" id="unidadEdad" name="unidadEdad" style="max-width: 120px;" required>
-                      <option value="meses">Meses</option>
-                      <option value="años" selected>Años</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <label for="genero" class="form-label fw-bold">Género</label>
-                  <select class="form-select" id="genero" name="genero">
-                    <option value="M">Macho</option>
-                    <option value="F">Hembra</option>
-                    <option value="desconocido">Desconocido</option>
+              <div class="mb-3">
+                <label for="raza" class="form-label fw-bold">Raza (Opcional)</label>
+                <input type="text" class="form-control" id="raza" [(ngModel)]="nuevaMascota.raza" name="raza" placeholder="Ej. Golden Retriever">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold">Edad</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="edad" [(ngModel)]="nuevaMascota.edad" name="edad" min="0" placeholder="Ej. 2">
+                  <select class="form-select" id="unidadEdad" [(ngModel)]="nuevaMascota.unidadEdad" name="unidadEdad" style="max-width: 120px;">
+                    <option value="Meses">Meses</option>
+                    <option value="Años">Años</option>
                   </select>
                 </div>
               </div>
-              <div class="mb-3">
-                <label for="tamano" class="form-label fw-bold">Tamaño</label>
-                <select class="form-select" id="tamano" name="tamano">
-                  <option value="" selected disabled>Selecciona un tamaño</option>
-                  <option value="pequeño">Pequeño</option>
-                  <option value="mediano">Mediano</option>
-                  <option value="grande">Grande</option>
-                </select>
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label for="genero" class="form-label fw-bold">Género</label>
+                  <select class="form-select" id="genero" [(ngModel)]="nuevaMascota.genero" name="genero">
+                    <option value="">Selecciona</option>
+                    <option value="Macho">Macho</option>
+                    <option value="Hembra">Hembra</option>
+                    <option value="Desconocido">Desconocido</option>
+                  </select>
+                </div>
+                <div class="col-6 mb-3">
+                  <label for="tamano" class="form-label fw-bold">Tamaño</label>
+                  <select class="form-select" id="tamano" [(ngModel)]="nuevaMascota.tamano" name="tamano">
+                    <option value="">Selecciona</option>
+                    <option value="Pequeño">Pequeño</option>
+                    <option value="Mediano">Mediano</option>
+                    <option value="Grande">Grande</option>
+                    <option value="Gigante">Gigante</option>
+                  </select>
+                </div>
               </div>
+            </div>
+            <div class="col-12">
               <div class="mb-3">
-                <label for="descripcion" class="form-label fw-bold">Descripción</label>
-                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" placeholder="Características, comportamiento, etc."></textarea>
+                <label for="descripcion" class="form-label fw-bold">Descripción (Opcional)</label>
+                <textarea class="form-control" id="descripcion" [(ngModel)]="nuevaMascota.descripcion" name="descripcion" rows="2"
+                  placeholder="Cuéntanos un poco sobre tu mascota (personalidad, cuidados especiales, etc.)"></textarea>
               </div>
             </div>
           </div>
@@ -642,7 +619,8 @@
 </div>
 
 <!-- Modal para Editar Mascota -->
-<div class="modal fade" *ngIf="showEditPetModal" style="display: block; background: rgba(0,0,0,0.5);" (click)="closeEditPetModal()">
+<div class="modal fade show" *ngIf="showEditPetModal" style="display: block; background: rgba(0,0,0,0.5);"
+  (click)="closeEditPetModal()">
   <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
@@ -652,22 +630,23 @@
         <button type="button" class="btn-close" (click)="closeEditPetModal()"></button>
       </div>
       <div class="modal-body">
-        <form id="editPetForm">
+        <form id="editPetForm" (ngSubmit)="guardarMascotaEditada()">
           <div class="row g-3">
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="editNombre" class="form-label fw-bold">Nombre de la Mascota</label>
-                <input type="text" class="form-control" id="editNombre" [(ngModel)]="mascotaEdit.nombre" name="nombre" required>
+                <input type="text" class="form-control" id="editNombre" [(ngModel)]="mascotaEdit.nombre" name="nombre"
+                  required>
               </div>
               <div class="mb-3">
                 <label for="editEspecie" class="form-label fw-bold">Especie</label>
                 <select class="form-select" id="editEspecie" [(ngModel)]="mascotaEdit.especie" name="especie" required>
-                  <option value="perro">Perro</option>
-                  <option value="gato">Gato</option>
-                  <option value="ave">Ave</option>
-                  <option value="roedor">Roedor</option>
-                  <option value="reptil">Reptil</option>
-                  <option value="otro">Otro</option>
+                  <option value="Perro">Perro</option>
+                  <option value="Gato">Gato</option>
+                  <option value="Ave">Ave</option>
+                  <option value="Roedor">Roedor</option>
+                  <option value="Reptil">Reptil</option>
+                  <option value="Otro">Otro</option>
                 </select>
               </div>
               <div class="mb-3">
@@ -685,33 +664,36 @@
                 <div class="col-6">
                   <label for="editEdad" class="form-label fw-bold">Edad</label>
                   <div class="input-group">
-                    <input type="number" class="form-control" id="editEdad" [(ngModel)]="mascotaEdit.edad" name="edad" min="0" max="50" required>
-                    <select class="form-select" id="editUnidadEdad" [(ngModel)]="mascotaEdit.unidadEdad" name="unidadEdad" style="max-width: 120px;" required>
-                      <option value="meses">Meses</option>
-                      <option value="años">Años</option>
+                    <input type="number" class="form-control" id="editEdad" [(ngModel)]="mascotaEdit.edad" name="edad"
+                      min="0" max="50" required>
+                    <select class="form-select" id="editUnidadEdad" [(ngModel)]="mascotaEdit.unidadEdad"
+                      name="unidadEdad" style="max-width: 120px;" required>
+                      <option value="Meses">Meses</option>
+                      <option value="Años">Años</option>
                     </select>
                   </div>
                 </div>
                 <div class="col-6">
                   <label for="editGenero" class="form-label fw-bold">Género</label>
                   <select class="form-select" id="editGenero" [(ngModel)]="mascotaEdit.genero" name="genero">
-                    <option value="M">Macho</option>
-                    <option value="F">Hembra</option>
-                    <option value="desconocido">Desconocido</option>
+                    <option value="Macho">Macho</option>
+                    <option value="Hembra">Hembra</option>
+                    <option value="Desconocido">Desconocido</option>
                   </select>
                 </div>
               </div>
               <div class="mb-3">
                 <label for="editTamano" class="form-label fw-bold">Tamaño</label>
                 <select class="form-select" id="editTamano" [(ngModel)]="mascotaEdit.tamano" name="tamano">
-                  <option value="pequeño">Pequeño</option>
-                  <option value="mediano">Mediano</option>
-                  <option value="grande">Grande</option>
+                  <option value="Pequeño">Pequeño</option>
+                  <option value="Mediano">Mediano</option>
+                  <option value="Grande">Grande</option>
                 </select>
               </div>
               <div class="mb-3">
                 <label for="editDescripcion" class="form-label fw-bold">Descripción</label>
-                <textarea class="form-control" id="editDescripcion" [(ngModel)]="mascotaEdit.descripcion" name="descripcion" rows="4"></textarea>
+                <textarea class="form-control" id="editDescripcion" [(ngModel)]="mascotaEdit.descripcion"
+                  name="descripcion" rows="4"></textarea>
               </div>
             </div>
           </div>

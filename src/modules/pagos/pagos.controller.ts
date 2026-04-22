@@ -4,6 +4,8 @@ import { PagosService } from './pagos.service';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
 import { Pago } from './entities/pago.entity';
+import { CreateStripeCheckoutDto } from './dto/create-stripe-checkout.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('pagos')
 @Controller('pagos')
@@ -16,6 +18,14 @@ export class PagosController {
   @ApiBearerAuth('JWT-auth')
   create(@Body() createPagoDto: CreatePagoDto) {
     return this.pagosService.create(createPagoDto);
+  }
+
+  @Post('stripe/checkout-session')
+  @Public()
+  @ApiOperation({ summary: 'Crear sesión de pago en Stripe (modo prueba)' })
+  @ApiResponse({ status: 201, description: 'Sesión de Stripe creada' })
+  createStripeCheckoutSession(@Body() dto: CreateStripeCheckoutDto) {
+    return this.pagosService.createStripeCheckoutSession(dto);
   }
 
   @Get()

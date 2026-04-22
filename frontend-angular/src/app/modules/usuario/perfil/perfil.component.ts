@@ -1,15 +1,14 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AdopcionService } from '../../../core/services/adopcion.service';
 import { PublicacionesService } from '../../../core/services/publicaciones.service';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-perfil',
@@ -23,7 +22,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   usuarioEdit: any = {};
   usuarioOriginal: any = {};
   mascotas: any[] = [];
-  activeSection = 'dashboard';
+  activeSection = 'mascotas';
   sidebarOpen = false;
   compras: any[] = [];
   citas: any[] = [];
@@ -33,6 +32,19 @@ export class PerfilComponent implements OnInit, OnDestroy {
   // Modales
   showAddPetModal = false;
   showEditPetModal = false;
+
+  // Mascota nueva
+  nuevaMascota: any = {
+    nombre: '',
+    especie: '',
+    raza: '',
+    edad: null,
+    unidadEdad: 'Años',
+    genero: '',
+    tamano: '',
+    descripcion: ''
+  };
+  nuevaMascotaFoto: File | null = null;
 
   // Mascota en edición
   mascotaEdit: any = {};
@@ -71,11 +83,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.inicializarDatos();
+    if (isPlatformBrowser(this.platformId)) {
+      this.inicializarDatos();
+    }
   }
 
   ngOnDestroy(): void {
-    // Ya no hay subscripciones activas que requieran cleanup manual
+    // Limpieza de subscripciones
   }
 
   inicializarDatos(): void {
@@ -98,14 +112,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.usuarioEdit = { ...userData, id: userId };
     this.usuarioOriginal = { ...userData, id: userId };
     
-    // Si ya tenemos los datos en memoria, apagamos el spinner de carga inmediatamente.
-    // Esto previene que al transicionar desde Inicio se quede colgado en el loading de Angular.
-    this.isLoadingUser = !userData?.nombres;
+    // No bloqueamos la UI con spinner al navegar entre rutas; mostramos datos en cuanto lleguen.
+    this.isLoadingUser = false;
     this.userImageLoaded = !!userData?.imagen;
+    this.dataInitialized = true;
 
-    // CORRECCIÓN: Una sola llamada HTTP al backend (eliminando condición de carrera con AppInitService)
+    // Disparar las llamadas HTTP necesarias
     this.cargarDatosCompletosUsuario(userId);
     this.cargarMascotas();
+    this.cargarPublicaciones();
     this.loadTheme();
   }
 
@@ -126,8 +141,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         // Sincronizar en localStorage para toda la app
         this.authService.updateUserData(data);
 
-        // Forzar detección de cambios sincrónica (detectChanges en lugar de markForCheck) 
-        // para garantizar la iteración completa independientemente de cómo Angular Router maneje el Zone
+        // Forzar detección de cambios para reflejar los nuevos datos del usuario
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -178,17 +192,38 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   cargarMascotas(): void {
+    console.log('[PERFIL] cargarMascotas llamado. ID de usuario:', this.usuarioLogueado?.id);
     if (this.usuarioLogueado?.id) {
       this.mascotasService.getMascotasByUsuario(this.usuarioLogueado.id).subscribe({
         next: (data) => { 
-          this.mascotas = data; 
-          this.cdr.detectChanges();
+          console.log('[PERFIL] Mascotas recibidas:', data);
+          this.mascotas = (data || []).map((mascota: any) => ({
+            ...mascota,
+            genero: mascota.genero || mascota.sexo || '',
+            unidadEdad: mascota.unidadEdad || mascota.unidad_edad || 'Años',
+            foto: this.getMascotaImageUrl(mascota.foto)
+          }));
+          
+          // En Angular moderno, delegamos a setTimeout para forzar 
+          // el ciclo de ChangeDetection luego de que los datos asíncronos llegan.
+          // Evitamos usar NgZone.run directamente porque en configuraciones Zoneless falla.
+          setTimeout(() => {
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+          }, 0);
         },
-        error: () => { 
+        error: (err) => { 
+          console.error('[PERFIL] Error al cargar mascotas:', err);
           this.mascotas = []; 
-          this.cdr.detectChanges();
+          
+          setTimeout(() => {
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+          }, 0);
         }
       });
+    } else {
+      console.warn('[PERFIL] No hay ID de usuario para cargar mascotas');
     }
   }
 
@@ -232,8 +267,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
   // CORRECCIÓN: Método público limpio que siempre carga desde el backend
   cargarPublicaciones(): void {
     console.log('[PERFIL] cargarPublicaciones llamado');
-    const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
-    if (!userId) return;
+    const userId = Number(this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario);
+    if (!userId) {
+      this.isLoadingPublicaciones = false;
+      this.publicaciones = [];
+      return;
+    }
 
     this.isLoadingPublicaciones = true;
     this.errorCargaPublicaciones = false;
@@ -241,17 +280,20 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     console.log('[PERFIL] Iniciando HTTP GET publicaciones');
     this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
-      next: (data) => {
-        console.log('[PERFIL] HTTP GET publicaciones EXITOSO. Recibidas:', data.length);
-        this.publicaciones = data.map(pub => ({
+      next: (data: any) => {
+        const publicacionesRaw = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        console.log('[PERFIL] HTTP GET publicaciones EXITOSO. Recibidas:', publicacionesRaw.length);
+
+        this.publicaciones = publicacionesRaw.map((pub: any) => ({
           id: pub.id,
-          contenido: pub.contenido,
-          imagen: pub.imagen,
-          fecha: new Date(pub.createdAt),
-          likes: pub.likesCount || pub.reaccionesData?.length || 0,
-          comentarios: pub.comentariosCount || pub.comentariosData?.length || 0,
+          contenido: pub.contenido || '',
+          imagen: pub.imagen || '',
+          fecha: new Date(pub.createdAt || pub.created_at || Date.now()),
+          likes: pub.likesCount ?? pub.reaccionesData?.length ?? pub.likes ?? 0,
+          comentarios: pub.comentariosCount ?? pub.comentariosData?.length ?? pub.comentarios ?? 0,
           compartidos: 0
         }));
+
         this.isLoadingPublicaciones = false;
         this.publicacionesCargadas = true;
         this.cdr.detectChanges();
@@ -421,21 +463,153 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   // ===== MODALES =====
   openAddPetModal(): void {
+    this.nuevaMascota = {
+      nombre: '',
+      especie: '',
+      raza: '',
+      edad: null,
+      unidadEdad: 'Años',
+      genero: '',
+      tamano: '',
+      descripcion: ''
+    };
+    this.nuevaMascotaFoto = null;
     this.showAddPetModal = true;
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.classList.add('modal-open');
+    }
   }
 
   closeAddPetModal(): void {
     this.showAddPetModal = false;
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  onNuevaMascotaFotoSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.nuevaMascotaFoto = file;
+    }
+  }
+
+  guardarNuevaMascota(): void {
+    if (!this.nuevaMascota.nombre || !this.nuevaMascota.especie) {
+      Swal.fire('Campos requeridos', 'Por favor, ingresa el nombre y la especie de la mascota', 'warning');
+      return;
+    }
+
+    const mascotaData: any = {
+      nombre: this.nuevaMascota.nombre,
+      especie: this.nuevaMascota.especie,
+      raza: this.nuevaMascota.raza,
+      edad: this.nuevaMascota.edad,
+      unidadEdad: this.nuevaMascota.unidadEdad,
+      sexo: this.nuevaMascota.genero,
+      tamano: this.nuevaMascota.tamano,
+      descripcion: this.nuevaMascota.descripcion,
+      idUsuario: this.usuarioLogueado.id
+    };
+
+    const formData = new FormData();
+    Object.keys(mascotaData).forEach(key => {
+      if (mascotaData[key] !== null && mascotaData[key] !== undefined && mascotaData[key] !== '') {
+        formData.append(key, mascotaData[key]);
+      }
+    });
+
+    if (this.nuevaMascotaFoto) {
+      formData.append('foto', this.nuevaMascotaFoto);
+    }
+
+    // Realizamos un casting a any para enviar el FormData
+    this.mascotasService.createMascota(formData as any).subscribe({
+      next: (newPet) => {
+        Swal.fire({
+          title: '¡Éxito!',
+          text: 'Mascota agregada correctamente',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        
+        // Agregar directamente a la lista actual para actualización instantánea en la vista
+        if (newPet) {
+          // Si el backend devuelve rutas relativas, nos aseguramos de que Angular lo procese correctamente
+          if (newPet.foto && !newPet.foto.startsWith('http')) {
+            newPet.foto = `http://localhost:3000${newPet.foto}`;
+          }
+          this.mascotas.push(newPet);
+        } else {
+          this.cargarMascotas(); // Respaldo si el backend no retorna el objeto
+        }
+        
+        this.closeAddPetModal();
+        this.cdr.detectChanges(); // Forzar actualización de la UI inmediatamente
+      },
+      error: (error) => {
+        Swal.fire('Error', 'No se pudo agregar la mascota', 'error');
+        console.error('Error al crear mascota:', error);
+      }
+    });
   }
 
   openEditPetModal(mascota: any): void {
-    this.mascotaEdit = { ...mascota };
+    this.mascotaEdit = {
+      ...mascota,
+      genero: mascota.genero || mascota.sexo || '',
+      unidadEdad: mascota.unidadEdad || mascota.unidad_edad || 'Años'
+    };
     this.showEditPetModal = true;
   }
 
   closeEditPetModal(): void {
     this.showEditPetModal = false;
     this.mascotaEdit = {};
+  }
+
+  guardarMascotaEditada(): void {
+    if (!this.mascotaEdit?.id || !this.mascotaEdit?.nombre || !this.mascotaEdit?.especie) {
+      Swal.fire('Campos requeridos', 'Completa nombre y especie para guardar los cambios.', 'warning');
+      return;
+    }
+
+    const payload: any = {
+      nombre: this.mascotaEdit.nombre,
+      especie: this.mascotaEdit.especie,
+      raza: this.mascotaEdit.raza,
+      edad: this.mascotaEdit.edad,
+      unidadEdad: this.mascotaEdit.unidadEdad,
+      sexo: this.mascotaEdit.genero,
+      tamano: this.mascotaEdit.tamano,
+      descripcion: this.mascotaEdit.descripcion
+    };
+
+    this.mascotasService.updateMascota(this.mascotaEdit.id, payload).subscribe({
+      next: (updatedPet: any) => {
+        const index = this.mascotas.findIndex((m) => m.id === this.mascotaEdit.id);
+        if (index !== -1) {
+          this.mascotas[index] = {
+            ...this.mascotas[index],
+            ...updatedPet,
+            genero: updatedPet?.genero || updatedPet?.sexo || this.mascotaEdit.genero,
+            unidadEdad: updatedPet?.unidadEdad || updatedPet?.unidad_edad || this.mascotaEdit.unidadEdad,
+            foto: this.getMascotaImageUrl(updatedPet?.foto || this.mascotas[index]?.foto)
+          };
+        } else {
+          this.cargarMascotas();
+        }
+
+        this.closeEditPetModal();
+        Swal.fire('¡Actualizada!', 'La información de la mascota se actualizó correctamente.', 'success');
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al actualizar mascota:', error);
+        Swal.fire('Error', 'No se pudo actualizar la información de la mascota.', 'error');
+      }
+    });
   }
 
   // ===== FOTO DE PERFIL =====
@@ -450,6 +624,19 @@ export class PerfilComponent implements OnInit, OnDestroy {
       return `http://localhost:3000/${imagen}`;
     }
     return 'assets/img/humano.jpg';
+  }
+
+  getMascotaImageUrl(imagen: string | null | undefined): string {
+    if (!imagen || imagen === 'null' || imagen === 'undefined') {
+      return '';
+    }
+    if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
+      return imagen;
+    }
+    if (imagen.startsWith('/uploads')) {
+      return `http://localhost:3000${imagen}`;
+    }
+    return `http://localhost:3000/${imagen}`;
   }
 
   onProfilePictureSelected(event: any): void {

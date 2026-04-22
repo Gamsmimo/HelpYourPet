@@ -2,8 +2,6 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CacheModule } from './cache/cache.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MetricsController } from './common/controllers/metrics.controller';
@@ -102,9 +100,8 @@ import { PublicacionesModule } from './modules/publicaciones/publicaciones.modul
     VeterinariaVeterinarioModule,
     PublicacionesModule,
   ],
-  controllers: [AppController, MetricsController],
+  controllers: [MetricsController],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: MetricsInterceptor,

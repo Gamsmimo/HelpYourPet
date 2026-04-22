@@ -18,16 +18,20 @@ export class ServiciosService {
   }
 
   async findAll(): Promise<Servicio[]> {
-    return this.serviciosRepository.find();
+    return this.serviciosRepository.find({ relations: ['veterinaria'] });
   }
 
   async findByVeterinaria(idVeterinaria: number): Promise<Servicio[]> {
-    return this.serviciosRepository.find();
+    return this.serviciosRepository.find({
+      where: { idVeterinaria },
+      relations: ['veterinaria'],
+    });
   }
 
   async findOne(id: number): Promise<Servicio> {
     const servicio = await this.serviciosRepository.findOne({
       where: { id },
+      relations: ['veterinaria'],
     });
     if (!servicio) {
       throw new NotFoundException(`Servicio con ID ${id} no encontrado`);

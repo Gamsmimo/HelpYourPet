@@ -1,10 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { CreateVeterinarioDto } from './dto/create-veterinario.dto';
-import { Usuario } from '../usuarios/entities/usuario.entity';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class RolesManagementService {
@@ -57,11 +53,12 @@ export class RolesManagementService {
     }
 
     // Crear usuario con rol de veterinario
+    // Nota: No hacer hash aquí porque usuariosService.create() ya lo hace
     const usuario = await this.usuariosService.create({
       nombres: veterinarioData.nombres,
       apellidos: veterinarioData.apellidos,
       correo: veterinarioData.correo,
-      password: await bcrypt.hash(veterinarioData.contrasena, 10),
+      password: veterinarioData.contrasena,
       num_documento: veterinarioData.num_documento,
       telefono: veterinarioData.telefono,
       direccion: veterinarioData.direccion || '',

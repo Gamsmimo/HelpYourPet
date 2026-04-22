@@ -28,6 +28,14 @@ export class Servicio {
   @Column({ type: 'boolean', default: true })
   estado: boolean;
 
+  @ApiProperty({ description: 'ID de la veterinaria' })
+  @Column({ name: 'id_veterinaria', nullable: true })
+  idVeterinaria: number;
+
+  @ManyToOne(() => Veterinaria)
+  @JoinColumn({ name: 'id_veterinaria' })
+  veterinaria: Veterinaria;
+
   @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { MascotasService } from './mascotas.service';
 import { CreateMascotaDto } from './dto/create-mascota.dto';
 import { UpdateMascotaDto } from './dto/update-mascota.dto';
@@ -14,7 +17,36 @@ export class MascotasController {
   @ApiOperation({ summary: 'Crear nueva mascota' })
   @ApiResponse({ status: 201, description: 'Mascota creada exitosamente', type: Mascota })
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createMascotaDto: CreateMascotaDto) {
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @UseInterceptors(FileInterceptor('foto', {
+    storage: diskStorage({
+      destination: './uploads/mascotas',
+      filename: (req, file, cb) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        cb(null, `${randomName}${extname(file.originalname)}`);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+        return cb(new Error('Solo se permiten imágenes'), false);
+      }
+      cb(null, true);
+    }
+  }))
+  create(
+    @Body() createMascotaDto: CreateMascotaDto,
+    @UploadedFile() file?: Express.Multer.File
+  ) {
+    if (file) {
+      createMascotaDto.foto = `/uploads/mascotas/${file.filename}`;
+    }
+    // Parsear datos numéricos si vienen de FormData (como strings)
+    if (createMascotaDto.idUsuario) {
+      createMascotaDto.idUsuario = parseInt(createMascotaDto.idUsuario.toString(), 10);
+    }
+    if (createMascotaDto.edad) {
+      createMascotaDto.edad = parseInt(createMascotaDto.edad.toString(), 10);
+    }
     return this.mascotasService.create(createMascotaDto);
   }
 

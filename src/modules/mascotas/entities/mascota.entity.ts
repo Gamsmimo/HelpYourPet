@@ -24,17 +24,21 @@ export class Mascota {
   @Column({ type: 'int', nullable: true })
   edad: number;
 
-  @ApiProperty({ description: 'Sexo', example: 'Macho' })
-  @Column({ name: 'sexo', length: 10, nullable: true })
+  @ApiProperty({ description: 'Sexo/Género', example: 'Macho' })
+  @Column({ name: 'sexo', length: 20, nullable: true })
   sexo: string;
 
-  @ApiProperty({ description: 'Peso', example: 15.5 })
-  @Column({ name: 'peso', type: 'decimal', precision: 5, scale: 2, nullable: true })
-  peso: number;
+  @ApiProperty({ description: 'Unidad de edad', example: 'Años' })
+  @Column({ name: 'unidad_edad', length: 20, nullable: true })
+  unidadEdad: string;
 
-  @ApiProperty({ description: 'Color', example: 'Café' })
-  @Column({ name: 'color', length: 50, nullable: true })
-  color: string;
+  @ApiProperty({ description: 'Tamaño', example: 'Mediano' })
+  @Column({ length: 50, nullable: true })
+  tamano: string;
+
+  @ApiProperty({ description: 'Descripción', example: 'Mascota muy juguetona' })
+  @Column({ type: 'text', nullable: true })
+  descripcion: string;
 
   @ApiProperty({ description: 'URL de la foto', required: false })
   @Column({ length: 255, nullable: true })

@@ -1,0 +1,266 @@
+<div class="tienda-wrapper">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="brand-section">
+        <img src="assets/img/logo.png" alt="logo" class="logo" />
+        <a routerLink="/usuario/inicio" class="brand-name">HelpYourPet</a>
+      </div>
+
+      <div class="botones-finales">
+        <a routerLink="/adopcion" class="nav-buttone">
+          <i class="fas fa-dog"></i>
+          <span>Adopciones</span>
+        </a>
+
+        <button type="button" class="nav-button" (click)="openEmergencias()">
+          <i class="fas fa-truck-medical"></i>
+          <span>Emergencias</span>
+        </button>
+
+        <div class="theme-toggle-container">
+          <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" [checked]="isDarkMode" (change)="toggleTheme()" />
+          <label for="themeToggle" class="theme-toggle-label">
+            <div class="toggle-circle">
+              <i class="bi bi-moon-stars-fill"></i>
+              <i class="bi bi-sun-fill"></i>
+            </div>
+          </label>
+        </div>
+
+        <button type="button" class="cart-nav-button" (click)="openCart()">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge">{{ cartCount }}</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="store-selection-section" *ngIf="!hasStoreSelected">
+    <div class="store-selection-container">
+      <div class="store-selection-header">
+        <h1 class="store-selection-title">
+          <i class="fas fa-store"></i>
+          Selecciona tu Tienda Preferida
+        </h1>
+        <p class="store-selection-subtitle">Elige la tienda más cercana para ver sus productos disponibles</p>
+      </div>
+
+      <div class="stores-grid">
+        <button type="button" class="store-card" *ngFor="let store of stores" (click)="selectStore(store.id)">
+          <div class="store-icon">
+            <i class="fas" [ngClass]="store.icono"></i>
+          </div>
+          <h3>{{ store.nombre }}</h3>
+          <p>{{ store.direccion }}</p>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <ng-container *ngIf="hasStoreSelected">
+    <button type="button" class="btn-back-to-stores" (click)="backToStoreSelection()">
+      <i class="fas fa-store"></i>
+      <span>Ver Tiendas</span>
+    </button>
+
+    <div class="hero-section">
+      <div class="hero-carousel">
+        <div class="carousel-slide" *ngFor="let slide of slides; let i = index" [class.active]="i === activeSlide">
+          <img [src]="slide.imagen" [alt]="slide.titulo" class="img-hero" />
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h1 class="hero-title">{{ slide.titulo }}</h1>
+            <p class="hero-subtitle">{{ slide.subtitulo }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-controls">
+        <button type="button" class="carousel-btn" (click)="prevSlide()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button type="button" class="carousel-btn" (click)="nextSlide()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="carousel-indicators">
+        <button type="button" class="indicator" *ngFor="let _ of slides; let i = index" [class.active]="i === activeSlide" (click)="goToSlide(i)"></button>
+      </div>
+    </div>
+
+    <section class="benefits-section">
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fas fa-shield-heart"></i></div>
+          <h3>Calidad Garantizada</h3>
+          <p>Productos certificados y seguros</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fas fa-headset"></i></div>
+          <h3>Atención 24/7</h3>
+          <p>Siempre disponibles para ayudarte</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fas fa-percent"></i></div>
+          <h3>Ofertas Exclusivas</h3>
+          <p>Descuentos especiales cada semana</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="filters-section">
+      <div class="filters-container">
+        <div class="filter-group">
+          <label class="filter-label"><i class="fas fa-filter"></i> Categoría</label>
+          <select class="filter-select" [value]="selectedCategory" (change)="onCategoryChange($any($event.target).value)">
+            <option value="all">Todas las categorías</option>
+            <option value="food">Alimentos</option>
+            <option value="accessories">Accesorios</option>
+            <option value="medicine">Medicamentos</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label"><i class="fas fa-sort-amount-down"></i> Ordenar por</label>
+          <select class="filter-select" [value]="selectedSort" (change)="onSortChange($any($event.target).value)">
+            <option value="featured">Destacados</option>
+            <option value="price-low">Precio: Menor a Mayor</option>
+            <option value="price-high">Precio: Mayor a Menor</option>
+            <option value="name">Nombre A-Z</option>
+          </select>
+        </div>
+
+        <div class="filter-group search-group">
+          <label class="filter-label"><i class="fas fa-search"></i> Buscar</label>
+          <input class="filter-select" type="text" placeholder="Nombre de producto" [(ngModel)]="searchTerm" />
+        </div>
+
+        <button type="button" class="btn-filtrar" (click)="applySearch()">
+          <i class="fas fa-search"></i>
+          Buscar productos
+        </button>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <div class="section-header">
+        <h2>Productos Destacados - {{ selectedStoreName }}</h2>
+        <p>Los favoritos de nuestros clientes</p>
+      </div>
+      <div class="products-grid">
+        <article class="product-card" *ngFor="let product of featuredProducts">
+          <img [src]="getProductImage(product.nombre)" [alt]="product.nombre" class="product-img" />
+          <div class="product-info">
+            <h3>{{ product.nombre }}</h3>
+            <p class="product-category">{{ product.categoria }}</p>
+            <p class="product-price">{{ formatPrice(product.precio) }}</p>
+            <button type="button" class="add-btn" (click)="addToCart(product)">Agregar al carrito</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <div class="section-header">
+        <h2>Todos Nuestros Productos</h2>
+        <p>Explora nuestro catálogo completo</p>
+      </div>
+      <div class="products-grid">
+        <article class="product-card" *ngFor="let product of filteredProducts">
+          <img [src]="getProductImage(product.nombre)" [alt]="product.nombre" class="product-img" />
+          <div class="product-info">
+            <h3>{{ product.nombre }}</h3>
+            <p class="product-category">{{ product.categoria }}</p>
+            <p class="product-price">{{ formatPrice(product.precio) }}</p>
+            <button type="button" class="add-btn" (click)="addToCart(product)">Agregar al carrito</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </ng-container>
+
+  <div class="cart-overlay" [class.active]="isCartOpen" (click)="closeCart()"></div>
+  <aside class="cart-sidebar" [class.active]="isCartOpen">
+    <div class="cart-header">
+      <h2><i class="fas fa-shopping-bag"></i> Mi Carrito</h2>
+      <button type="button" class="close-cart" (click)="closeCart()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="cart-items" *ngIf="cart.length > 0; else emptyCart">
+      <div class="cart-item" *ngFor="let item of cart">
+        <div>
+          <h6>{{ item.nombre }}</h6>
+          <p>{{ formatPrice(item.precio) }}</p>
+        </div>
+        <div class="cart-item-controls">
+          <button type="button" class="quantity-btn" (click)="decreaseQty(item.id)">-</button>
+          <span class="quantity-display">{{ item.cantidad }}</span>
+          <button type="button" class="quantity-btn" (click)="increaseQty(item.id)">+</button>
+        </div>
+        <button type="button" class="remove-item" (click)="removeFromCart(item.id)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <ng-template #emptyCart>
+      <div class="empty-cart-message">
+        <div class="empty-cart-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <p>Tu carrito está vacío</p>
+      </div>
+    </ng-template>
+
+    <div class="cart-footer">
+      <div class="summary-row">
+        <span>Subtotal:</span>
+        <span>{{ formatPrice(subtotal) }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span>{{ formatPrice(subtotal) }}</span>
+      </div>
+      <button type="button" class="checkout-btn" (click)="checkout()" [disabled]="cart.length === 0 || isProcessingPayment">
+        {{ isProcessingPayment ? 'Redirigiendo a Stripe...' : 'Proceder al Pago' }}
+      </button>
+    </div>
+  </aside>
+
+  <div class="modal" *ngIf="isEmergenciaOpen" style="display: block;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Emergencias Veterinarias</h2>
+        <button type="button" class="close" (click)="cerrarModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="Emergencia">
+          <h3>Consulta Virtual</h3>
+          <h4>Videollamada directa con profesionales especializados</h4>
+          <button class="contactarse" type="button" (click)="redirigirVideollamada()">Videollamada</button>
+        </div>
+        <div class="Emergencia">
+          <h3>Respuesta Inmediata</h3>
+          <h4>Nuestro veterinario de guardia responderá en menos de 5 minutos</h4>
+          <button class="whatsapp" type="button" (click)="redirigirWhatsApp()">WhatsApp</button>
+        </div>
+        <div class="Emergencia">
+          <h3>Primeros Auxilios</h3>
+          <h4>Instrucciones paso a paso mientras esperas</h4>
+          <button class="whatsapp" type="button" (click)="redirigirWhatsApp2()">WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-logo">
+        <img src="assets/img/logo.png" alt="logo" />
+        <div class="footer-brand">HelpYourPet</div>
+      </div>
+      <p class="footer-copy">© 2025 HelpYourPet. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>
