@@ -7,6 +7,7 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AdopcionService } from '../../../core/services/adopcion.service';
 import { PublicacionesService } from '../../../core/services/publicaciones.service';
+import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 
 
@@ -70,6 +71,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   // Control para evitar llamadas duplicadas
   private publicacionesCargadas = false;
+  private publicacionesSubscription?: Subscription;
+  private publicacionesTimeoutId: any = null;
 
   constructor(
     private authService: AuthService,
@@ -89,7 +92,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpieza de subscripciones
+    if (this.publicacionesSubscription) {
+      this.publicacionesSubscription.unsubscribe();
+    }
+    if (this.publicacionesTimeoutId) {
+      clearTimeout(this.publicacionesTimeoutId);
+      this.publicacionesTimeoutId = null;
+    }
   }
 
   inicializarDatos(): void {
@@ -278,27 +287,69 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.errorCargaPublicaciones = false;
     this.errorMensajePublicaciones = '';
 
+    // Cancela llamadas previas para evitar estados de carga colgados
+    if (this.publicacionesSubscription) {
+      this.publicacionesSubscription.unsubscribe();
+    }
+    if (this.publicacionesTimeoutId) {
+      clearTimeout(this.publicacionesTimeoutId);
+      this.publicacionesTimeoutId = null;
+    }
+
+    // Red de seguridad: si la petición queda pendiente demasiado tiempo, cerramos carga y mostramos error
+    this.publicacionesTimeoutId = setTimeout(() => {
+      if (this.isLoadingPublicaciones) {
+        if (this.publicacionesSubscription) {
+          this.publicacionesSubscription.unsubscribe();
+        }
+        this.isLoadingPublicaciones = false;
+        this.errorCargaPublicaciones = true;
+        this.errorMensajePublicaciones =
+          'La carga de publicaciones tardó demasiado. Verifica el servidor y vuelve a intentar.';
+        this.cdr.detectChanges();
+      }
+    }, 15000);
+
     console.log('[PERFIL] Iniciando HTTP GET publicaciones');
-    this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
+    this.publicacionesSubscription = this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
       next: (data: any) => {
+        if (this.publicacionesTimeoutId) {
+          clearTimeout(this.publicacionesTimeoutId);
+          this.publicacionesTimeoutId = null;
+        }
         const publicacionesRaw = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
         console.log('[PERFIL] HTTP GET publicaciones EXITOSO. Recibidas:', publicacionesRaw.length);
+        try {
+          this.publicaciones = (publicacionesRaw || [])
+            .filter((pub: any) => !!pub)
+            .map((pub: any) => ({
+              id: pub.id,
+              contenido: pub.contenido || '',
+              imagen: pub.imagen || '',
+              fecha: new Date(pub.createdAt || pub.created_at || Date.now()),
+              likes: pub.likesCount ?? pub.reaccionesData?.length ?? pub.likes ?? 0,
+              comentarios: pub.comentariosCount ?? pub.comentariosData?.length ?? pub.comentarios ?? 0,
+              compartidos: 0
+            }));
 
-        this.publicaciones = publicacionesRaw.map((pub: any) => ({
-          id: pub.id,
-          contenido: pub.contenido || '',
-          imagen: pub.imagen || '',
-          fecha: new Date(pub.createdAt || pub.created_at || Date.now()),
-          likes: pub.likesCount ?? pub.reaccionesData?.length ?? pub.likes ?? 0,
-          comentarios: pub.comentariosCount ?? pub.comentariosData?.length ?? pub.comentarios ?? 0,
-          compartidos: 0
-        }));
-
-        this.isLoadingPublicaciones = false;
-        this.publicacionesCargadas = true;
-        this.cdr.detectChanges();
+          this.errorCargaPublicaciones = false;
+          this.publicacionesCargadas = true;
+        } catch (mapError) {
+          console.error('[PERFIL] Error procesando publicaciones:', mapError);
+          this.publicaciones = [];
+          this.errorCargaPublicaciones = true;
+          this.errorMensajePublicaciones =
+            'Llegaron datos de publicaciones con un formato inesperado.';
+        } finally {
+          this.isLoadingPublicaciones = false;
+          this.cdr.detectChanges();
+        }
       },
       error: (error) => {
+        if (this.publicacionesTimeoutId) {
+          clearTimeout(this.publicacionesTimeoutId);
+          this.publicacionesTimeoutId = null;
+        }
         console.error('Error al cargar publicaciones:', error);
         this.publicaciones = [];
         this.isLoadingPublicaciones = false;

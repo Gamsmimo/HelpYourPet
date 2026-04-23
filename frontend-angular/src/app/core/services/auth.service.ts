@@ -14,6 +14,34 @@ export class AuthService {
   private router = inject(Router);
   private apiUrl = environment.apiUrl;
 
+  private getModuleRouteByRole(role: number): string {
+    switch (role) {
+      case 1:
+        return '/admin';
+      case 2:
+        return '/veterinario';
+      case 3:
+        return '/usuario';
+      default:
+        return '/';
+    }
+  }
+
+  private logLoginModuleData(source: 'login' | 'register'): void {
+    if (environment.production) return;
+
+    const user = this.getUser();
+    const role = Number(user?.rol_id || 0);
+    const moduleRoute = this.getModuleRouteByRole(role);
+
+    console.groupCollapsed(`[AUTH] ${source} exitoso -> modulo destino`);
+    console.log('usuario:', user);
+    console.log('rol_id:', role);
+    console.log('rol:', user?.rol || 'SIN_ROL');
+    console.log('moduloRuta:', moduleRoute);
+    console.groupEnd();
+  }
+
   login(credentials: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap(response => {
@@ -25,6 +53,8 @@ export class AuthService {
         if ((response as any).user) {
           this.updateUserData((response as any).user);
         }
+
+        this.logLoginModuleData('login');
       })
     );
   }
@@ -39,6 +69,8 @@ export class AuthService {
         if ((response as any).user) {
           this.updateUserData((response as any).user);
         }
+
+        this.logLoginModuleData('register');
       })
     );
   }
@@ -121,18 +153,7 @@ export class AuthService {
 
   redirectByRole(): void {
     const role = this.getUserRole();
-    switch(role) {
-      case 1:
-        this.router.navigate(['/admin']);
-        break;
-      case 2:
-        this.router.navigate(['/veterinario']);
-        break;
-      case 3:
-        this.router.navigate(['/usuario']);
-        break;
-      default:
-        this.router.navigate(['/']);
-    }
+    const moduleRoute = this.getModuleRouteByRole(role);
+    this.router.navigate([moduleRoute]);
   }
 }
