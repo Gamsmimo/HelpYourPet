@@ -1,0 +1,492 @@
+	<!-- Overlay para cerrar el menú en móviles -->
+	<div class="sidebar-overlay" *ngIf="isSidebarActive" (click)="isSidebarActive = false" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999; cursor: pointer;"></div>
+
+	<!-- Menú Lateral -->
+	<nav class="sidebar" [class.active]="isSidebarActive">
+		<div class="user-profile">
+			<img [src]="perfilVeterinario.usuario.imagen || 'assets/IMG/default.jpg'" alt="Foto">
+			<div>
+				<small>Veterinario</small>
+				<h6>{{ perfilVeterinario.usuario.nombres }} {{ perfilVeterinario.usuario.apellidos }}</h6>
+			</div>
+		</div>
+
+		<ul class="menu-items">
+			<li><a href="#" class="menu-link" [class.active]="activeSection === 'inicio'" (click)="$event.preventDefault(); setSection('inicio')"><i class="fas fa-home"></i>
+					<span>Inicio</span></a></li>
+			<li><a href="#" class="menu-link" [class.active]="activeSection === 'eventos'" (click)="$event.preventDefault(); setSection('eventos')"><i class="fa-solid fa-calendar-week"></i>
+					<span>Eventos y Campañas</span></a></li>
+			<li><a href="#" class="menu-link" [class.active]="activeSection === 'petshop'" (click)="$event.preventDefault(); setSection('petshop')"><i class="fas fa-shopping-bag"></i>
+					<span>Pet Shop</span></a></li>
+			<li><a href="#" class="menu-link" [class.active]="activeSection === 'configuracion'" (click)="$event.preventDefault(); setSection('configuracion')"><i class="fas fa-cog"></i>
+					<span>Configuración</span></a></li>
+			
+			<li style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color, #e0e0e0);">
+				<a (click)="logout()" class="menu-link logout-veterinario"
+					style="cursor: pointer; color: #dc3545; background: rgba(220, 53, 69, 0.1); border-radius: 8px; transition: all 0.3s ease;">
+					<i class="fas fa-sign-out-alt"></i>
+					<span>Cerrar Sesión</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+
+	<!-- Contenido Principal -->
+	<main class="main-content">
+		<!-- Barra Superior -->
+		<header class="top-bar">
+			<div class="top-bar-left">
+				<button class="hamburger-menu-btn" (click)="toggleSidebar()" aria-label="Abrir menú">
+					<i class="fas fa-bars"></i>
+				</button>
+			</div>
+			<div class="search-bar">
+				<input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" autocomplete="off">
+				<i class="fas fa-search"></i>
+			</div>
+			<div class="user-actions">
+				<!-- Toggle Modo Oscuro/Claro -->
+				<div class="theme-toggle-container">
+					<input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
+					<label for="themeToggle" class="theme-toggle-label">
+						<i class="bi bi-moon-stars-fill toggle-icon moon-icon"></i>
+						<i class="bi bi-sun-fill toggle-icon sun-icon"></i>
+					</label>
+				</div>
+			</div>
+		</header>
+
+		<!-- Secciones de contenido -->
+		<div class="content-sections">
+			
+			<!-- Sección Inicio -->
+			<section class="content-section" [class.active]="activeSection === 'inicio'">
+				<div class="welcome-section">
+					<h1>Hola, {{ perfilVeterinario.usuario.nombres }} {{ perfilVeterinario.usuario.apellidos }} 👋</h1>
+					<p>Bienvenido a tu panel de control. Aquí puedes gestionar todas las actividades de la clínica.</p>
+
+					<div class="summary-cards">
+						<div class="card card-summary bg-warning">
+							<i class="fa-solid fa-calendar-week"></i>
+							<h3>{{ eventosVet.length }}</h3>
+							<p>Eventos</p>
+						</div>
+						<div class="card card-summary bg-info">
+							<i class="fas fa-shopping-bag"></i>
+							<h3>{{ productos.length }}</h3>
+							<p>Productos</p>
+						</div>
+					</div>
+
+					<div class="quick-actions">
+						<h3>Acciones rápidas</h3>
+						<div class="actions-grid">
+							<button class="btn-action" (click)="openModal('new-event')">
+								<i class="fa-solid fa-calendar-week"></i>
+								<span>Crear evento</span>
+							</button>
+							<button class="btn-action" (click)="openModal('new-product')">
+								<i class="fas fa-box-open"></i>
+								<span>Agregar producto</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Sección Eventos -->
+			<section class="content-section" [class.active]="activeSection === 'eventos'">
+				<div class="section-header">
+					<h2><i class="fa-solid fa-calendar-week"></i> Eventos y Campañas</h2>
+					<button class="btn btn-primary" (click)="openModal('new-event')">
+						<i class="fas fa-plus"></i> Crear evento
+					</button>
+				</div>
+
+				<div class="cards-container">
+					<div class="event-card" *ngFor="let evento of eventosVet">
+						<div class="card-image-placeholder">
+							<i class="fas fa-image" *ngIf="!evento.imagen"></i>
+							<img *ngIf="evento.imagen" [src]="evento.imagen" alt="Imagen evento"
+								style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+						</div>
+						<div class="card-content">
+							<h4 class="card-title">{{ evento.titulo }}</h4>
+							<div class="card-date">
+								<i class="far fa-calendar-alt"></i>
+								<span>Desde {{ evento.fechainicio | date:'dd/MM/yyyy' }}</span>
+							</div>
+							<div class="card-date" *ngIf="evento.fechafin">
+								<i class="far fa-calendar-alt"></i>
+								<span>Hasta {{ evento.fechafin | date:'dd/MM/yyyy' }}</span>
+							</div>
+							<p class="card-description">{{ evento.descripcion }}</p>
+							<div class="card-actions">
+								<button class="btn btn-edit" (click)="openModal('edit-event', { eventId: evento.id })">
+									<i class="fas fa-pen"></i> EDITAR
+								</button>
+								<button class="btn btn-delete" (click)="deleteEvent(evento.id)">
+									<i class="fas fa-trash-alt"></i> ELIMINAR
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Sección Pet Shop -->
+			<section class="content-section" [class.active]="activeSection === 'petshop'">
+				<div class="section-header">
+					<h2><i class="fas fa-shopping-bag"></i> Pet Shop</h2>
+					<button class="btn btn-primary" (click)="openModal('new-product')">
+						<i class="fas fa-plus"></i> Agregar producto
+					</button>
+				</div>
+
+				<div class="product-filters">
+					<div class="row">
+						<div class="col-md-3">
+							<label>Categoría</label>
+							<select class="form-select" [(ngModel)]="categoriaFiltro">
+								<option value="">Todas las categorías</option>
+								<option value="Alimentos">Alimentos</option>
+								<option value="Medicamentos">Medicamentos</option>
+								<option value="Juguetes">Juguetes</option>
+								<option value="Accesorios">Accesorios</option>
+								<option value="Higiene">Higiene</option>
+							</select>
+						</div>
+						<div class="col-md-3">
+							<label>Estado</label>
+							<select class="form-select" [(ngModel)]="estadoFiltro">
+								<option value="">Todos</option>
+								<option value="Disponible">Disponible</option>
+								<option value="Agotado">Agotado</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="product-grid">
+					<div *ngFor="let producto of productosFiltrados" class="product-card">
+						<div [ngClass]="['product-badge', inventarioPorProducto[producto.id]?.estado === 'Disponible' ? 'featured' : 'out-of-stock']">
+							{{ inventarioPorProducto[producto.id]?.estado || 'No disponible' }}
+						</div>
+
+						<div class="product-image">
+							<img [src]="producto.imagen || 'assets/IMG/default-product.png'" [alt]="producto.nombre">
+						</div>
+
+						<div class="product-info">
+							<h5>{{ producto.nombre }}</h5>
+							<p class="product-description">{{ producto.descripcion }}</p>
+							<div class="product-meta">
+								<span class="price">${{ producto.precio | number:'1.0-0' }}</span>
+								<span class="stock">
+									<i class="fas fa-box"></i>
+									<span>{{ inventarioPorProducto[producto.id]?.cantidadDisponible || 0 }} unidades</span>
+								</span>
+							</div>
+							<div class="product-actions" style="opacity: 1 !important; visibility: visible !important; transform: none !important; display: flex; gap: 10px; margin-top: 15px;">
+								<button class="btn btn-sm btn-primary" (click)="openModal('edit-product', { inventoryId: getInventoryIdByProductId(producto.id) })"><i class="fas fa-edit"></i></button>
+								<button class="btn btn-sm btn-danger" (click)="deleteProduct(producto.id)"><i class="fas fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Sección Configuración -->
+			<section class="content-section" [class.active]="activeSection === 'configuracion'">
+				<div class="section-header">
+					<h2><i class="fas fa-cog"></i> Configuración</h2>
+				</div>
+
+				<div class="config-container">
+					<div class="config-content">
+						<!-- Foto Perfil -->
+						<div class="config-left-column">
+							<div class="config-photo-card">
+								<div class="config-photo-wrapper">
+									<img [src]="perfilVeterinario.usuario.imagen" alt="Foto perfil" class="config-profile-img">
+								</div>
+								<button type="button" class="config-change-photo-btn" (click)="fileInput.click()">
+									<i class="fas fa-camera"></i> Cambiar foto
+								</button>
+								<input type="file" #fileInput accept="image/*" style="display: none;" (change)="previewImage($event)">
+								<small class="config-photo-hint">
+									<i class="fas fa-info-circle"></i> Cualquier imagen (Máx. 10MB)
+								</small>
+							</div>
+						</div>
+
+						<!-- Información Personal y de Contacto -->
+						<div class="config-info-section">
+							<div class="config-info-group">
+								<h3 class="config-section-title"><i class="fas fa-user"></i> Información Personal</h3>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-user"></i> Nombre</label>
+									<input type="text" class="config-input" [(ngModel)]="perfilVeterinario.usuario.nombres">
+								</div>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-user"></i> Apellidos</label>
+									<input type="text" class="config-input" [(ngModel)]="perfilVeterinario.usuario.apellidos">
+								</div>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-user-md"></i> Especialidad</label>
+									<input type="text" class="config-input config-readonly" [(ngModel)]="perfilVeterinario.especialidad" readonly>
+								</div>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-id-card"></i> Tarjeta Profesional</label>
+									<input type="text" class="config-input config-readonly" [(ngModel)]="perfilVeterinario.tarjetaProfesional" readonly>
+								</div>
+							</div>
+
+							<div class="config-info-group">
+								<h3 class="config-section-title"><i class="fas fa-address-book"></i> Información de Contacto</h3>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-envelope"></i> Email</label>
+									<input type="email" class="config-input config-readonly" [(ngModel)]="perfilVeterinario.usuario.correo" readonly>
+								</div>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-phone"></i> Teléfono</label>
+									<input type="tel" class="config-input" [(ngModel)]="perfilVeterinario.usuario.telefono">
+								</div>
+								<div class="config-field">
+									<label class="config-label"><i class="fas fa-map-marker-alt"></i> Dirección</label>
+									<input type="text" class="config-input" [(ngModel)]="perfilVeterinario.usuario.direccion">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="config-actions">
+						<button type="button" class="config-btn config-btn-save" (click)="savePerfil()">
+							<i class="fas fa-save"></i> Guardar Cambios
+						</button>
+						<button type="button" class="config-btn config-btn-password" routerLink="/recuperar-contrasena">
+							<i class="fas fa-key"></i> Cambiar Contraseña
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<!-- MODALES -->
+			<div class="modal-overlay" [class.active]="openModalName !== ''" (click)="closeModal()"></div>
+
+			<!-- Modal Editar Evento -->
+			<div class="modal" [class.active]="openModalName === 'edit-event'" [style.display]="openModalName === 'edit-event' ? 'block' : 'none'">
+				<form (submit)="$event.preventDefault(); saveEvent()">
+					<div class="modal-header">
+						<h3><i class="fa-solid fa-calendar-week"></i>Editar Evento</h3>
+						<button type="button" class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Nombre del evento</label>
+								<input type="text" name="titulo" [(ngModel)]="eventForm.titulo" placeholder="Nombre" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Fecha de Inicio</label>
+								<input type="date" name="fechainicio" [(ngModel)]="eventForm.fechainicio" class="form-control" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Descripción del evento</label>
+								<textarea name="descripcion" [(ngModel)]="eventForm.descripcion" class="form-control" rows="3"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+						<button type="submit" class="btn btn-primary">Actualizar evento</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Modal Crear Evento -->
+			<div class="modal" [class.active]="openModalName === 'new-event'" [style.display]="openModalName === 'new-event' ? 'block' : 'none'">
+				<form (submit)="$event.preventDefault(); saveEvent()">
+					<div class="modal-header">
+						<h3><i class="fa-solid fa-calendar-plus"></i> Crear Evento</h3>
+						<button type="button" class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Nombre del evento *</label>
+								<input type="text" name="titulo" [(ngModel)]="eventForm.titulo" placeholder="Nombre" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Imagen del evento *</label>
+								<input type="file" class="form-control" accept="image/*" (change)="onEventImageChange($event)" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Fecha de Inicio *</label>
+								<input type="date" name="fechainicio" [(ngModel)]="eventForm.fechainicio" class="form-control" [min]="today" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Fecha de finalización *</label>
+								<input type="date" name="fechafin" [(ngModel)]="eventForm.fechafin" class="form-control" [min]="eventForm.fechainicio || today" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Descripción del evento *</label>
+								<textarea name="descripcion" [(ngModel)]="eventForm.descripcion" class="form-control" rows="3" placeholder="Detalles del evento..." required></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+						<button type="submit" class="btn btn-primary">Publicar evento</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Modal Editar Evento -->
+			<div class="modal" [class.active]="openModalName === 'edit-event'" [style.display]="openModalName === 'edit-event' ? 'block' : 'none'">
+				<form (submit)="$event.preventDefault(); saveEvent()">
+					<div class="modal-header">
+						<h3><i class="fa-solid fa-calendar-check"></i> Editar Evento</h3>
+						<button type="button" class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Nombre del evento *</label>
+								<input type="text" name="editTitulo" [(ngModel)]="eventForm.titulo" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Imagen del evento (opcional editar)</label>
+								<input type="file" class="form-control" accept="image/*" (change)="onEventImageChange($event)">
+								<small class="text-muted" *ngIf="eventForm.imagen">Imagen actual cargada</small>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Fecha de Inicio *</label>
+								<input type="date" name="editFechainicio" [(ngModel)]="eventForm.fechainicio" class="form-control" [min]="today" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Fecha de finalización *</label>
+								<input type="date" name="editFechafin" [(ngModel)]="eventForm.fechafin" class="form-control" [min]="eventForm.fechainicio || today" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Descripción del evento *</label>
+								<textarea name="editDescripcion" [(ngModel)]="eventForm.descripcion" class="form-control" rows="3" required></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+						<button type="submit" class="btn btn-primary">Actualizar evento</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Modal Agregar Producto -->
+			<div class="modal" [class.active]="openModalName === 'new-product'" [style.display]="openModalName === 'new-product' ? 'block' : 'none'">
+				<form (submit)="$event.preventDefault(); saveProduct()">
+					<div class="modal-header">
+						<h3><i class="fas fa-box-open"></i> Agregar Producto</h3>
+						<button type="button" class="btn-close-modal" (click)="closeModal()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Nombre *</label>
+								<input type="text" name="nombre" [(ngModel)]="productForm.nombre" placeholder="Nombre del producto" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Precio *</label>
+								<input type="number" name="precio" [(ngModel)]="productForm.precio" placeholder="0.000" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Cantidad *</label>
+								<input type="number" name="cantidad" [(ngModel)]="productForm.cantidad" class="form-control" placeholder="0" required>
+								<div class="form-text mt-1" style="font-size: 11px; color: #6c757d;">Número de unidades que ingresan al stock</div>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Categoría *</label>
+								<select name="categoria" [(ngModel)]="productForm.categoria" class="form-select" required>
+									<option value="">Seleccionar categoría</option>
+									<option value="Alimentos">Alimentos</option>
+									<option value="Medicamentos">Medicamentos</option>
+									<option value="Juguetes">Juguetes</option>
+									<option value="Accesorios">Accesorios</option>
+									<option value="Higiene">Higiene</option>
+								</select>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Descripción *</label>
+							<textarea name="descripcion" [(ngModel)]="productForm.descripcion" class="form-control" rows="3" placeholder="Descripción del producto" required></textarea>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Imagen del Producto *</label>
+							<input type="file" class="form-control" accept="image/*" (change)="onProductImageChange($event)" required>
+							<div class="mt-2 text-center" *ngIf="productForm.imagen">
+								<img [src]="getImageUrl(productForm.imagen, '')" alt="Preview" style="max-height: 100px; border-radius: 8px;">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" style="background: #94a3b8; border: none;" (click)="closeModal()">Cancelar</button>
+						<button type="submit" class="btn btn-primary" style="background: #007bff; border: none;">Guardar</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Modal Editar Producto -->
+			<div class="modal" [class.active]="openModalName === 'edit-product'" [style.display]="openModalName === 'edit-product' ? 'block' : 'none'">
+				<form (submit)="$event.preventDefault(); saveProduct()">
+					<div class="modal-header">
+						<h3><i class="fa-solid fa-pen-to-square"></i> Editar Producto</h3>
+						<button type="button" class="btn-close-modal" (click)="closeModal()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Nombre *</label>
+								<input type="text" name="nombre_edit" [(ngModel)]="productForm.nombre" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Precio *</label>
+								<input type="number" name="precio_edit" [(ngModel)]="productForm.precio" class="form-control" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Cantidad *</label>
+								<input type="number" name="cantidad_edit" [(ngModel)]="productForm.cantidad" class="form-control" min="0" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Categoría *</label>
+								<select name="categoria_edit" [(ngModel)]="productForm.categoria" class="form-select" required>
+									<option value="Alimentos">Alimentos</option>
+									<option value="Medicamentos">Medicamentos</option>
+									<option value="Juguetes">Juguetes</option>
+									<option value="Accesorios">Accesorios</option>
+									<option value="Higiene">Higiene</option>
+								</select>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Descripción *</label>
+							<textarea name="descripcion_edit" [(ngModel)]="productForm.descripcion" class="form-control" rows="3" required></textarea>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Imagen del Producto (opcional editar)</label>
+							<input type="file" class="form-control" accept="image/*" (change)="onProductImageChange($event)">
+							<div class="mt-2 text-center" *ngIf="productForm.imagen">
+								<div class="form-text mb-1" style="font-size: 11px;">Imagen actual cargada</div>
+								<img [src]="getImageUrl(productForm.imagen, '')" alt="Current" style="max-height: 100px; border-radius: 8px;">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" style="background: #94a3b8; border: none;" (click)="closeModal()">Cancelar</button>
+						<button type="submit" class="btn btn-primary" style="background: #007bff; border: none;">Guardar cambios</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>

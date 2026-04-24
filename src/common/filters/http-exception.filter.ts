@@ -32,9 +32,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
         error = (exceptionResponse as any).error;
       }
     } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = 'Internal server error';
-      error = 'Internal Server Error';
+      const payloadTooLarge =
+        exception instanceof Error &&
+        (exception.name === 'PayloadTooLargeError' ||
+          exception.message?.toLowerCase().includes('request entity too large'));
+
+      if (payloadTooLarge) {
+        status = HttpStatus.PAYLOAD_TOO_LARGE;
+        message = 'Payload demasiado grande. Reduce el tamano de la imagen o archivo.';
+        error = 'Payload Too Large';
+      } else {
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
+        message = 'Internal server error';
+        error = 'Internal Server Error';
+      }
       
       // Loggear errores inesperados
       this.logger.error(

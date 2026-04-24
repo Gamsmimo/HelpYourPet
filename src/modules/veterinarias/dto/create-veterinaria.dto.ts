@@ -21,6 +21,11 @@ export class CreateVeterinariaDto {
   @IsString()
   direccion?: string;
 
+  @ApiProperty({ description: 'Descripción de la veterinaria', required: false })
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
+
   @ApiProperty({ description: 'Estado', example: true, required: false })
   @IsOptional()
   @IsBoolean()

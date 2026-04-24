@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsInt, IsBoolean } from 'class-validator';
 
 export class CreateVeterinarioDto {
   @ApiProperty({ description: 'Nombres del veterinario', example: 'Carlos' })
@@ -32,8 +32,38 @@ export class CreateVeterinarioDto {
   @IsString()
   direccion?: string;
 
-  @ApiProperty({ description: 'ID de la veterinaria', example: 1 })
+  @ApiProperty({ description: 'Tipo de documento', example: 'CC', required: false })
   @IsOptional()
   @IsString()
+  tipo_documento?: string;
+
+  @ApiProperty({ description: 'Edad', example: 25, required: false })
+  @IsOptional()
+  @IsInt()
+  edad?: number;
+
+  @ApiProperty({ description: 'Especialidad', example: 'Cirugía', required: false })
+  @IsOptional()
+  @IsString()
+  especialidad?: string;
+
+  @ApiProperty({ description: 'Tarjeta profesional', example: 'TP-12345', required: false })
+  @IsOptional()
+  @IsString()
+  tarjetaProfesional?: string;
+
+  @ApiProperty({ description: 'Años de experiencia', example: 5, required: false })
+  @IsOptional()
+  @IsInt()
+  experiencia?: number;
+
+  @ApiProperty({ description: 'ID de la veterinaria', example: 1, required: false })
+  @IsOptional()
+  @IsInt()
   idVeterinaria?: number;
+
+  @ApiProperty({ description: 'Estado activo', example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  estado?: boolean;
 }

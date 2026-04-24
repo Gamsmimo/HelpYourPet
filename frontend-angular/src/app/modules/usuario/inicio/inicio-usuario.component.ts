@@ -180,50 +180,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     });
   }
 
-  cargarPublicacionesEjemplo(): void {
-    // Publicaciones de ejemplo (solo fallback)
-    this.publicaciones = [
-      {
-        id: 1,
-        usuario: {
-          nombre: 'María García',
-          avatar: 'https://ui-avatars.com/api/?name=Maria+Garcia&background=4ade80&color=fff'
-        },
-        contenido: '¡Mi perro Max disfrutando del parque hoy! 🐶 🌳',
-        imagen: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600',
-        fecha: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        likes: 24,
-        comentarios: [
-          {
-            id: 1,
-            usuario: {
-              nombre: 'Carlos Pérez',
-              avatar: 'https://ui-avatars.com/api/?name=Carlos+Perez&background=3b82f6&color=fff'
-            },
-            contenido: '¡Qué lindo! 😍',
-            fecha: new Date(Date.now() - 1 * 60 * 60 * 1000)
-          }
-        ],
-        compartidos: 3,
-        likedByUser: false,
-        mostrarComentarios: false
-      },
-      {
-        id: 2,
-        usuario: {
-          nombre: 'Juan Martínez',
-          avatar: 'https://ui-avatars.com/api/?name=Juan+Martinez&background=f59e0b&color=fff'
-        },
-        contenido: 'Recordatorio: Vacunación gratuita este sábado en la Clínica Veterinaria Central 💉',
-        fecha: new Date(Date.now() - 5 * 60 * 60 * 1000),
-        likes: 45,
-        comentarios: [],
-        compartidos: 12,
-        likedByUser: true,
-        mostrarComentarios: false
-      }
-    ];
-  }
+  // Método eliminado: antes cargaba publicaciones de ejemplo (mock) en memoria.
 
   toggleMenu(): void {
     this.menuAbierto = !this.menuAbierto;
@@ -268,18 +225,13 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
 
   publicar(): void {
     if (this.nuevaPublicacion.trim() || this.imagenPreview) {
-      // Obtener ID del usuario (puede estar en 'id' o 'id_usuario')
-      const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
-      console.log('Usuario logueado:', this.usuarioLogueado);
-      console.log('ID Usuario:', userId);
-      
-      if (!userId) {
+      if (!this.usuarioLogueado) {
         alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.');
         return;
       }
       
       // Enviar al backend
-      this.publicacionesService.createPublicacion(userId, this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
+      this.publicacionesService.createPublicacion(this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
         next: (data) => {
           console.log('Publicación creada:', data);
           // Limpiar el formulario

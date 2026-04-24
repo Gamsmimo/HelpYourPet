@@ -23,6 +23,10 @@ export class Veterinaria {
   @Column({ length: 255, nullable: true })
   direccion: string;
 
+  @ApiProperty({ description: 'Descripción de la veterinaria' })
+  @Column({ type: 'text', nullable: true })
+  descripcion: string;
+
   @ApiProperty({ description: 'Estado', example: true })
   @Column({ type: 'boolean', default: true })
   estado: boolean;

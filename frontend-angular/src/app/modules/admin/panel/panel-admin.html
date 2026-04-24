@@ -1,0 +1,742 @@
+<!-- Header -->
+<header class="header">
+  <div class="logo-container">
+    <img src="assets/img/logo.png" alt="Logo HelpYourPet" class="logo-img">
+    <div class="logo-text">
+      <h1>HelpYourPet</h1>
+      <span>Panel Administrador</span>
+    </div>
+  </div>
+  <div class="user-controls">
+    <button id="themeToggle" type="button" class="theme-toggle-btn" (click)="toggleTheme()" aria-label="Cambiar tema">
+      <i class="bi theme-icon" [ngClass]="isDarkMode ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
+    </button>
+    <div class="user-profile">
+      <img [src]="adminData.imagen.startsWith('assets') || adminData.imagen.startsWith('data:') || adminData.imagen.startsWith('http') ? adminData.imagen : baseUrl + adminData.imagen" alt="imagen de perfil" class="profile-pic" id="headerProfilePic">
+      <span>{{ adminData.nombres }} {{ adminData.apellidos }}</span>
+    </div>
+  </div>
+</header>
+
+<!-- Contenido principal -->
+<main class="main-container">
+  <nav class="sidebar">
+    <ul class="nav-menu">
+      <li><a href="#" class="nav-link" [class.active]="currentSection === 'dashboard'" (click)="setSection('dashboard', $event)" data-section="dashboard">Inicio</a></li>
+      <li><a href="#" class="nav-link" [class.active]="currentSection === 'users'" (click)="setSection('users', $event)" data-section="users">Gestión de Usuarios</a></li>
+      <li><a href="#" class="nav-link" [class.active]="currentSection === 'pets'" (click)="setSection('pets', $event)" data-section="pets">Gestión de Mascotas</a></li>
+      <li><a href="#" class="nav-link" [class.active]="currentSection === 'vets'" (click)="setSection('vets', $event)" data-section="vets">Gestión Veterinaria</a></li>
+      <!--<li><a href="#" class="nav-link" data-section="settings">Configuración General</a></li>
+				<li><a href="#" class="nav-link" data-section="security">Control y Seguridad</a></li>-->
+      <li><a href="#" class="nav-link" [class.active]="currentSection === 'profile'" (click)="setSection('profile', $event)" data-section="profile">Perfil Administrador</a></li>
+      <li><a href="#" class="nav-link logout-nav-btn" (click)="cerrarSesion($event)"><i class="bi bi-box-arrow-right"></i>Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+
+  <div class="content-area">
+    <div *ngIf="mensaje" class="alert alert-success">
+      <span>{{ mensaje }}</span>
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      <span>{{ error }}</span>
+    </div>
+
+    <section id="dashboard" class="content-section" [class.active]="currentSection === 'dashboard'">
+      <h2>Inicio</h2>
+      <div class="dashboard-cards">
+        <div class="card">
+          <h3>Usuarios Activos</h3>
+          <p class="stat-number">{{ stats.totalUsuarios }}</p>
+        </div>
+        <div class="card">
+          <h3>Mascotas Registradas</h3>
+          <p class="stat-number">{{ stats.totalMascotas }}</p>
+        </div>
+        <div class="card">
+          <h3>Veterinarias Activas</h3>
+          <p class="stat-number">{{ stats.totalVeterinarias }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="users" class="content-section" [class.active]="currentSection === 'users'">
+      <h2>Gestión de Usuarios</h2>
+      <div class="section-actions">
+        <button type="button" class="btn-primary" (click)="abrirModal('vetModal')">Registrar Veterinario</button>
+        <button type="button" class="btn-primary" (click)="abrirModal('clinicModal')">Registrar Veterinaria</button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaUsuarios">
+          <tr *ngFor="let usuario of usuarios">
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombres }} {{ usuario.apellidos }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>
+              <span *ngIf="usuario.rol != null">{{ usuario.rol.nombre }}</span>
+              <span *ngIf="usuario.rol == null">Sin rol</span>
+            </td>
+            <td>
+              <span *ngIf="usuario.activo" class="status active">Activo</span>
+              <span *ngIf="!usuario.activo" class="status inactive">Desactivado</span>
+            </td>
+            <td>
+              <a href="#" class="btn-action" (click)="$event.preventDefault(); abrirModal('detalleUsuarioModal', usuario)">Ver</a>
+              <form style="display:inline;" (submit)="$event.preventDefault(); toggleUserStatus(usuario)">
+                <input type="hidden" name="activo" [value]="!usuario.activo" />
+                <button type="submit" class="btn-action" [ngClass]="usuario.activo ? 'btn-inactivate' : 'btn-activate'">
+                  {{ usuario.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pets" class="content-section" [class.active]="currentSection === 'pets'">
+      <h2>Gestión de Mascotas</h2>
+      <div class="tabs">
+        <button type="button" class="tab-btn" [class.active]="activeTabPets === 'pets-tab'" (click)="setTab('pets', 'pets-tab', $event)" data-tab="pets-tab">Mascotas Registradas</button>
+        <!--<button class="tab-btn" data-tab="abuse-tab">Reportes de Maltrato</button>-->
+      </div>
+
+      <div class="tab-content" [class.active]="activeTabPets === 'pets-tab'" id="pets-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Especie</th>
+              <th>Raza</th>
+              <th>Dueño</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMascotas">
+            <tr *ngFor="let m of mascotas">
+              <td>{{ m.id }}</td>
+              <td>{{ m.nombre }}</td>
+              <td>{{ m.especie }}</td>
+              <td>{{ m.raza }}</td>
+              <td>{{ m.usuario.nombres }} {{ m.usuario.apellidos }}</td>
+              <td>
+                <a href="#" class="btn-action" (click)="$event.preventDefault(); abrirModal('detalleMascotaModal', m)">Ver</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" [class.active]="activeTabPets === 'abuse-tab'" id="abuse-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="reportes == null || reportes.length === 0">
+              <td colspan="5" class="text-center">No hay reportes de maltrato registrados</td>
+            </tr>
+            <tr *ngFor="let reporte of reportes">
+              <td>{{ reporte.id }}</td>
+              <td>{{ reporte.fecha | date:'dd/MM/yyyy' }}</td>
+              <td>{{ reporte.usuario != null ? reporte.usuario.nombres + ' ' + reporte.usuario.apellidos : 'Anónimo' }}</td>
+              <td>
+                <span *ngIf="reporte.estado === 'pendiente'" class="status pending">Pendiente</span>
+                <span *ngIf="reporte.estado === 'asignado'" class="status medium">Asignado</span>
+                <span *ngIf="reporte.estado === 'completado'" class="status active">Completado</span>
+              </td>
+              <td>
+                <a href="#" class="btn-action" (click)="$event.preventDefault(); abrirModal('detalleReporteModal', reporte)">Ver</a>
+
+                <form *ngIf="reporte.estado === 'pendiente'" style="display:inline;" (submit)="$event.preventDefault()">
+                  <select name="autoridad" class="authority-select" #authSel required>
+                    <option value="">Asignar autoridad...</option>
+                    <option value="Policía Nacional">Policía Nacional</option>
+                    <option value="Seguridad Animal">Seguridad Animal</option>
+                    <option value="Defensa Animal Municipal">Defensa Animal Municipal</option>
+                    <option value="Policía Ambiental">Policía Ambiental</option>
+                    <option value="Fiscalía">Fiscalía</option>
+                  </select>
+                  <button type="button" class="btn-action btn-assign" (click)="asignarAutoridad(reporte, authSel.value)">Asignar</button>
+                </form>
+
+                <form *ngIf="reporte.estado === 'asignado'" style="display:inline;" (submit)="$event.preventDefault(); marcarCompletado(reporte)">
+                  <input type="hidden" name="estado" value="completado" />
+                  <button type="submit" class="btn-action">Marcar Completado</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="vets" class="content-section" [class.active]="currentSection === 'vets'">
+      <h2>Gestión Veterinaria</h2>
+
+      <div class="tabs">
+        <button type="button" class="tab-btn" [class.active]="activeTabVets === 'clinics-vet-tab'" (click)="setTab('vets', 'clinics-vet-tab', $event)" data-tab="clinics-vet-tab">Clínicas</button>
+        <!--<button class="tab-btn" data-tab="reviews-tab">Calificaciones y Comentarios</button>-->
+      </div>
+
+      <div class="tab-content" [class.active]="activeTabVets === 'clinics-vet-tab'" id="clinics-vet-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Contacto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let veterinaria of veterinarias">
+              <td>{{ veterinaria.id }}</td>
+              <td>{{ veterinaria.nombre }}</td>
+              <td>Veterinaria</td>
+              <td>{{ veterinaria.telefono }}</td>
+              <td>
+                <span *ngIf="veterinaria.estado === 'Activa'" class="status active">Activa</span>
+                <span *ngIf="veterinaria.estado !== 'Activa'" class="status inactive">Desactivada</span>
+              </td>
+              <td>
+                <a href="#" class="btn-action" (click)="$event.preventDefault(); abrirModal('detalleVeterinariaModal', veterinaria)">Ver</a>
+                <form style="display:inline;" (submit)="$event.preventDefault(); toggleClinicStatus(veterinaria)">
+                  <input type="hidden" name="estado" [value]="veterinaria.estado !== 'Activa'" />
+                  <button type="submit" class="btn-action" [ngClass]="veterinaria.estado === 'Activa' ? 'btn-inactivate' : 'btn-activate'">
+                    {{ veterinaria.estado === 'Activa' ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" [class.active]="activeTabVets === 'reviews-tab'" id="reviews-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Veterinaria/Veterinario</th>
+              <th>Calificación</th>
+              <th>Comentario</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ana García</td>
+              <td>Veterinaria Central</td>
+              <td>5/5</td>
+              <td>Excelente servicio</td>
+              <td><span class="status approved">Aprobado</span></td>
+              <td>
+                <button type="button" class="btn-action">Editar</button>
+                <button type="button" class="btn-action btn-reject">Rechazar</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Carlos Rodríguez</td>
+              <td>Clínica PetCare</td>
+              <td>4/5</td>
+              <td>Muy buen trato con mi mascota</td>
+              <td><span class="status approved">Aprobado</span></td>
+              <td>
+                <button type="button" class="btn-action">Editar</button>
+                <button type="button" class="btn-action btn-reject">Rechazar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="settings" class="content-section" [class.active]="currentSection === 'settings'">
+      <h2>Configuración General del Sistema</h2>
+      <div class="settings-options">
+        <div class="setting-item">
+          <h3>Gestión de Permisos por Rol</h3>
+          <button type="button" class="btn-action">Configurar</button>
+        </div>
+        <div class="setting-item">
+          <h3>Políticas de Privacidad y Términos de Uso</h3>
+          <button type="button" class="btn-action">Editar</button>
+        </div>
+        <div class="setting-item">
+          <h3>Copias de Seguridad y Restauración</h3>
+          <button type="button" class="btn-action">Programar</button>
+        </div>
+        <div class="setting-item">
+          <h3>Configuración de Idioma y Moneda</h3>
+          <button type="button" class="btn-action">Configurar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="security" class="content-section" [class.active]="currentSection === 'security'">
+      <h2>Zona de Control y Seguridad</h2>
+      <div class="tabs">
+        <button type="button" class="tab-btn" [class.active]="activeTabSecurity === 'suspicious-tab'" (click)="setTab('security', 'suspicious-tab', $event)" data-tab="suspicious-tab">Actividades Sospechosas</button>
+        <button type="button" class="tab-btn" [class.active]="activeTabSecurity === 'legal-tab'" (click)="setTab('security', 'legal-tab', $event)" data-tab="legal-tab">Solicitudes Legales</button>
+      </div>
+      <div class="tab-content" [class.active]="activeTabSecurity === 'suspicious-tab'" id="suspicious-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Actividad</th>
+              <th>Nivel de Riesgo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>16/10/2023</td>
+              <td>user123</td>
+              <td>Múltiples intentos de login fallidos</td>
+              <td><span class="status medium">Medio</span></td>
+              <td><button type="button" class="btn-action">Investigar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-content" [class.active]="activeTabSecurity === 'legal-tab'" id="legal-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>14/10/2023</td>
+              <td>Denuncia</td>
+              <td>Uso indebido de datos personales</td>
+              <td><span class="status pending">Pendiente</span></td>
+              <td><button type="button" class="btn-action">Revisar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="profile" class="content-section" [class.active]="currentSection === 'profile'">
+      <h2>Perfil Administrador</h2>
+      <div class="profile-container">
+        <div class="profile-header">
+          <div class="profile-image-section">
+            <div class="image-upload-container">
+              <img *ngIf="adminData.imagen" [src]="adminData.imagen.startsWith('assets') || adminData.imagen.startsWith('data:') || adminData.imagen.startsWith('http') ? adminData.imagen : baseUrl + adminData.imagen" alt="Foto de perfil" class="profile-large" id="profileImage">
+              <div *ngIf="!adminData.imagen" class="profile-image-placeholder" id="profileImage">
+                <i class="bi bi-person-circle"></i>
+              </div>
+
+              <form id="imageUploadForm" (ngSubmit)="onImageUploadSubmit()">
+                <div class="file-upload-wrapper">
+                  <input type="file" name="imagen" id="fileInput" accept="image/*" class="file-input" (change)="onFileInputChange($event)">
+                  <label for="fileInput" class="file-upload-btn">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                  </label>
+                  <span class="file-name" id="fileName">{{ fileNameDisplay }}</span>
+                </div>
+                <button type="submit" class="btn-upload" [disabled]="!fileSelected">
+                  <i class="bi bi-upload"></i> Subir Imagen
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="profile-info">
+            <h3>Información Personal</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Nombre:</label>
+                <span>{{ adminData.nombres }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{ adminData.correo }}</span>
+              </div>
+              <div class="info-item">
+                <label>Teléfono:</label>
+                <span>{{ adminData.telefono }}</span>
+              </div>
+            </div>
+            <button type="button" class="btn-primary" (click)="abrirModal('profileModal')">Editar Información</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Modal Editar Perfil -->
+<div id="profileModal" class="modal" [style.display]="showProfileModal ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'profileModal')">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <span class="close" (click)="cerrarModal('profileModal')">&times;</span>
+    <h2>Editar Perfil</h2>
+    <form id="profileForm" (ngSubmit)="onProfileFormSubmit($event)">
+      <div class="form-group">
+        <label for="profileName">Nombres:</label>
+        <input type="text" id="profileName" name="nombres" [(ngModel)]="adminData.nombres" required>
+      </div>
+      <div class="form-group">
+        <label for="profileEmail">Email:</label>
+        <input type="email" id="profileEmail" name="correo" [(ngModel)]="adminData.correo" required>
+      </div>
+      <div class="form-group">
+        <label for="profilePhone">Teléfono:</label>
+        <input type="tel" id="profilePhone" name="telefono" [(ngModel)]="adminData.telefono" required>
+      </div>
+      <button type="submit" class="btn-primary">Guardar Cambios</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Registrar Veterinario -->
+<div id="vetModal" class="modale" [style.display]="showVetModal ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'vetModal')">
+  <div class="modal-content">
+    <span class="close" (click)="cerrarModal('vetModal')">&times;</span>
+    <h2>Registrar Nuevo Veterinario</h2>
+    <form id="vetForm" (ngSubmit)="onVetFormSubmit($event)">
+      <div class="form-group">
+        <label for="vetNombres">Nombres:</label>
+        <input type="text" id="vetNombres" name="nombres" required>
+      </div>
+      <div class="form-group">
+        <label for="vetApellidos">Apellidos:</label>
+        <input type="text" id="vetApellidos" name="apellidos" required>
+      </div>
+      <div class="form-group">
+        <label for="vetEdad">Edad:</label>
+        <input type="number" id="vetEdad" name="edad" required min="18" max="100">
+      </div>
+      <div class="form-group">
+        <label for="vetTipoDocumento">Tipo Documento:</label>
+        <select id="vetTipoDocumento" name="tipoDocumento" required>
+          <option value="CC">Cédula de Ciudadanía</option>
+          <option value="CE">Cédula de Extranjería</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="vetNumDocumento">Número de Documento:</label>
+        <input type="text" id="vetNumDocumento" name="numDocumento" required>
+      </div>
+      <div class="form-group">
+        <label for="vetDireccion">Dirección:</label>
+        <input type="text" id="vetDireccion" name="direccion" required>
+      </div>
+      <div class="form-group">
+        <label for="vetCorreo">Correo:</label>
+        <input type="email" id="vetCorreo" name="correo" required>
+      </div>
+      <div class="form-group">
+        <label for="vetTelefono">Teléfono:</label>
+        <input type="tel" id="vetTelefono" name="telefono" required>
+      </div>
+      <div class="form-group">
+        <label for="vetPassword">Contraseña:</label>
+        <input type="password" id="vetPassword" name="password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="vetEspecialidad">Especialidad:</label>
+        <input type="text" id="vetEspecialidad" name="especialidad" required>
+      </div>
+      <div class="form-group">
+        <label for="vetTarjetaProfesional">Tarjeta Profesional:</label>
+        <input type="text" id="vetTarjetaProfesional" name="tarjetaProfesional" required>
+      </div>
+      <div class="form-group">
+        <label for="vetExperiencia">Experiencia (años):</label>
+        <input type="number" id="vetExperiencia" name="experiencia" required min="0">
+      </div>
+      <div class="form-group">
+        <label for="vetClinic">Veterinaria Asociada:</label>
+        <select id="vetClinic" name="veterinariaId">
+          <option value="">Seleccionar Veterinaria</option>
+          <option *ngFor="let vet of veterinarias" [value]="vet.id">{{ vet.nombre }}</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">Registrar Veterinario</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Registrar Veterinaria -->
+<div id="clinicModal" class="modal" [style.display]="showClinicModal ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'clinicModal')">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="cerrarModal('clinicModal')">&times;</span>
+    <h2>Registrar Nueva Veterinaria</h2>
+    <form id="clinicForm" (ngSubmit)="onClinicFormSubmit($event)">
+      <div class="form-group">
+        <label for="clinicNombre">Nombre:</label>
+        <input type="text" id="clinicNombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="clinicRUT">NIT:</label>
+        <input type="text" id="clinicRUT" name="rut" required>
+        <small style="display: block; margin-top: 5px; color: #666;">
+          <a href="https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" target="_blank"
+            style="color: var(--primary-color); text-decoration: none;">
+            <i class="bi bi-link-45deg"></i> Compruebe el NIT de la veterinaria aquí
+          </a>
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="clinicDireccion">Dirección:</label>
+        <input type="text" id="clinicDireccion" name="direccion" required>
+      </div>
+      <div class="form-group">
+        <label for="clinicTelefono">Teléfono:</label>
+        <input type="tel" id="clinicTelefono" name="telefono" required>
+      </div>
+      <div class="form-group">
+        <label for="clinicCorreo">Correo:</label>
+        <input type="email" id="clinicCorreo" name="correo" required>
+      </div>
+      <div class="form-group">
+        <label for="clinicHorario">Horario:</label>
+        <input type="text" id="clinicHorario" name="horario" placeholder="Ej: Lunes a Viernes 8:00-18:00">
+      </div>
+      <div class="form-group">
+        <label for="clinicDescripcion">Descripción:</label>
+        <textarea id="clinicDescripcion" name="descripcion" placeholder="Descripción de servicios..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="clinicServices">Servicios Ofrecidos:</label>
+        <textarea id="clinicServices" name="servicios" rows="3"></textarea>
+      </div>
+      <div class="form-row-two">
+        <div class="form-group">
+          <label for="clinicEstado">Estado:</label>
+          <select id="clinicEstado" name="estado">
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="clinicFoto">Foto:</label>
+          <div class="file-upload-clinic">
+            <input type="file" id="clinicFoto" name="foto" accept="image/*" class="file-input-clinic" (change)="onClinicFotoChange($event)">
+            <label for="clinicFoto" class="file-label-clinic">
+              <i class="bi bi-cloud-arrow-up"></i>
+              <span id="clinicFotoNombre">{{ clinicFotoNombre || 'Seleccionar imagen...' }}</span>
+            </label>
+            <img *ngIf="clinicFotoPreview" [src]="clinicFotoPreview" alt="Preview" class="clinic-foto-preview">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Registrar Veterinaria</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Detalle Usuario -->
+<div id="detalleUsuarioModal" class="modal" [style.display]="showDetalleUsuario ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'detalleUsuarioModal')">
+  <div class="modal-contenido" *ngIf="detalleUsuario != null" (click)="$event.stopPropagation()">
+    <a href="#" class="close" (click)="$event.preventDefault(); cerrarModal('detalleUsuarioModal')">&times;</a>
+    <h2>Detalles de Usuario</h2>
+    <div style="display: grid; gap: 1rem;">
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <img *ngIf="detalleUsuario.imagen" [src]="detalleUsuario.imagen.startsWith('assets') || detalleUsuario.imagen.startsWith('data:') || detalleUsuario.imagen.startsWith('http') ? detalleUsuario.imagen : baseUrl + detalleUsuario.imagen" alt="Foto de perfil"
+          style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid var(--primary-color);" />
+        <img *ngIf="!detalleUsuario.imagen" src="https://via.placeholder.com/150?text=Sin+Foto" alt="Sin foto"
+          style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid var(--primary-color);" />
+      </div>
+      <p><strong>Nombre Completo:</strong> <span>{{ detalleUsuario.nombres }} {{ detalleUsuario.apellidos }}</span></p>
+      <p><strong>Correo:</strong> <span>{{ detalleUsuario.correo }}</span></p>
+      <p><strong>Teléfono:</strong> <span>{{ detalleUsuario.telefono }}</span></p>
+      <p><strong>Edad:</strong> <span>{{ detalleUsuario.edad }}</span> años</p>
+      <p><strong>Tipo Documento:</strong> <span>{{ detalleUsuario.tipoDocumento }}</span></p>
+      <p><strong>Número Documento:</strong> <span>{{ detalleUsuario.numDocumento }}</span></p>
+      <p><strong>Dirección:</strong> <span>{{ detalleUsuario.direccion }}</span></p>
+      <p><strong>Rol:</strong> <span>{{ detalleUsuario.rol?.nombre }}</span></p>
+      <p><strong>Estado:</strong>
+        <span *ngIf="detalleUsuario.activo" class="status active">Activo</span>
+        <span *ngIf="!detalleUsuario.activo" class="status inactive">Inactivo</span>
+      </p>
+    </div>
+    <a href="#" class="btn-primary" (click)="$event.preventDefault(); cerrarModal('detalleUsuarioModal')"
+      style="margin-top: 1rem; display: inline-block; text-decoration: none; text-align: center;">Cerrar</a>
+  </div>
+</div>
+
+<!-- Modal Detalle Mascota -->
+<div id="detalleMascotaModal" class="modal" [style.display]="showDetalleMascota ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'detalleMascotaModal')">
+  <div class="modal-contenido" *ngIf="detalleMascota != null" (click)="$event.stopPropagation()">
+    <a href="#" class="close" (click)="$event.preventDefault(); cerrarModal('detalleMascotaModal')">&times;</a>
+    <h2>Detalles de Mascota</h2>
+    <div style="display: grid; gap: 1rem;">
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <img *ngIf="detalleMascota.foto" [src]="detalleMascota.foto.startsWith('assets') || detalleMascota.foto.startsWith('data:') || detalleMascota.foto.startsWith('http') ? detalleMascota.foto : baseUrl + detalleMascota.foto" alt="Foto de mascota"
+          style="width: 200px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color);" />
+        <img *ngIf="!detalleMascota.foto" src="https://via.placeholder.com/200?text=Sin+Foto" alt="Sin foto"
+          style="width: 200px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color);" />
+      </div>
+      <p><strong>Nombre:</strong> <span>{{ detalleMascota.nombre }}</span></p>
+      <p><strong>Especie:</strong> <span>{{ detalleMascota.especie }}</span></p>
+      <p><strong>Raza:</strong> <span>{{ detalleMascota.raza }}</span></p>
+      <p><strong>Edad:</strong> <span>{{ detalleMascota.edad }}</span> años</p>
+      <p><strong>Género:</strong> <span>{{ detalleMascota.genero }}</span></p>
+      <p><strong>Tamaño:</strong> <span>{{ detalleMascota['tamaño'] }}</span></p>
+      <p><strong>Peso:</strong> <span>{{ detalleMascota.peso }}</span> kg</p>
+      <p><strong>Color:</strong> <span>{{ detalleMascota.color }}</span></p>
+      <p><strong>Descripción:</strong> <span>{{ detalleMascota.descripcion }}</span></p>
+      <p><strong>Dueño:</strong> <span>{{ detalleMascota.usuario.nombres }} {{ detalleMascota.usuario.apellidos }}</span></p>
+      <p><strong>Correo Dueño:</strong> <span>{{ detalleMascota.usuario.correo }}</span></p>
+      <p><strong>Teléfono Dueño:</strong> <span>{{ detalleMascota.usuario.telefono }}</span></p>
+    </div>
+    <a href="#" class="btn-primary" (click)="$event.preventDefault(); cerrarModal('detalleMascotaModal')"
+      style="margin-top: 1rem; display: inline-block; text-decoration: none; text-align: center;">Cerrar</a>
+  </div>
+</div>
+
+<!-- Modal Detalle Veterinario -->
+<div id="detalleVeterinarioModal" class="modal" [style.display]="showDetalleVeterinario ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'detalleVeterinarioModal')">
+  <div class="modal-contenido" *ngIf="detalleVeterinario != null" (click)="$event.stopPropagation()">
+    <a href="#" class="close" (click)="$event.preventDefault(); cerrarModal('detalleVeterinarioModal')">&times;</a>
+    <h2>Detalles de Veterinario</h2>
+    <div style="display: grid; gap: 1rem;">
+      <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Información Personal</h3>
+      <p><strong>Nombre Completo:</strong> <span>{{ detalleVeterinario.usuario.nombres }} {{ detalleVeterinario.usuario.apellidos }}</span></p>
+      <p><strong>Edad:</strong> <span>{{ detalleVeterinario.usuario.edad }}</span> años</p>
+      <p><strong>Tipo Documento:</strong> <span>{{ detalleVeterinario.usuario.tipoDocumento }}</span></p>
+      <p><strong>Número Documento:</strong> <span>{{ detalleVeterinario.usuario.numDocumento }}</span></p>
+      <p><strong>Dirección:</strong> <span>{{ detalleVeterinario.usuario.direccion }}</span></p>
+      <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 1rem;">Contacto</h3>
+      <p><strong>Teléfono:</strong> <span>{{ detalleVeterinario.usuario.telefono }}</span></p>
+      <p><strong>Correo:</strong> <span>{{ detalleVeterinario.usuario.correo }}</span></p>
+      <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 1rem;">Información Profesional</h3>
+      <p><strong>Especialidad:</strong> <span>{{ detalleVeterinario.especialidad }}</span></p>
+      <p><strong>Tarjeta Profesional:</strong> <span>{{ detalleVeterinario.tarjetaProfesional }}</span></p>
+      <p><strong>Experiencia:</strong> <span>{{ detalleVeterinario.experiencia }}</span> años</p>
+      <p><strong>Estado:</strong>
+        <span *ngIf="detalleVeterinario.estado" class="status active">Activo</span>
+        <span *ngIf="!detalleVeterinario.estado" class="status inactive">Inactivo</span>
+      </p>
+    </div>
+    <a href="#" class="btn-primary" (click)="$event.preventDefault(); cerrarModal('detalleVeterinarioModal')"
+      style="margin-top: 1rem; display: inline-block; text-decoration: none; text-align: center;">Cerrar</a>
+  </div>
+</div>
+
+<!-- Modal Detalle Veterinaria -->
+<div id="detalleVeterinariaModal" class="modal" [style.display]="showDetalleVeterinaria ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'detalleVeterinariaModal')">
+  <div class="modal-contenido" style="max-width: 850px; padding: 2.5rem;" *ngIf="detalleVeterinaria != null" (click)="$event.stopPropagation()">
+    <span class="close" (click)="cerrarModal('detalleVeterinariaModal')" style="font-size: 2rem; top: 1rem; right: 1.5rem;">&times;</span>
+    <h2 style="margin-bottom: 2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+      <span><i class="bi bi-hospital" style="color: var(--primary-color); margin-right: 0.5rem;"></i> {{ detalleVeterinaria.nombre }}</span>
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+      <!-- Columna Izquierda: Imagen y Contacto (Más corta) -->
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="text-align: center; margin-bottom: 0.5rem;">
+          <img *ngIf="detalleVeterinaria.foto" [src]="baseUrl + detalleVeterinaria.foto" alt="Foto de Veterinaria"
+            style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color); box-shadow: var(--shadow);" />
+          <div *ngIf="!detalleVeterinaria.foto" 
+            style="width: 100%; height: 220px; display: flex; align-items: center; justify-content: center; background: var(--hover-color); border-radius: 12px; border: 3px dashed var(--border-color); color: var(--text-secondary);">
+            <i class="bi bi-image" style="font-size: 3rem; margin-right: 10px;"></i> Sin Fotografía
+          </div>
+        </div>
+        
+        <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 0; font-size: 1rem;"><i class="bi bi-telephone-fill"></i> Contacto Rápido</h3>
+          <p style="margin-top: 1rem;"><strong>Teléfono:</strong> <span>{{ detalleVeterinaria.telefono || 'No especificado' }}</span></p>
+          <p style="margin-top: 0.5rem;"><strong>Correo:</strong> <span>{{ detalleVeterinaria.correo || 'No especificado' }}</span></p>
+        </div>
+
+        <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <p style="margin: 0;"><strong>Calificación:</strong></p>
+          <span *ngIf="detalleVeterinaria.calificacionPromedio" style="color: var(--warning); font-weight: bold; font-size: 1.1rem;">
+            <i class="bi bi-star-fill"></i> {{ detalleVeterinaria.calificacionPromedio }} / 5.0
+          </span>
+          <span *ngIf="!detalleVeterinaria.calificacionPromedio" style="color: var(--text-secondary); font-style: italic;">S/C</span>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Detalles operativos (Más larga) -->
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div>
+          <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; font-size: 1.1rem; margin-top: 0;"><i class="bi bi-geo-alt-fill"></i> Ubicación</h3>
+          <p style="margin-top: 0.75rem;"><strong>Dirección:</strong> <span>{{ detalleVeterinaria.direccion || 'No especificada' }}</span></p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; font-size: 1.1rem; margin-top: 0;"><i class="bi bi-clock-fill"></i> Operación</h3>
+          <p style="margin-top: 0.75rem;"><strong>Horario:</strong> <span>{{ detalleVeterinaria.horarioAtencion || 'No especificado' }}</span></p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; font-size: 1.1rem; margin-top: 0;"><i class="bi bi-info-circle-fill"></i> Descripción</h3>
+          <div style="margin-top: 0.75rem; white-space: pre-wrap; background: var(--hover-color); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; font-size: 0.95rem; color: var(--text-color); line-height: 1.5; max-height: 100px; overflow-y: auto;">{{ detalleVeterinaria.descripcion || 'Sin descripción' }}</div>
+        </div>
+
+        <div>
+          <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; font-size: 1.1rem; margin-top: 0;"><i class="bi bi-list-check"></i> Servicios Ofrecidos</h3>
+          <div style="margin-top: 0.75rem; white-space: pre-wrap; background: var(--hover-color); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; font-size: 0.95rem; color: var(--text-color); line-height: 1.5; max-height: 100px; overflow-y: auto;">{{ detalleVeterinaria.serviciosOfrecidos || 'Ningún servicio detallado' }}</div>
+        </div>
+
+        <div style="margin-top: auto; padding-top: 1.5rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color);">
+          <span><strong>Registrada:</strong> {{ detalleVeterinaria.createdAt ? detalleVeterinaria.createdAt.slice(0,10) : 'N/A' }}</span>
+          <span><strong>Actualizada:</strong> {{ detalleVeterinaria.updatedAt ? detalleVeterinaria.updatedAt.slice(0,10) : 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalle Reporte -->
+<div id="detalleReporteModal" class="modal" [style.display]="showDetalleReporte ? 'flex' : 'none'" (click)="onModalBackdropClick($event, 'detalleReporteModal')">
+  <div class="modal-contenido" *ngIf="detalleReporte != null" (click)="$event.stopPropagation()">
+    <a href="#" class="close" (click)="$event.preventDefault(); cerrarModal('detalleReporteModal')">&times;</a>
+    <h2>Detalles del Reporte de Maltrato</h2>
+    <div class="modal-reporte-content" style="display: grid; gap: 1rem;">
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+        <p><strong>ID del Reporte:</strong> <span>{{ detalleReporte.id }}</span></p>
+        <p><strong>Fecha de Reporte:</strong> <span>{{ detalleReporte.fecha | date:'dd/MM/yyyy' }}</span></p>
+        <p><strong>Estado:</strong>
+          <span *ngIf="detalleReporte.estado === 'pendiente'" class="status pending">Pendiente</span>
+          <span *ngIf="detalleReporte.estado === 'asignado'" class="status medium">Asignado</span>
+          <span *ngIf="detalleReporte.estado === 'completado'" class="status active">Completado</span>
+        </p>
+        <p><strong>Usuario que reporta:</strong>
+          <span>{{ detalleReporte.usuario != null ? detalleReporte.usuario.nombres + ' ' + detalleReporte.usuario.apellidos : 'Anónimo' }}</span>
+        </p>
+      </div>
+      <div style="background: #fff; padding: 1rem; border: 1px solid #dee2e6; border-radius: 8px;">
+        <h4 style="color: var(--primary-color); margin-bottom: 1rem;">Descripción Completa del Reporte</h4>
+        <pre style="white-space: pre-wrap; font-family: inherit;">{{ detalleReporte.descripcion }}</pre>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+        <a href="#" class="btn-primary" (click)="$event.preventDefault(); cerrarModal('detalleReporteModal')"
+          style="text-decoration: none; text-align: center;">Cerrar</a>
+      </div>
+    </div>
+  </div>
+</div>

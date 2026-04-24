@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Publicacion } from './entities/publicacion.entity';
@@ -87,14 +87,20 @@ export class PublicacionesService {
     return publicacion;
   }
 
-  async update(id: number, updatePublicacionDto: UpdatePublicacionDto): Promise<Publicacion> {
+  async update(id: number, updatePublicacionDto: UpdatePublicacionDto, authUserId: number): Promise<Publicacion> {
     const publicacion = await this.findOne(id);
+    if (publicacion.idUsuario !== authUserId) {
+      throw new ForbiddenException('No tienes permisos para editar esta publicación');
+    }
     Object.assign(publicacion, updatePublicacionDto);
     return this.publicacionesRepository.save(publicacion);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number, authUserId: number): Promise<void> {
     const publicacion = await this.findOne(id);
+    if (publicacion.idUsuario !== authUserId) {
+      throw new ForbiddenException('No tienes permisos para eliminar esta publicación');
+    }
     await this.publicacionesRepository.remove(publicacion);
   }
 

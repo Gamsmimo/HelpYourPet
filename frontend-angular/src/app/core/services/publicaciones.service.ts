@@ -35,9 +35,8 @@ export class PublicacionesService {
     );
   }
 
-  createPublicacion(idUsuario: number, contenido: string, imagen?: string): Observable<any> {
+  createPublicacion(contenido: string, imagen?: string): Observable<any> {
     const data: any = {
-      idUsuario: Number(idUsuario),
       contenido,
       ...(imagen && { imagen })
     };

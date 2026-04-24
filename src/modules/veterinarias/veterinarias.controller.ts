@@ -1,5 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Body, Patch, Param, Delete,
+  ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { VeterinariasService } from './veterinarias.service';
 import { CreateVeterinariaDto } from './dto/create-veterinaria.dto';
 import { UpdateVeterinariaDto } from './dto/update-veterinaria.dto';
@@ -9,6 +15,39 @@ import { Veterinaria } from './entities/veterinaria.entity';
 @Controller('veterinarias')
 export class VeterinariasController {
   constructor(private readonly veterinariasService: VeterinariasService) {}
+
+  @Post('upload-foto')
+  @ApiOperation({ summary: 'Subir foto de veterinaria. Devuelve { fotoUrl } con la URL relativa del archivo.' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('foto', {
+      storage: diskStorage({
+        destination: './uploads/veterinarias',
+        filename: (_req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `vet-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        const allowed = /jpeg|jpg|png|gif|webp/;
+        const ext = allowed.test(extname(file.originalname).toLowerCase());
+        const mime = allowed.test(file.mimetype);
+        if (ext && mime) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('Solo se permiten imágenes (jpeg, jpg, png, gif, webp)'), false);
+        }
+      },
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    }),
+  )
+  uploadFoto(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No se recibió ningún archivo');
+    }
+    const fotoUrl = `/uploads/veterinarias/${file.filename}`;
+    return { fotoUrl };
+  }
 
   @Post()
   @ApiOperation({ summary: 'Crear nueva veterinaria' })

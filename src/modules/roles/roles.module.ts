@@ -7,9 +7,10 @@ import { RolesManagementController } from './roles-management.controller';
 import { RoleSeed } from './seeds/role.seed';
 import { Rol } from './entities/rol.entity';
 import { UsuariosModule } from '../usuarios/usuarios.module';
+import { PerfilVeterinario } from '../perfil-veterinario/entities/perfil-veterinario.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Rol]), UsuariosModule],
+  imports: [TypeOrmModule.forFeature([Rol, PerfilVeterinario]), UsuariosModule],
   controllers: [RolesController, RolesManagementController],
   providers: [RolesService, RolesManagementService, RoleSeed],
   exports: [RolesService, TypeOrmModule],

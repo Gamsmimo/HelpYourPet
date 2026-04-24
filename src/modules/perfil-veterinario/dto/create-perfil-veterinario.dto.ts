@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsOptional, Min } from 'class-validator';
+import { IsString, IsInt, IsOptional, Min, IsBoolean } from 'class-validator';
 
 export class CreatePerfilVeterinarioDto {
   @ApiProperty({ description: 'Especialidad del veterinario', example: 'Cirugía', required: false })
@@ -13,12 +13,22 @@ export class CreatePerfilVeterinarioDto {
   @Min(0)
   experiencia?: number;
 
-  @ApiProperty({ description: 'Licencia profesional', example: 'VET-12345', required: false })
+  @ApiProperty({ description: 'Tarjeta profesional', example: 'TP-12345', required: false })
   @IsOptional()
   @IsString()
-  licencia?: string;
+  tarjetaProfesional?: string;
+
+  @ApiProperty({ description: 'Estado activo del veterinario', example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  estado?: boolean;
 
   @ApiProperty({ description: 'ID del usuario' })
   @IsInt()
   idUsuario: number;
+
+  @ApiProperty({ description: 'ID de la veterinaria asociada', required: false })
+  @IsOptional()
+  @IsInt()
+  idVeterinaria?: number;
 }

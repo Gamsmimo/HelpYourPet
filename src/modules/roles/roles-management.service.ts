@@ -1,11 +1,17 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { CreateVeterinarioDto } from './dto/create-veterinario.dto';
+import { Usuario } from '../usuarios/entities/usuario.entity';
+import { PerfilVeterinario } from '../perfil-veterinario/entities/perfil-veterinario.entity';
 
 @Injectable()
 export class RolesManagementService {
   constructor(
     private usuariosService: UsuariosService,
+    @InjectRepository(PerfilVeterinario)
+    private perfilVeterinarioRepository: Repository<PerfilVeterinario>,
   ) {}
 
   /**
@@ -53,7 +59,7 @@ export class RolesManagementService {
     }
 
     // Crear usuario con rol de veterinario
-    // Nota: No hacer hash aquí porque usuariosService.create() ya lo hace
+    // Texto plano: UsuariosService.create() ya aplica bcrypt una vez (no doble-hash).
     const usuario = await this.usuariosService.create({
       nombres: veterinarioData.nombres,
       apellidos: veterinarioData.apellidos,
@@ -62,16 +68,23 @@ export class RolesManagementService {
       num_documento: veterinarioData.num_documento,
       telefono: veterinarioData.telefono,
       direccion: veterinarioData.direccion || '',
-      tipo_documento: 'CC' as any,
-      edad: 18,
+      tipo_documento: (veterinarioData.tipo_documento || 'CC') as any,
+      edad: veterinarioData.edad || 18,
       rol_id: rolVeterinario.id,
       activo: true,
     });
 
-    // Si tiene veterinaria asignada, crear la relación
-    if (veterinarioData.idVeterinaria) {
-      await this.createVeterinariaVeterinario(usuario.id, Number(veterinarioData.idVeterinaria));
-    }
+    // Crear perfil de veterinario
+    const perfilVeterinario = this.perfilVeterinarioRepository.create({
+      idUsuario: usuario.id,
+      especialidad: veterinarioData.especialidad || '',
+      tarjetaProfesional: veterinarioData.tarjetaProfesional || '',
+      experiencia: veterinarioData.experiencia || 0,
+      estado: veterinarioData.estado ?? true,
+      idVeterinaria: veterinarioData.idVeterinaria || null,
+    });
+
+    await this.perfilVeterinarioRepository.save(perfilVeterinario);
 
     return {
       message: 'Veterinario creado exitosamente',

@@ -13,6 +13,7 @@ import compression from 'compression';
 import * as path from 'path';
 import { initializeTracing } from './monitoring/tracing';
 import { PrometheusService } from './monitoring/prometheus.service';
+import { json, urlencoded } from 'express';
 
 // Inicializar tracing
 const sdk = initializeTracing();
@@ -20,6 +21,7 @@ const sdk = initializeTracing();
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger,
+    bodyParser: false,
   });
 
   const configService = app.get(ConfigService);
@@ -38,6 +40,9 @@ async function bootstrap() {
   });
 
   // Middleware
+  // Permite publicaciones con imagen en base64 sin topar el limite por defecto (~100kb)
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
   app.use(compression());
   
   // Configuración

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacionDto } from './dto/create-publicacion.dto';
@@ -8,6 +8,9 @@ import { CreateReaccionDto } from './dto/create-reaccion.dto';
 import { Publicacion } from './entities/publicacion.entity';
 import { Comentario } from './entities/comentario.entity';
 import { Public } from '../auth/decorators/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @ApiTags('publicaciones')
 @Controller('publicaciones')
@@ -44,9 +47,16 @@ export class PublicacionesController {
   @Post()
   @ApiOperation({ summary: 'Crear nueva publicación' })
   @ApiResponse({ status: 201, description: 'Publicación creada', type: Publicacion })
-  create(@Body() createPublicacionDto: CreatePublicacionDto) {
-    const { idUsuario, ...resto } = createPublicacionDto;
-    return this.publicacionesService.create(idUsuario, resto);
+  @UseGuards(RolesGuard)
+  @Roles('USUARIO', 'VETERINARIO')
+  @ApiBearerAuth('JWT-auth')
+  create(
+    @GetUser('id') authUserId: number,
+    @Body() createPublicacionDto: CreatePublicacionDto,
+  ) {
+    const resto = { ...createPublicacionDto };
+    delete resto.idUsuario;
+    return this.publicacionesService.create(authUserId, resto);
   }
 
   @Public()
@@ -77,20 +87,28 @@ export class PublicacionesController {
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar publicación' })
   @ApiResponse({ status: 200, description: 'Publicación actualizada', type: Publicacion })
+  @UseGuards(RolesGuard)
+  @Roles('USUARIO', 'VETERINARIO')
   @ApiBearerAuth('JWT-auth')
   update(
     @Param('id', ParseIntPipe) id: number,
+    @GetUser('id') authUserId: number,
     @Body() updatePublicacionDto: UpdatePublicacionDto,
   ) {
-    return this.publicacionesService.update(id, updatePublicacionDto);
+    return this.publicacionesService.update(id, updatePublicacionDto, authUserId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar publicación' })
   @ApiResponse({ status: 200, description: 'Publicación eliminada' })
+  @UseGuards(RolesGuard)
+  @Roles('USUARIO', 'VETERINARIO')
   @ApiBearerAuth('JWT-auth')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.publicacionesService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser('id') authUserId: number,
+  ) {
+    return this.publicacionesService.remove(id, authUserId);
   }
 
   @Post(':id/likes')
