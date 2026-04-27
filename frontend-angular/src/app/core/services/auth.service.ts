@@ -5,6 +5,7 @@ import { Observable, tap, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginDto, RegisterDto, AuthResponse, User } from '../models/user.model';
 import { jwtDecode } from 'jwt-decode';
+import { APP_PATHS, ROLE_HOME_PATH } from '../constants/app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -15,16 +16,7 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
 
   private getModuleRouteByRole(role: number): string {
-    switch (role) {
-      case 1:
-        return '/admin';
-      case 2:
-        return '/veterinario';
-      case 3:
-        return '/usuario';
-      default:
-        return '/';
-    }
+    return ROLE_HOME_PATH[role] ?? `/${APP_PATHS.LOGIN}`;
   }
 
   private logLoginModuleData(source: 'login' | 'register'): void {
@@ -80,7 +72,7 @@ export class AuthService {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
-    this.router.navigate(['/login']);
+    this.router.navigate([`/${APP_PATHS.LOGIN}`]);
   }
 
   getToken(): string | null {

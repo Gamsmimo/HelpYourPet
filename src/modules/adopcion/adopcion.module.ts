@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AdopcionController } from './adopcion.controller';
-import { AdopcionService } from './adopcion.service';
+import { AdopcionController } from './controllers/adopcion.controller';
+import { AdopcionService } from './services/adopcion.service';
 import { Adopcion } from './entities/adopcion.entity';
 
 @Module({
@@ -11,3 +11,4 @@ import { Adopcion } from './entities/adopcion.entity';
   exports: [AdopcionService, TypeOrmModule],
 })
 export class AdopcionModule {}
+

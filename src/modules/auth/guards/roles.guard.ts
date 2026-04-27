@@ -15,8 +15,26 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
-    
+
     const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.nombreRol === role);
+    if (!user) {
+      return false;
+    }
+
+    const normalizedRequiredRoles = requiredRoles.map((role) => role.toUpperCase());
+    const normalizedUserRole = (user.nombreRol || '').toUpperCase();
+
+    // Respaldo por idRol para evitar fallos por capitalizacion o tokens antiguos
+    const roleById: Record<number, string> = {
+      1: 'ADMIN',
+      2: 'VETERINARIO',
+      3: 'USUARIO',
+    };
+    const normalizedUserRoleById = roleById[Number(user.idRol)] || '';
+
+    return normalizedRequiredRoles.some(
+      (requiredRole) =>
+        normalizedUserRole === requiredRole || normalizedUserRoleById === requiredRole,
+    );
   }
 }

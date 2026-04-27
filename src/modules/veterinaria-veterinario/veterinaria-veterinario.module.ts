@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VeterinariaVeterinarioController } from './veterinaria-veterinario.controller';
-import { VeterinariaVeterinarioService } from './veterinaria-veterinario.service';
+import { VeterinariaVeterinarioController } from './controllers/veterinaria-veterinario.controller';
+import { VeterinariaVeterinarioService } from './services/veterinaria-veterinario.service';
 import { VeterinariaVeterinario } from './entities/veterinaria-veterinario.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { VeterinariaVeterinario } from './entities/veterinaria-veterinario.entit
   exports: [VeterinariaVeterinarioService, TypeOrmModule],
 })
 export class VeterinariaVeterinarioModule {}
+
+

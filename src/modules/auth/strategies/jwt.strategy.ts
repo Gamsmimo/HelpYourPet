@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+﻿import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-import { UsuariosService } from '../../usuarios/usuarios.service';
+import { UsuariosService } from '../../usuarios/services/usuarios.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const usuario = await this.usuariosService.findOne(payload.sub);
     
     if (!usuario) {
-      throw new UnauthorizedException('Token inválido');
+      throw new UnauthorizedException('Token invÃ¡lido');
     }
 
     if (!usuario.estado) {
@@ -37,3 +37,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     };
   }
 }
+

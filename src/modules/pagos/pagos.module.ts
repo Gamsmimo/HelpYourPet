@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PagosController } from './pagos.controller';
-import { PagosService } from './pagos.service';
+import { PagosController } from './controllers/pagos.controller';
+import { PagosService } from './services/pagos.service';
 import { Pago } from './entities/pago.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { Pago } from './entities/pago.entity';
   exports: [PagosService, TypeOrmModule],
 })
 export class PagosModule {}
+
+

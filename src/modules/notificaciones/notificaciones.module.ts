@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NotificacionesController } from './notificaciones.controller';
-import { NotificacionesService } from './notificaciones.service';
+import { NotificacionesController } from './controllers/notificaciones.controller';
+import { NotificacionesService } from './services/notificaciones.service';
 import { Notificacion } from './entities/notificacion.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { Notificacion } from './entities/notificacion.entity';
   exports: [NotificacionesService, TypeOrmModule],
 })
 export class NotificacionesModule {}
+
+

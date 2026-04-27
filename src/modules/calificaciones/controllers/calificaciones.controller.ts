@@ -1,0 +1,61 @@
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { CalificacionesService } from '../services/calificaciones.service';
+import { CreateCalificacionDto } from '../dto/create-calificacion.dto';
+import { UpdateCalificacionDto } from '../dto/update-calificacion.dto';
+import { Calificacion } from '../entities/calificacion.entity';
+
+@ApiTags('calificaciones')
+@Controller('calificaciones')
+export class CalificacionesController {
+  constructor(private readonly calificacionesService: CalificacionesService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Crear nueva calificaciÃ³n' })
+  @ApiResponse({ status: 201, description: 'CalificaciÃ³n creada', type: Calificacion })
+  @ApiBearerAuth('JWT-auth')
+  create(@Body() createCalificacionDto: CreateCalificacionDto) {
+    return this.calificacionesService.create(createCalificacionDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Listar todas las calificaciones' })
+  @ApiResponse({ status: 200, description: 'Lista de calificaciones', type: [Calificacion] })
+  findAll() {
+    return this.calificacionesService.findAll();
+  }
+
+  @Get('veterinaria/:idVeterinaria')
+  @ApiOperation({ summary: 'Listar calificaciones de una veterinaria' })
+  @ApiResponse({ status: 200, description: 'Lista de calificaciones filtradas', type: [Calificacion] })
+  findByVeterinaria(@Param('idVeterinaria', ParseIntPipe) idVeterinaria: number) {
+    return this.calificacionesService.findByVeterinaria(idVeterinaria);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener calificaciÃ³n por ID' })
+  @ApiResponse({ status: 200, description: 'CalificaciÃ³n encontrada', type: Calificacion })
+  @ApiResponse({ status: 404, description: 'CalificaciÃ³n no encontrada' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.calificacionesService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar calificaciÃ³n' })
+  @ApiResponse({ status: 200, description: 'CalificaciÃ³n actualizada', type: Calificacion })
+  @ApiBearerAuth('JWT-auth')
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateCalificacionDto: UpdateCalificacionDto) {
+    return this.calificacionesService.update(id, updateCalificacionDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar calificaciÃ³n' })
+  @ApiResponse({ status: 200, description: 'CalificaciÃ³n eliminada' })
+  @ApiBearerAuth('JWT-auth')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.calificacionesService.remove(id);
+  }
+}
+
+
+

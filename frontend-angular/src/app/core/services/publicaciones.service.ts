@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+import { catchError, map, timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import {
+  PublicacionApi,
+  PublicacionComentarioApi,
+  PublicacionReaccionApi,
+} from '../models/publicaciones.model';
 
 @Injectable({
   providedIn: 'root'
@@ -35,33 +40,52 @@ export class PublicacionesService {
     );
   }
 
-  createPublicacion(contenido: string, imagen?: string): Observable<any> {
-    const data: any = {
+  createPublicacion(contenido: string, imagen?: string): Observable<PublicacionApi> {
+    const data: { contenido: string; imagen?: string } = {
       contenido,
-      ...(imagen && { imagen })
+      ...(imagen && { imagen }),
     };
     console.log('Enviando publicación:', data);
-    return this.withTimeout(this.http.post(this.apiUrl, data));
+    return this.withTimeout(this.http.post<PublicacionApi>(this.apiUrl, data));
   }
 
-  getPublicacionesByUsuario(idUsuario: number): Observable<any[]> {
-    return this.withTimeout(this.http.get<any[]>(`${this.apiUrl}/usuario/${idUsuario}`));
+  getPublicacionesByUsuario(
+    idUsuario: number,
+  ): Observable<PublicacionApi[]> {
+    return this.withTimeout(
+      this.http
+        .get<PublicacionApi[] | { data?: PublicacionApi[] }>(
+          `${this.apiUrl}/usuario/${idUsuario}`,
+        )
+        .pipe(
+          map((response) =>
+            Array.isArray(response)
+              ? response
+              : Array.isArray(response?.data)
+                ? response.data
+                : [],
+          ),
+        ),
+    );
   }
 
-  getAllPublicaciones(): Observable<any[]> {
-    return this.withTimeout(this.http.get<any[]>(this.apiUrl));
+  getAllPublicaciones(): Observable<PublicacionApi[]> {
+    return this.withTimeout(this.http.get<PublicacionApi[]>(this.apiUrl));
   }
 
-  getPublicacionById(id: number): Observable<any> {
-    return this.withTimeout(this.http.get<any>(`${this.apiUrl}/${id}`));
+  getPublicacionById(id: number): Observable<PublicacionApi> {
+    return this.withTimeout(this.http.get<PublicacionApi>(`${this.apiUrl}/${id}`));
   }
 
-  updatePublicacion(id: number, data: any): Observable<any> {
-    return this.withTimeout(this.http.patch(`${this.apiUrl}/${id}`, data));
+  updatePublicacion(
+    id: number,
+    data: Partial<Pick<PublicacionApi, 'contenido' | 'imagen'>>,
+  ): Observable<PublicacionApi> {
+    return this.withTimeout(this.http.patch<PublicacionApi>(`${this.apiUrl}/${id}`, data));
   }
 
-  deletePublicacion(id: number): Observable<any> {
-    return this.withTimeout(this.http.delete(`${this.apiUrl}/${id}`));
+  deletePublicacion(id: number): Observable<void> {
+    return this.withTimeout(this.http.delete<void>(`${this.apiUrl}/${id}`));
   }
 
   incrementarLikes(id: number): Observable<any> {
@@ -74,19 +98,25 @@ export class PublicacionesService {
 
   // ==================== COMENTARIOS ====================
 
-  createComentario(idPublicacion: number, idUsuario: number, contenido: string): Observable<any> {
+  createComentario(
+    idPublicacion: number,
+    idUsuario: number,
+    contenido: string,
+  ): Observable<PublicacionComentarioApi> {
     return this.withTimeout(
-      this.http.post(`${this.apiUrl}/comentarios`, {
+      this.http.post<PublicacionComentarioApi>(`${this.apiUrl}/comentarios`, {
         idPublicacion,
         idUsuario,
-        contenido
+        contenido,
       }),
     );
   }
 
-  getComentarios(idPublicacion: number): Observable<any[]> {
+  getComentarios(idPublicacion: number): Observable<PublicacionComentarioApi[]> {
     return this.withTimeout(
-      this.http.get<any[]>(`${this.apiUrl}/${idPublicacion}/comentarios/list`),
+      this.http.get<PublicacionComentarioApi[]>(
+        `${this.apiUrl}/${idPublicacion}/comentarios/list`,
+      ),
     );
   }
 
@@ -105,8 +135,10 @@ export class PublicacionesService {
     );
   }
 
-  getReacciones(idPublicacion: number): Observable<any[]> {
-    return this.withTimeout(this.http.get<any[]>(`${this.apiUrl}/${idPublicacion}/reacciones`));
+  getReacciones(idPublicacion: number): Observable<PublicacionReaccionApi[]> {
+    return this.withTimeout(
+      this.http.get<PublicacionReaccionApi[]>(`${this.apiUrl}/${idPublicacion}/reacciones`),
+    );
   }
 
   checkUserReaction(idPublicacion: number, idUsuario: number): Observable<boolean> {

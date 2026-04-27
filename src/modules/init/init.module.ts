@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InitService } from './init.service';
+import { InitService } from './services/init.service';
 import { Rol } from '../roles/entities/rol.entity';
 
 @Module({
@@ -9,3 +9,5 @@ import { Rol } from '../roles/entities/rol.entity';
   exports: [InitService],
 })
 export class InitModule {}
+
+

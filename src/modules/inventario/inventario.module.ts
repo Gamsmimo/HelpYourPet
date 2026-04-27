@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InventarioController } from './inventario.controller';
-import { InventarioService } from './inventario.service';
+import { InventarioController } from './controllers/inventario.controller';
+import { InventarioService } from './services/inventario.service';
 import { Inventario } from './entities/inventario.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { Inventario } from './entities/inventario.entity';
   exports: [InventarioService, TypeOrmModule],
 })
 export class InventarioModule {}
+
+

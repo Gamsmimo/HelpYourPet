@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReportesMaltratoController } from './reportes-maltrato.controller';
-import { ReportesMaltratoService } from './reportes-maltrato.service';
+import { ReportesMaltratoController } from './controllers/reportes-maltrato.controller';
+import { ReportesMaltratoService } from './services/reportes-maltrato.service';
 import { ReporteMaltrato } from './entities/reporte-maltrato.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { ReporteMaltrato } from './entities/reporte-maltrato.entity';
   exports: [ReportesMaltratoService, TypeOrmModule],
 })
 export class ReportesMaltratoModule {}
+
+

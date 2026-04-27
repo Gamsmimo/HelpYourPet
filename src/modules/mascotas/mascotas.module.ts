@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MascotasController } from './mascotas.controller';
-import { MascotasService } from './mascotas.service';
+import { MascotasController } from './controllers/mascotas.controller';
+import { MascotasService } from './services/mascotas.service';
 import { Mascota } from './entities/mascota.entity';
 
 @Module({
@@ -11,3 +11,4 @@ import { Mascota } from './entities/mascota.entity';
   exports: [MascotasService, TypeOrmModule],
 })
 export class MascotasModule {}
+

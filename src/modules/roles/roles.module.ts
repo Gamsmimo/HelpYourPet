@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RolesService } from './roles.service';
-import { RolesController } from './roles.controller';
-import { RolesManagementService } from './roles-management.service';
-import { RolesManagementController } from './roles-management.controller';
+import { RolesService } from './services/roles.service';
+import { RolesController } from './controllers/roles.controller';
+import { RolesManagementService } from './management/services/roles-management.service';
+import { RolesManagementController } from './management/controllers/roles-management.controller';
 import { RoleSeed } from './seeds/role.seed';
 import { Rol } from './entities/rol.entity';
 import { UsuariosModule } from '../usuarios/usuarios.module';
@@ -16,3 +16,5 @@ import { PerfilVeterinario } from '../perfil-veterinario/entities/perfil-veterin
   exports: [RolesService, TypeOrmModule],
 })
 export class RolesModule {}
+
+

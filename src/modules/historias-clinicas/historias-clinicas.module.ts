@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HistoriasClinicasController } from './historias-clinicas.controller';
-import { HistoriasClinicasService } from './historias-clinicas.service';
+import { HistoriasClinicasController } from './controllers/historias-clinicas.controller';
+import { HistoriasClinicasService } from './services/historias-clinicas.service';
 import { HistoriaClinica } from './entities/historia-clinica.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { HistoriaClinica } from './entities/historia-clinica.entity';
   exports: [HistoriasClinicasService, TypeOrmModule],
 })
 export class HistoriasClinicasModule {}
+
+

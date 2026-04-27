@@ -8,32 +8,14 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { environment } from '../../../../environments/environment';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-
-interface Publicacion {
-  id: number;
-  usuario: {
-    nombre: string;
-    avatar: string;
-  };
-  contenido: string;
-  imagen?: string;
-  fecha: Date;
-  likes: number;
-  comentarios: Comentario[];
-  compartidos: number;
-  likedByUser: boolean;
-  mostrarComentarios: boolean;
-}
-
-interface Comentario {
-  id: number;
-  usuario: {
-    nombre: string;
-    avatar: string;
-  };
-  contenido: string;
-  fecha: Date;
-}
+import {
+  ComentarioFeed,
+  PublicacionApi,
+  PublicacionComentarioApi,
+  PublicacionFeed,
+  PublicacionReaccionApi,
+} from '../../../core/models/publicaciones.model';
+import { APP_PATHS } from '../../../core/constants/app.constants';
 
 @Component({
   selector: 'app-inicio-usuario',
@@ -44,7 +26,7 @@ interface Comentario {
 })
 export class InicioUsuarioComponent implements OnInit, OnDestroy {
   usuarioLogueado: any = null;
-  publicaciones: Publicacion[] = [];
+  publicaciones: PublicacionFeed[] = [];
   nuevaPublicacion: string = '';
   imagenSeleccionada: File | null = null;
   imagenPreview: string | null = null;
@@ -68,9 +50,10 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     
     // Suscribirse a eventos de navegación para recargar cuando se vuelve a esta ruta
     this.navigationSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        if (event.url === '/usuario' || event.urlAfterRedirects === '/usuario') {
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        const usuarioPath = `/${APP_PATHS.USUARIO}`;
+        if (event.url === usuarioPath || event.urlAfterRedirects === usuarioPath) {
           this.inicializarDatos();
         }
       });
@@ -143,29 +126,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     this.publicacionesService.getAllPublicaciones().subscribe({
       next: (data) => {
         console.log('Publicaciones cargadas:', data);
-        this.publicaciones = data.map(pub => ({
-          id: pub.id,
-          usuario: {
-            nombre: pub.usuario?.nombres || 'Usuario',
-            avatar: this.buildAvatarUrl(pub.usuario?.imagen, pub.usuario?.nombres)
-          },
-          contenido: pub.contenido,
-          imagen: pub.imagen,
-          fecha: new Date(pub.createdAt),
-          likes: pub.reaccionesData?.length || pub.likes || 0,
-          comentarios: (pub.comentariosData || []).map((c: any) => ({
-            id: c.id,
-            usuario: {
-              nombre: c.usuario?.nombres || 'Usuario',
-              avatar: this.buildAvatarUrl(c.usuario?.imagen, c.usuario?.nombres)
-            },
-            contenido: c.contenido,
-            fecha: new Date(c.createdAt)
-          })),
-          compartidos: 0,
-          likedByUser: this.checkIfUserLiked(pub.reaccionesData || []),
-          mostrarComentarios: false
-        }));
+        this.publicaciones = data.map((pub) => this.mapPublicacionApiToFeed(pub));
         this.isLoadingPublicaciones = false;
         // Forzar detección de cambios para actualizar la vista
         this.cdr.detectChanges();
@@ -206,13 +167,14 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
     if (file) {
       this.imagenSeleccionada = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imagenPreview = e.target.result;
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.imagenPreview = (e.target?.result as string) || null;
       };
       reader.readAsDataURL(file);
     }
@@ -232,8 +194,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
       
       // Enviar al backend
       this.publicacionesService.createPublicacion(this.nuevaPublicacion, this.imagenPreview || undefined).subscribe({
-        next: (data) => {
-          console.log('Publicación creada:', data);
+        next: () => {
           // Limpiar el formulario
           this.nuevaPublicacion = '';
           this.eliminarImagen();
@@ -248,7 +209,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     }
   }
 
-  darLike(publicacion: Publicacion): void {
+  darLike(publicacion: PublicacionFeed): void {
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
     if (!userId) {
       alert('Debes iniciar sesión para dar like');
@@ -267,11 +228,11 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleComentarios(publicacion: Publicacion): void {
+  toggleComentarios(publicacion: PublicacionFeed): void {
     publicacion.mostrarComentarios = !publicacion.mostrarComentarios;
   }
 
-  agregarComentario(publicacion: Publicacion): void {
+  agregarComentario(publicacion: PublicacionFeed): void {
     const contenido = this.nuevoComentario[publicacion.id];
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
     
@@ -283,7 +244,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     if (contenido && contenido.trim()) {
       this.publicacionesService.createComentario(publicacion.id, userId, contenido.trim()).subscribe({
         next: (comentarioCreado) => {
-          const nuevoComentario: Comentario = {
+          const nuevoComentario: ComentarioFeed = {
             id: comentarioCreado.id,
             usuario: {
               nombre: comentarioCreado.usuario?.nombres || this.usuarioLogueado?.nombres || 'Usuario',
@@ -304,7 +265,7 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
     }
   }
 
-  compartir(publicacion: Publicacion): void {
+  compartir(publicacion: PublicacionFeed): void {
     publicacion.compartidos++;
     // Aquí podrías implementar lógica para compartir
     alert('¡Publicación compartida!');
@@ -329,23 +290,55 @@ export class InicioUsuarioComponent implements OnInit, OnDestroy {
 
   irAPerfil(): void {
     this.menuAbierto = false;
-    this.router.navigate(['/usuario/perfil']);
+    this.router.navigate([`/${APP_PATHS.USUARIO}/perfil`]);
   }
 
   irATienda(): void {
     this.menuAbierto = false;
-    this.router.navigate(['/tienda']);
+    this.router.navigate([`/${APP_PATHS.TIENDA}`]);
   }
 
   irAAdopciones(): void {
     this.menuAbierto = false;
-    this.router.navigate(['/adopcion']);
+    this.router.navigate([`/${APP_PATHS.ADOPCION}`]);
   }
 
-  private checkIfUserLiked(reacciones: any[]): boolean {
+  private checkIfUserLiked(reacciones: PublicacionReaccionApi[]): boolean {
     const userId = this.usuarioLogueado?.id || this.usuarioLogueado?.id_usuario;
     if (!userId || !reacciones) return false;
     return reacciones.some(r => r.idUsuario === userId);
+  }
+
+  private mapComentarioApiToFeed(comentario: PublicacionComentarioApi): ComentarioFeed {
+    return {
+      id: comentario.id,
+      usuario: {
+        nombre: comentario.usuario?.nombres || 'Usuario',
+        avatar: this.buildAvatarUrl(comentario.usuario?.imagen, comentario.usuario?.nombres),
+      },
+      contenido: comentario.contenido,
+      fecha: new Date(comentario.createdAt),
+    };
+  }
+
+  private mapPublicacionApiToFeed(pub: PublicacionApi): PublicacionFeed {
+    return {
+      id: pub.id,
+      usuario: {
+        nombre: pub.usuario?.nombres || 'Usuario',
+        avatar: this.buildAvatarUrl(pub.usuario?.imagen, pub.usuario?.nombres),
+      },
+      contenido: pub.contenido,
+      imagen: pub.imagen || undefined,
+      fecha: new Date(pub.createdAt),
+      likes: pub.reaccionesData?.length || pub.likes || 0,
+      comentarios: (pub.comentariosData || []).map((comentario) =>
+        this.mapComentarioApiToFeed(comentario),
+      ),
+      compartidos: 0,
+      likedByUser: this.checkIfUserLiked(pub.reaccionesData || []),
+      mostrarComentarios: false,
+    };
   }
 
   private buildAvatarUrl(imagen: string | null | undefined, nombre: string | null | undefined): string {

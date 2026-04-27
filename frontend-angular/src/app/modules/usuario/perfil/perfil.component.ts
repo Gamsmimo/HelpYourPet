@@ -9,6 +9,7 @@ import { AdopcionService } from '../../../core/services/adopcion.service';
 import { PublicacionesService } from '../../../core/services/publicaciones.service';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import { PublicacionApi, PublicacionPerfil } from '../../../core/models/publicaciones.model';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   compras: any[] = [];
   citas: any[] = [];
   adopciones: any[] = [];
-  publicaciones: any[] = [];
+  publicaciones: PublicacionPerfil[] = [];
 
   // Modales
   showAddPetModal = false;
@@ -312,17 +313,17 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     console.log('[PERFIL] Iniciando HTTP GET publicaciones');
     this.publicacionesSubscription = this.publicacionesService.getPublicacionesByUsuario(userId).subscribe({
-      next: (data: any) => {
+      next: (data: PublicacionApi[]) => {
         if (this.publicacionesTimeoutId) {
           clearTimeout(this.publicacionesTimeoutId);
           this.publicacionesTimeoutId = null;
         }
-        const publicacionesRaw = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        const publicacionesRaw = Array.isArray(data) ? data : [];
         console.log('[PERFIL] HTTP GET publicaciones EXITOSO. Recibidas:', publicacionesRaw.length);
         try {
           this.publicaciones = (publicacionesRaw || [])
-            .filter((pub: any) => !!pub)
-            .map((pub: any) => ({
+            .filter((pub): pub is PublicacionApi => !!pub)
+            .map((pub) => ({
               id: pub.id,
               contenido: pub.contenido || '',
               imagen: pub.imagen || '',

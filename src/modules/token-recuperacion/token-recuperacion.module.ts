@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TokenRecuperacionController } from './token-recuperacion.controller';
-import { TokenRecuperacionService } from './token-recuperacion.service';
+import { TokenRecuperacionController } from './controllers/token-recuperacion.controller';
+import { TokenRecuperacionService } from './services/token-recuperacion.service';
 import { TokenRecuperacion } from './entities/token-recuperacion.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { TokenRecuperacion } from './entities/token-recuperacion.entity';
   exports: [TokenRecuperacionService, TypeOrmModule],
 })
 export class TokenRecuperacionModule {}
+
+

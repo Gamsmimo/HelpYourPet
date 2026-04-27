@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EventosController } from './eventos.controller';
-import { EventosService } from './eventos.service';
+import { EventosController } from './controllers/eventos.controller';
+import { EventosService } from './services/eventos.service';
 import { Evento } from './entities/evento.entity';
 
 @Module({
@@ -11,3 +11,5 @@ import { Evento } from './entities/evento.entity';
   exports: [EventosService, TypeOrmModule],
 })
 export class EventosModule {}
+
+
