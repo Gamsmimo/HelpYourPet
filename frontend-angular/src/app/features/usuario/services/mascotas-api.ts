@@ -1,0 +1,31 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
+@Injectable({ providedIn: 'root' })
+export class MascotasApiService {
+  private http = inject(HttpClient);
+  private apiUrl = environment.apiUrl;
+
+  getAll(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/mascotas`);
+  }
+
+  getById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/mascotas/${id}`);
+  }
+
+  create(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/mascotas`, payload);
+  }
+
+  update(id: number, payload: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/mascotas/${id}`, payload);
+  }
+
+  remove(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/mascotas/${id}`);
+  }
+}
+

@@ -8,15 +8,12 @@ export const APP_PATHS = {
   ROOT: '',
   LOGIN: 'login',
   REGISTER: 'register',
-  RECOVERY: 'recovery',
-  RESET_PASSWORD: 'reset-password',
   ADMIN: 'admin',
   VETERINARIO: 'veterinario',
   USUARIO: 'usuario',
   ADOPCION: 'adopcion',
   TIENDA: 'tienda',
   SERVICIOS: 'servicios',
-  SOBRE_NOSOTROS: 'sobre-nosotros',
 } as const;
 
 export const ROLE_HOME_PATH: Record<number, string> = {
