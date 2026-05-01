@@ -37,11 +37,8 @@ export class AuthService {
   login(credentials: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap(response => {
-        this.setToken(response.access_token);
-        this.setUserFromToken(response.access_token);
-
-        // CORRECCIÓN: Si el backend devuelve el objeto user con datos completos,
-        // guardarlos inmediatamente en localStorage para que el perfil los tenga
+        // El token ahora se maneja con cookies httpOnly, no se guarda en localStorage
+        // Solo guardamos los datos del usuario
         if ((response as any).user) {
           this.updateUserData((response as any).user);
         }
@@ -54,10 +51,8 @@ export class AuthService {
   register(data: RegisterDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data).pipe(
       tap(response => {
-        this.setToken(response.access_token);
-        this.setUserFromToken(response.access_token);
-
-        // Guardar datos completos si el backend los devuelve
+        // El token ahora se maneja con cookies httpOnly, no se guarda en localStorage
+        // Solo guardamos los datos del usuario
         if ((response as any).user) {
           this.updateUserData((response as any).user);
         }
@@ -68,58 +63,51 @@ export class AuthService {
   }
 
   logout(): void {
+    // Llamar al endpoint de logout para limpiar la cookie en el servidor
+    this.http.post(`${this.apiUrl}/auth/logout`, {}).subscribe({
+      next: () => {
+        this.clearUserData();
+        this.router.navigate([`/${APP_PATHS.LOGIN}`]);
+      },
+      error: () => {
+        // Incluso si falla, limpiar datos locales y redirigir
+        this.clearUserData();
+        this.router.navigate([`/${APP_PATHS.LOGIN}`]);
+      }
+    });
+  }
+
+  clearUserData(): void {
     if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
-    this.router.navigate([`/${APP_PATHS.LOGIN}`]);
   }
 
   getToken(): string | null {
-    if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem('token');
-    }
+    // Ya no usamos localStorage para el token
+    // El token se maneja automáticamente via cookies httpOnly
     return null;
   }
 
   setToken(token: string): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('token', token);
-    }
+    // Ya no usamos localStorage para el token
+    // El token se maneja automáticamente via cookies httpOnly
   }
 
   setUserFromToken(token: string): void {
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const decoded: any = jwtDecode(token);
-        const user = {
-          id: decoded.sub,
-          correo: decoded.correo,
-          rol_id: decoded.idRol,
-          rol: decoded.nombreRol
-        };
-        localStorage.setItem('user', JSON.stringify(user));
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-    }
+    // Ya no decodificamos el token en el frontend
+    // Los datos del usuario vienen del backend en login/register
   }
 
   isAuthenticated(): boolean {
+    // Verificamos autenticación basándonos en si tenemos datos de usuario
+    // La cookie httpOnly se valida en el servidor
     if (typeof localStorage === 'undefined') {
       return false;
     }
     
-    const token = this.getToken();
-    if (!token) return false;
-    
-    try {
-      const decoded: any = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-      return decoded.exp > currentTime;
-    } catch {
-      return false;
-    }
+    const user = this.getUser();
+    return user !== null;
   }
 
   getUser(): any {

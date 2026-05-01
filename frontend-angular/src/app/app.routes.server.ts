@@ -10,14 +10,6 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'recovery',
-    renderMode: RenderMode.Prerender,
-  },
-  {
-    path: 'reset-password',
-    renderMode: RenderMode.Prerender,
-  },
-  {
     // Todas las rutas protegidas deben renderizarse solo en el cliente
     // para evitar que el SSR (sin localStorage) piense que el usuario no tiene sesión
     path: '**',

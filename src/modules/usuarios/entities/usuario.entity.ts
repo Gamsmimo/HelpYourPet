@@ -62,16 +62,7 @@ export class Usuario {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Rol, { eager: true })
+  @ManyToOne(() => Rol)
   @JoinColumn({ name: 'id_rol' })
   rol: Rol;
-
-  // Alias para compatibilidad con código existente
-  get activo(): boolean {
-    return this.estado;
-  }
-
-  set activo(value: boolean) {
-    this.estado = value;
-  }
 }

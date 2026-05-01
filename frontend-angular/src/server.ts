@@ -13,6 +13,22 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
+ * Content Security Policy middleware
+ */
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+    "connect-src 'self' http://localhost:3000 http://localhost:4200 http://localhost:4200/.well-known/appspecific/com.chrome.devtools.json ws://localhost:* wss://localhost:* https://*.googleapis.com https://*.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+    "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+    "img-src 'self' data: blob: https: http:;"
+  );
+  next();
+});
+
+/**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
  *

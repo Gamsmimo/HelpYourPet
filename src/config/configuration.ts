@@ -2,11 +2,11 @@ export default () => ({
   port: parseInt(process.env.PORT || '3000', 10),
   database: {
     host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
+    port: parseInt(process.env.DB_PORT || '5432', 10),
     username: process.env.DB_USERNAME || 'helppet',
     password: process.env.DB_PASSWORD || 'helppet123',
     database: process.env.DB_DATABASE || 'help_your_pet',
-    synchronize: process.env.NODE_ENV === 'development',
+    synchronize: process.env.NODE_ENV === 'development' && process.env.ALLOW_DB_SYNC === 'true',
     logging: process.env.NODE_ENV === 'development',
     extra: {
       connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
@@ -20,24 +20,30 @@ export default () => ({
   },
   cors: {
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        'http://localhost:3000',
-        'http://localhost:3001', 
-        'http://localhost:4200',
-        'http://localhost:60664'
-      ];
+      const frontendUrl = process.env.FRONTEND_URL;
       
-      // Permitir localhost y 127.0.0.1 en cualquier puerto
-      if (!origin || 
-          allowedOrigins.includes(origin) || 
-          origin.startsWith('http://localhost:') || 
-          origin.startsWith('http://127.0.0.1:')) {
-        callback(null, true);
+      // En desarrollo, permitir localhost en cualquier puerto
+      if (process.env.NODE_ENV === 'development') {
+        if (!origin || 
+            origin.startsWith('http://localhost:') || 
+            origin.startsWith('http://127.0.0.1:') ||
+            origin === frontendUrl) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
       } else {
-        callback(new Error('Not allowed by CORS'));
+        // En producción, solo permitir el origen específico
+        if (origin === frontendUrl) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info',

@@ -25,7 +25,7 @@ export class UsuariosService {
     const usuario = this.usuariosRepository.create({
       ...createUsuarioDto,
       password: hashedPassword,
-      estado: createUsuarioDto.estado ?? createUsuarioDto.activo ?? true,
+      estado: createUsuarioDto.estado ?? true,
     });
 
     return this.usuariosRepository.save(usuario);
